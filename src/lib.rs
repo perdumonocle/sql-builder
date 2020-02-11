@@ -1,5 +1,22 @@
 //! Simple SQL code generator.
 //!
+//! ## Usage
+//!
+//! To use `sql-builder`, first add this to your `Cargo.toml`:
+//!
+//! ```toml
+//! [dependencies]
+//! sql-builder = "0.1"
+//! ```
+//!
+//! Next, add this to your crate:
+//! 
+//! ```
+//! extern crate sql_builder;
+//!
+//! use sql_builder::SqlBuilder;
+//! ```
+//!
 //! # Examples:
 //!
 //! ```
