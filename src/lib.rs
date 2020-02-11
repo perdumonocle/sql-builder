@@ -47,7 +47,7 @@ pub struct SqlBuilder {
     distinct: bool,
     fields: Vec<String>,
     sets: Vec<String>,
-    values: Vec<String>,
+    values: Values,
     group_by: Vec<String>,
     having: Option<String>,
     wheres: Vec<String>,
@@ -64,6 +64,13 @@ enum Statement {
     DeleteFrom,
 }
 
+/// INSERT values
+enum Values {
+    Empty,
+    List(Vec<String>),
+    Select(String),
+}
+
 impl SqlBuilder {
     /// Default constructor for struct
     fn default() -> Self {
@@ -74,7 +81,7 @@ impl SqlBuilder {
             distinct: false,
             fields: Vec::new(),
             sets: Vec::new(),
-            values: Vec::new(),
+            values: Values::Empty,
             group_by: Vec::new(),
             having: None,
             wheres: Vec::new(),
@@ -470,7 +477,44 @@ impl SqlBuilder {
             .map(|v| (*v).to_string())
             .collect::<Vec<String>>();
         let values = format!("({})", values.join(", "));
-        self.values.push(values);
+
+        match &mut self.values {
+            Values::Empty => self.values = Values::List(vec![values]),
+            Values::Select(_) => self.values = Values::List(vec![values]),
+            Values::List(v) => v.push(values),
+        };
+
+        self
+    }
+
+    /// Add SELECT part (for INSERT).
+    ///
+    /// ```
+    /// extern crate sql_builder;
+    ///
+    /// # use std::error::Error;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let data = SqlBuilder::select_from("warehouse")
+    ///     .field("title")
+    ///     .field("preliminary_price * 2")
+    ///     .query()?;
+    ///
+    /// assert_eq!("SELECT title, preliminary_price * 2 FROM warehouse", &data);
+    ///
+    /// let sql = SqlBuilder::insert_into("books")
+    ///     .field("title")
+    ///     .field("price")
+    ///     .select(&data)
+    ///     .sql()?;
+    ///
+    /// assert_eq!("INSERT INTO books (title, price) SELECT title, preliminary_price * 2 FROM warehouse;", &sql);
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn select(&mut self, query: &str) -> &mut Self {
+        self.values = Values::Select(query.to_string());
         self
     }
 
@@ -846,8 +890,33 @@ impl SqlBuilder {
         Ok(text)
     }
 
-    /// SQL command generator for query or subquery
-    fn query(&self) -> Result<String, Box<dyn Error>> {
+    /// SQL command generator for query or subquery.
+    ///
+    /// ```
+    /// extern crate sql_builder;
+    ///
+    /// # use std::error::Error;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let data = SqlBuilder::select_from("warehouse")
+    ///     .field("title")
+    ///     .field("preliminary_price * 2")
+    ///     .query()?;
+    ///
+    /// assert_eq!("SELECT title, preliminary_price * 2 FROM warehouse", &data);
+    ///
+    /// let sql = SqlBuilder::insert_into("books")
+    ///     .field("title")
+    ///     .field("price")
+    ///     .select(&data)
+    ///     .sql()?;
+    ///
+    /// assert_eq!("INSERT INTO books (title, price) SELECT title, preliminary_price * 2 FROM warehouse;", &sql);
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn query(&self) -> Result<String, Box<dyn Error>> {
         // Checks
         if self.table.is_empty() {
             return Err("No table name".into());
@@ -925,23 +994,40 @@ impl SqlBuilder {
         if self.table.is_empty() {
             return Err("No table name".into());
         }
-        if self.values.is_empty() {
-            return Err("No set fields".into());
-        }
 
         // Make SET part
         let fields = self.fields.join(", ");
 
-        // Make VALUES part
-        let values = self.values.join(", ");
+        // Add values or query
+        let sql = match &self.values {
+            Values::Empty => return Err("No values".into()),
+            Values::List(values) => {
+                if values.is_empty() {
+                    return Err("No values".into());
+                }
 
-        // Make SQL
-        let sql = format!(
-            "INSERT INTO {table} ({fields}) VALUES {values};",
-            table = &self.table,
-            fields = fields,
-            values = values,
-        );
+                // Make VALUES part
+                let values = values.join(", ");
+
+                // Make SQL
+                format!(
+                    "INSERT INTO {table} ({fields}) VALUES {values};",
+                    table = &self.table,
+                    fields = fields,
+                    values = values,
+                )
+            }
+            Values::Select(query) => {
+                // Make SQL
+                format!(
+                    "INSERT INTO {table} ({fields}) {query};",
+                    table = &self.table,
+                    fields = fields,
+                    query = query,
+                )
+            }
+        };
+
         Ok(sql)
     }
 
@@ -1330,6 +1416,29 @@ mod tests {
             .sql()?;
 
         assert_eq!(&sql, "INSERT INTO books (title, price) VALUES ('In Search of Lost Time', 150), ('Don Quixote', 200);");
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_add_books_from_warehouse() -> Result<(), Box<dyn Error>> {
+        let data = SqlBuilder::select_from("warehouse")
+            .field("title")
+            .field("preliminary_price * 2")
+            .query()?;
+
+        assert_eq!("SELECT title, preliminary_price * 2 FROM warehouse", &data);
+
+        let sql = SqlBuilder::insert_into("books")
+            .field("title")
+            .field("price")
+            .select(&data)
+            .sql()?;
+
+        assert_eq!(
+            "INSERT INTO books (title, price) SELECT title, preliminary_price * 2 FROM warehouse;",
+            &sql
+        );
 
         Ok(())
     }
