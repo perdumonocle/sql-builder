@@ -1,0 +1,13 @@
+language: rust
+
+sudo: false
+script:
+  - cargo test --all
+  - cargo clippy
+  - cargo fmt --all -- --check
+  - cargo doc
+  - cargo build
+
+notifications:
+  email:
+    on_success: never
