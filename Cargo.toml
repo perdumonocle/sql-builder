@@ -1,6 +1,6 @@
 [package]
 name = "sql-builder"
-version = "0.1.4"
+version = "0.1.5"
 description = "Simple SQL code generator."
 authors = ["perdumonocle <konstantin_1987@mail.ru>"]
 license = "MIT"
@@ -8,5 +8,9 @@ edition = "2018"
 keywords = ["sql", "db", "database", "simple", "codegen"]
 categories = ["database", "text-processing"]
 repository = "https://github.com/perdumonocle/sql-builder.git"
+readme = "README.md"
+
+[badges]
+travis-ci = { repository = "perdumonocle/sql-builder" }
 
 [dependencies]

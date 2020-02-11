@@ -2,6 +2,8 @@
 
 Simple SQL code generator.
 
+[![Build Status](https://travis-ci.org/perdumonocle/sql-builder.svg)](https://travis-ci.org/perdumonocle/sql-builder)
+
 ## Usage
 
 To use `sql-builder`, first add this to your `Cargo.toml`:
