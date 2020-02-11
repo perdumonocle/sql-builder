@@ -10,7 +10,7 @@
 //! ```
 //!
 //! Next, add this to your crate:
-//! 
+//!
 //! ```
 //! extern crate sql_builder;
 //!
