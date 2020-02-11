@@ -8,7 +8,7 @@ before_script:
 
 sudo: false
 script:
-  - cargo clippy
+  - cargo clippy -- -D warning
   - cargo fmt --all -- --check
   - cargo test --all
   - cargo doc
