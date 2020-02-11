@@ -5,6 +5,7 @@ description = "Simple SQL code generator."
 authors = ["perdumonocle <konstantin_1987@mail.ru>"]
 license = "MIT"
 edition = "2018"
-keywords = ["sql", "db", "database", "builder", "simple"]
+keywords = ["sql", "db", "database", "builder", "simple", "codegen"]
+repository = "https://github.com/perdumonocle/sql-builder.git"
 
 [dependencies]
