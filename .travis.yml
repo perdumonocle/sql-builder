@@ -1,10 +1,16 @@
 language: rust
+rust:
+  - stable
+
+before_script:
+  - rustup component add clippy
+  - rustup component add rustfmt
 
 sudo: false
 script:
-  - cargo test --all
   - cargo clippy
   - cargo fmt --all -- --check
+  - cargo test --all
   - cargo doc
   - cargo build
 
