@@ -1,8 +1,10 @@
 # sql-builder
 
-Simple SQL code generator.
-
 [![Build Status](https://travis-ci.org/perdumonocle/sql-builder.svg)](https://travis-ci.org/perdumonocle/sql-builder)
+[![Latest Version](https://img.shields.io/crates/v/sql-builder.svg)](https://crates.io/crates/sql-builder)
+[![Docs](https://docs.rs/sql-builder/badge.svg)](https://docs.rs/sql-builder)
+
+Simple SQL code generator.
 
 ## Usage
 

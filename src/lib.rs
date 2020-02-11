@@ -496,17 +496,17 @@ impl SqlBuilder {
     /// use sql_builder::SqlBuilder;
     ///
     /// # fn main() -> Result<(), Box<dyn Error>> {
-    /// let data = SqlBuilder::select_from("warehouse")
+    /// let query = SqlBuilder::select_from("warehouse")
     ///     .field("title")
     ///     .field("preliminary_price * 2")
     ///     .query()?;
     ///
-    /// assert_eq!("SELECT title, preliminary_price * 2 FROM warehouse", &data);
+    /// assert_eq!("SELECT title, preliminary_price * 2 FROM warehouse", &query);
     ///
     /// let sql = SqlBuilder::insert_into("books")
     ///     .field("title")
     ///     .field("price")
-    ///     .select(&data)
+    ///     .select(&query)
     ///     .sql()?;
     ///
     /// assert_eq!("INSERT INTO books (title, price) SELECT title, preliminary_price * 2 FROM warehouse;", &sql);
@@ -899,17 +899,17 @@ impl SqlBuilder {
     /// use sql_builder::SqlBuilder;
     ///
     /// # fn main() -> Result<(), Box<dyn Error>> {
-    /// let data = SqlBuilder::select_from("warehouse")
+    /// let query = SqlBuilder::select_from("warehouse")
     ///     .field("title")
     ///     .field("preliminary_price * 2")
     ///     .query()?;
     ///
-    /// assert_eq!("SELECT title, preliminary_price * 2 FROM warehouse", &data);
+    /// assert_eq!("SELECT title, preliminary_price * 2 FROM warehouse", &query);
     ///
     /// let sql = SqlBuilder::insert_into("books")
     ///     .field("title")
     ///     .field("price")
-    ///     .select(&data)
+    ///     .select(&query)
     ///     .sql()?;
     ///
     /// assert_eq!("INSERT INTO books (title, price) SELECT title, preliminary_price * 2 FROM warehouse;", &sql);
@@ -1422,17 +1422,17 @@ mod tests {
 
     #[test]
     fn test_add_books_from_warehouse() -> Result<(), Box<dyn Error>> {
-        let data = SqlBuilder::select_from("warehouse")
+        let query = SqlBuilder::select_from("warehouse")
             .field("title")
             .field("preliminary_price * 2")
             .query()?;
 
-        assert_eq!("SELECT title, preliminary_price * 2 FROM warehouse", &data);
+        assert_eq!("SELECT title, preliminary_price * 2 FROM warehouse", &query);
 
         let sql = SqlBuilder::insert_into("books")
             .field("title")
             .field("price")
-            .select(&data)
+            .select(&query)
             .sql()?;
 
         assert_eq!(
