@@ -67,7 +67,7 @@ impl SqlBuilder {
         }
     }
 
-    /// Create SELECT request.
+    /// Create SELECT query.
     /// You may specify comma separted list of tables.
     ///
     /// ```
@@ -95,7 +95,7 @@ impl SqlBuilder {
         }
     }
 
-    /// Create INSERT request.
+    /// Create INSERT query.
     ///
     /// ```
     /// extern crate sql_builder;
@@ -123,7 +123,7 @@ impl SqlBuilder {
         }
     }
 
-    /// Create UPDATE request.
+    /// Create UPDATE query.
     ///
     /// ```
     /// extern crate sql_builder;
@@ -148,7 +148,7 @@ impl SqlBuilder {
         }
     }
 
-    /// Create DELETE request.
+    /// Create DELETE query.
     ///
     /// ```
     /// extern crate sql_builder;
@@ -559,6 +559,32 @@ impl SqlBuilder {
     /// ```
     pub fn and_where_eq(&mut self, field: &str, value: &str) -> &mut Self {
         let cond = format!("{} = {}", &field, &value);
+        self.and_where(&cond)
+    }
+
+    /// Add WHERE condition for non-equal parts.
+    ///
+    /// ```
+    /// extern crate sql_builder;
+    ///
+    /// # use std::error::Error;
+    /// use sql_builder::{SqlBuilder, quote};
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("price")
+    ///     .and_where_ne("title", &quote("Harry Potter and the Philosopher's Stone"))
+    ///     .sql()?;
+    ///
+    /// assert_eq!(
+    ///     "SELECT price FROM books WHERE title <> 'Harry Potter and the Philosopher''s Stone';",
+    ///     &sql
+    /// );
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn and_where_ne(&mut self, field: &str, value: &str) -> &mut Self {
+        let cond = format!("{} <> {}", &field, &value);
         self.and_where(&cond)
     }
 
@@ -1077,6 +1103,21 @@ mod tests {
         assert_eq!(
             &sql,
             "SELECT price FROM books WHERE title = 'Harry Potter and the Philosopher''s Stone';"
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_select_price_not_for_harry_potter_and_phil_stone() -> Result<(), Box<dyn Error>> {
+        let sql = SqlBuilder::select_from("books")
+            .field("price")
+            .and_where_ne("title", &quote("Harry Potter and the Philosopher's Stone"))
+            .sql()?;
+
+        assert_eq!(
+            &sql,
+            "SELECT price FROM books WHERE title <> 'Harry Potter and the Philosopher''s Stone';"
         );
 
         Ok(())
