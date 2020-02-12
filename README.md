@@ -51,6 +51,7 @@ assert_eq!("SELECT id, name FROM company WHERE salary > 25000;", &sql);
 - group by
 - order by
 - where
+- union
 - limit, offset
 - subquery
 

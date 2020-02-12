@@ -50,6 +50,7 @@ pub struct SqlBuilder {
     values: Values,
     group_by: Vec<String>,
     having: Option<String>,
+    unions: String,
     wheres: Vec<String>,
     order_by: Vec<String>,
     limit: Option<usize>,
@@ -85,6 +86,7 @@ impl SqlBuilder {
             values: Values::Empty,
             group_by: Vec::new(),
             having: None,
+            unions: String::new(),
             wheres: Vec::new(),
             order_by: Vec::new(),
             limit: None,
@@ -675,6 +677,78 @@ impl SqlBuilder {
         self.and_where(&cond)
     }
 
+    /// Union query with subquery.
+    /// ORDER BY must be in the last subquery.
+    ///
+    /// ```
+    /// extern crate sql_builder;
+    ///
+    /// # use std::error::Error;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let append = SqlBuilder::select_from("books")
+    ///     .field("title")
+    ///     .field("price")
+    ///     .and_where("price < 100")
+    ///     .order_asc("title")
+    ///     .query()?;
+    ///
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("title")
+    ///     .field("price")
+    ///     .and_where("title LIKE 'Harry Potter%'")
+    ///     .order_desc("price")
+    ///     .union(&append)
+    ///     .sql()?;
+    ///
+    /// assert_eq!(
+    ///     "SELECT title, price FROM books WHERE title LIKE 'Harry Potter%' UNION SELECT title, price FROM books WHERE price < 100 ORDER BY title;",
+    ///     &sql
+    /// );
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn union(&mut self, query: &str) -> &mut Self {
+        let append = format!(" UNION {}", &query);
+        self.unions.push_str(&append);
+        self
+    }
+
+    /// Union query with all subquery.
+    /// ORDER BY must be in the last subquery.
+    ///
+    /// ```
+    /// extern crate sql_builder;
+    ///
+    /// # use std::error::Error;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let append = SqlBuilder::select_values(&["'The Great Gatsby'", "124"])
+    ///     .query_values()?;
+    ///
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("title")
+    ///     .field("price")
+    ///     .and_where("title LIKE 'Harry Potter%'")
+    ///     .order_desc("price")
+    ///     .union_all(&append)
+    ///     .sql()?;
+    ///
+    /// assert_eq!(
+    ///     "SELECT title, price FROM books WHERE title LIKE 'Harry Potter%' UNION ALL SELECT 'The Great Gatsby', 124;",
+    ///     &sql
+    /// );
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn union_all(&mut self, query: &str) -> &mut Self {
+        let append = format!(" UNION ALL {}", &query);
+        self.unions.push_str(&append);
+        self
+    }
+
     /// Add ORDER BY.
     ///
     /// ```
@@ -996,7 +1070,7 @@ impl SqlBuilder {
         let wheres = SqlBuilder::make_wheres(&self.wheres);
 
         // Make ORDER BY part
-        let order_by = if self.order_by.is_empty() {
+        let order_by = if self.order_by.is_empty() || !self.unions.is_empty() {
             String::new()
         } else {
             format!(" ORDER BY {}", self.order_by.join(", "))
@@ -1015,13 +1089,14 @@ impl SqlBuilder {
         };
 
         // Make SQL
-        let sql = format!("SELECT{distinct} {fields} FROM {table}{joins}{group_by}{wheres}{order_by}{limit}{offset}",
+        let sql = format!("SELECT{distinct} {fields} FROM {table}{joins}{group_by}{wheres}{unions}{order_by}{limit}{offset}",
             distinct = distinct,
             fields = fields,
             table = &self.table,
             joins = joins,
             group_by = group_by,
             wheres = wheres,
+            unions = &self.unions,
             order_by = order_by,
             limit = limit,
             offset = offset,
@@ -1353,6 +1428,46 @@ mod tests {
             .sql()?;
 
         assert_eq!(&sql, "SELECT title, price FROM books WHERE title LIKE 'Harry Potter%' ORDER BY price DESC, title;");
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_find_cheap_or_harry_potter() -> Result<(), Box<dyn Error>> {
+        let append = SqlBuilder::select_from("books")
+            .field("title")
+            .field("price")
+            .and_where("price < 100")
+            .order_asc("title")
+            .query()?;
+
+        let sql = SqlBuilder::select_from("books")
+            .field("title")
+            .field("price")
+            .and_where("title LIKE 'Harry Potter%'")
+            .order_desc("price")
+            .union(&append)
+            .sql()?;
+
+        assert_eq!(
+            "SELECT title, price FROM books WHERE title LIKE 'Harry Potter%' UNION SELECT title, price FROM books WHERE price < 100 ORDER BY title;",
+            &sql
+        );
+
+        let append = SqlBuilder::select_values(&["'The Great Gatsby'", "124"]).query_values()?;
+
+        let sql = SqlBuilder::select_from("books")
+            .field("title")
+            .field("price")
+            .and_where("title LIKE 'Harry Potter%'")
+            .order_desc("price")
+            .union_all(&append)
+            .sql()?;
+
+        assert_eq!(
+            "SELECT title, price FROM books WHERE title LIKE 'Harry Potter%' UNION ALL SELECT 'The Great Gatsby', 124;",
+            &sql
+        );
 
         Ok(())
     }
