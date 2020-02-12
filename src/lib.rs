@@ -59,6 +59,7 @@ pub struct SqlBuilder {
 /// SQL query statement
 enum Statement {
     SelectFrom,
+    SelectValues,
     UpdateTable,
     InsertInto,
     DeleteFrom,
@@ -117,6 +118,31 @@ impl SqlBuilder {
             table: table.to_string(),
             ..Self::default()
         }
+    }
+
+    /// Create SELECT query without a table.
+    ///
+    /// ```
+    /// extern crate sql_builder;
+    ///
+    /// # use std::error::Error;
+    /// use sql_builder::{SqlBuilder, quote};
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let sql = SqlBuilder::select_values(&["10", &quote("100")])
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT 10, '100';", &sql);
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn select_values(values: &[&str]) -> Self {
+        let mut sel = Self {
+            statement: Statement::SelectValues,
+            ..Self::default()
+        };
+        sel.fields(values);
+        sel
     }
 
     /// Create INSERT query.
@@ -813,6 +839,7 @@ impl SqlBuilder {
     pub fn sql(&self) -> Result<String, Box<dyn Error>> {
         match self.statement {
             Statement::SelectFrom => self.sql_select(),
+            Statement::SelectValues => self.sql_select_values(),
             Statement::UpdateTable => self.sql_update(),
             Statement::InsertInto => self.sql_insert(),
             Statement::DeleteFrom => self.sql_delete(),
@@ -821,7 +848,26 @@ impl SqlBuilder {
 
     /// Build complete SQL command for SELECT statement
     fn sql_select(&self) -> Result<String, Box<dyn Error>> {
+        // Checks
+        if self.table.is_empty() {
+            return Err("No table name".into());
+        }
+
+        // Build query
         let mut text = self.query()?;
+        text.push(';');
+        Ok(text)
+    }
+
+    /// Build complete SQL command for SELECT statement without a table
+    fn sql_select_values(&self) -> Result<String, Box<dyn Error>> {
+        // Checks
+        if self.fields.is_empty() {
+            return Err("No values".into());
+        }
+
+        // Build query
+        let mut text = self.query_values()?;
         text.push(';');
         Ok(text)
     }
@@ -917,11 +963,6 @@ impl SqlBuilder {
     /// # }
     /// ```
     pub fn query(&self) -> Result<String, Box<dyn Error>> {
-        // Checks
-        if self.table.is_empty() {
-            return Err("No table name".into());
-        }
-
         // Distinct results
         let distinct = if self.distinct { " DISTINCT" } else { "" };
 
@@ -985,6 +1026,31 @@ impl SqlBuilder {
             limit = limit,
             offset = offset,
         );
+        Ok(sql)
+    }
+
+    /// SQL command generator for query or subquery without a table.
+    ///
+    /// ```
+    /// extern crate sql_builder;
+    ///
+    /// # use std::error::Error;
+    /// use sql_builder::{SqlBuilder, quote};
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let values = SqlBuilder::select_values(&["10", &quote("100")])
+    ///     .query_values()?;
+    ///
+    /// assert_eq!("SELECT 10, '100'", &values);
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn query_values(&self) -> Result<String, Box<dyn Error>> {
+        // Make values
+        let fields = self.fields.join(", ");
+
+        // Make SQL
+        let sql = format!("SELECT {fields}", fields = fields,);
         Ok(sql)
     }
 
@@ -1140,6 +1206,15 @@ mod tests {
         let sql = quote("Hello, 'World'");
 
         assert_eq!(&sql, "'Hello, ''World'''");
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_select_only_values() -> Result<(), Box<dyn Error>> {
+        let values = SqlBuilder::select_values(&["10", &quote("100")]).sql()?;
+
+        assert_eq!("SELECT 10, '100';", &values);
 
         Ok(())
     }
