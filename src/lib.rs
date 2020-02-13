@@ -1565,8 +1565,11 @@ mod tests {
             .field("title")
             .and_where_not_like("title", "%Alice's%")
             .sql()?;
-       
-        assert_eq!("SELECT title FROM books WHERE title NOT LIKE '%Alice''s%';", &sql);
+
+        assert_eq!(
+            "SELECT title FROM books WHERE title NOT LIKE '%Alice''s%';",
+            &sql
+        );
 
         Ok(())
     }
