@@ -700,6 +700,29 @@ impl SqlBuilder {
         self.and_where(&cond)
     }
 
+    /// Add WHERE NOT LIKE condition
+    ///
+    /// ```
+    /// extern crate sql_builder;
+    ///
+    /// # use std::error::Error;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("title")
+    ///     .and_where_not_like("title", "%Alice's%")
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title FROM books WHERE title NOT LIKE '%Alice''s%';", &sql);
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn and_where_not_like(&mut self, field: &str, mask: &str) -> &mut Self {
+        let cond = format!("{} NOT LIKE '{}'", &field, &esc(&mask));
+        self.and_where(&cond)
+    }
+
     /// Union query with subquery.
     /// ORDER BY must be in the last subquery.
     ///
@@ -1532,6 +1555,18 @@ mod tests {
             .sql()?;
 
         assert_eq!(&sql, "SELECT title, price FROM books WHERE title LIKE 'Harry Potter%' ORDER BY title LIMIT 3 OFFSET 2;");
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_find_books_not_about_alice() -> Result<(), Box<dyn Error>> {
+        let sql = SqlBuilder::select_from("books")
+            .field("title")
+            .and_where_not_like("title", "%Alice's%")
+            .sql()?;
+       
+        assert_eq!("SELECT title FROM books WHERE title NOT LIKE '%Alice''s%';", &sql);
 
         Ok(())
     }
