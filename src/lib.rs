@@ -108,7 +108,7 @@ impl SqlBuilder {
     ///     .field("title")
     ///     .field("price")
     ///     .and_where("price > 100")
-    ///     .and_where("title LIKE 'Harry Potter%'")
+    ///     .and_where_like("title", "Harry Potter%")
     ///     .sql()?;
     ///
     /// assert_eq!("SELECT title, price FROM books WHERE (price > 100) AND (title LIKE 'Harry Potter%');", &sql);
@@ -677,6 +677,29 @@ impl SqlBuilder {
         self.and_where(&cond)
     }
 
+    /// Add WHERE LIKE condition
+    ///
+    /// ```
+    /// extern crate sql_builder;
+    ///
+    /// # use std::error::Error;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("price")
+    ///     .and_where_like("title", "%Philosopher's%")
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT price FROM books WHERE title LIKE '%Philosopher''s%';", &sql);
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn and_where_like(&mut self, field: &str, mask: &str) -> &mut Self {
+        let cond = format!("{} LIKE '{}'", &field, &esc(&mask));
+        self.and_where(&cond)
+    }
+
     /// Union query with subquery.
     /// ORDER BY must be in the last subquery.
     ///
@@ -697,7 +720,7 @@ impl SqlBuilder {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
-    ///     .and_where("title LIKE 'Harry Potter%'")
+    ///     .and_where_like("title", "Harry Potter%")
     ///     .order_desc("price")
     ///     .union(&append)
     ///     .sql()?;
@@ -731,7 +754,7 @@ impl SqlBuilder {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
-    ///     .and_where("title LIKE 'Harry Potter%'")
+    ///     .and_where_like("title", "Harry Potter%")
     ///     .order_desc("price")
     ///     .union_all(&append)
     ///     .sql()?;
@@ -761,7 +784,7 @@ impl SqlBuilder {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
-    ///     .and_where("title LIKE 'Harry Potter%'")
+    ///     .and_where_like("title", "Harry Potter%")
     ///     .order_by("price", false)
     ///     .sql()?;
     ///
@@ -794,7 +817,7 @@ impl SqlBuilder {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
-    ///     .and_where("title LIKE 'Harry Potter%'")
+    ///     .and_where_like("title", "Harry Potter%")
     ///     .order_asc("title")
     ///     .sql()?;
     ///
@@ -821,7 +844,7 @@ impl SqlBuilder {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
-    ///     .and_where("title LIKE 'Harry Potter%'")
+    ///     .and_where_like("title", "Harry Potter%")
     ///     .order_desc("price")
     ///     .sql()?;
     ///
@@ -848,7 +871,7 @@ impl SqlBuilder {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
-    ///     .and_where("title LIKE 'Harry Potter%'")
+    ///     .and_where_like("title", "Harry Potter%")
     ///     .order_desc("price")
     ///     .limit(10)
     ///     .sql()?;
@@ -877,7 +900,7 @@ impl SqlBuilder {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
-    ///     .and_where("title LIKE 'Harry Potter%'")
+    ///     .and_where_like("title", "Harry Potter%")
     ///     .order_desc("price")
     ///     .limit(10)
     ///     .offset(100)
@@ -1382,7 +1405,7 @@ mod tests {
             .field("title")
             .field("price")
             .and_where("price > 100")
-            .and_where("title LIKE 'Harry Potter%'")
+            .and_where_like("title", "Harry Potter%")
             .sql()?;
 
         assert_eq!(
@@ -1398,7 +1421,7 @@ mod tests {
         let sql = SqlBuilder::select_from("books")
             .field("title")
             .field("price")
-            .and_where("title LIKE 'Harry Potter%'")
+            .and_where_like("title", "Harry Potter%")
             .order_by("price", false)
             .sql()?;
 
@@ -1410,7 +1433,7 @@ mod tests {
         let sql = SqlBuilder::select_from("books")
             .field("title")
             .field("price")
-            .and_where("title LIKE 'Harry Potter%'")
+            .and_where_like("title", "Harry Potter%")
             .order_desc("price")
             .sql()?;
 
@@ -1422,7 +1445,7 @@ mod tests {
         let sql = SqlBuilder::select_from("books")
             .field("title")
             .field("price")
-            .and_where("title LIKE 'Harry Potter%'")
+            .and_where_like("title", "Harry Potter%")
             .order_desc("price")
             .order_asc("title")
             .sql()?;
@@ -1444,7 +1467,7 @@ mod tests {
         let sql = SqlBuilder::select_from("books")
             .field("title")
             .field("price")
-            .and_where("title LIKE 'Harry Potter%'")
+            .and_where_like("title", "Harry Potter%")
             .order_desc("price")
             .union(&append)
             .sql()?;
@@ -1459,7 +1482,7 @@ mod tests {
         let sql = SqlBuilder::select_from("books")
             .field("title")
             .field("price")
-            .and_where("title LIKE 'Harry Potter%'")
+            .and_where_like("title", "Harry Potter%")
             .order_desc("price")
             .union_all(&append)
             .sql()?;
@@ -1477,7 +1500,7 @@ mod tests {
         let sql = SqlBuilder::select_from("books")
             .field("title")
             .field("price")
-            .and_where("title LIKE 'Harry Potter%'")
+            .and_where_like("title", "Harry Potter%")
             .order_asc("title")
             .limit(3)
             .sql()?;
@@ -1492,7 +1515,7 @@ mod tests {
         let sql = SqlBuilder::select_from("books")
             .field("title")
             .field("price")
-            .and_where("title LIKE 'Harry Potter%'")
+            .and_where_like("title", "Harry Potter%")
             .order_asc("title")
             .offset(2)
             .sql()?;
@@ -1502,7 +1525,7 @@ mod tests {
         let sql = SqlBuilder::select_from("books")
             .field("title")
             .field("price")
-            .and_where("title LIKE 'Harry Potter%'")
+            .and_where_like("title", "Harry Potter%")
             .order_asc("title")
             .limit(3)
             .offset(2)
@@ -1585,7 +1608,7 @@ mod tests {
 
         let sql = SqlBuilder::update_table("books")
             .set("price", "price * 0.1")
-            .and_where("title LIKE 'Harry Potter%'")
+            .and_where_like("title", "Harry Potter%")
             .sql()?;
 
         assert_eq!(
@@ -1638,7 +1661,7 @@ mod tests {
         let sql = SqlBuilder::update_table("books")
             .set("price", "0")
             .set("title", "'[SOLD!]' || title")
-            .and_where("title LIKE 'Harry Potter%'")
+            .and_where_like("title", "Harry Potter%")
             .sql()?;
 
         assert_eq!(&sql, "UPDATE books SET price = 0, title = '[SOLD!]' || title WHERE title LIKE 'Harry Potter%';");
