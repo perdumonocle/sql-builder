@@ -112,6 +112,8 @@ impl SqlBuilder {
     ///     .sql()?;
     ///
     /// assert_eq!("SELECT title, price FROM books WHERE (price > 100) AND (title LIKE 'Harry Potter%');", &sql);
+    /// // add                               ^^^^^
+    /// // here                              table
     /// # Ok(())
     /// # }
     /// ```
@@ -135,6 +137,8 @@ impl SqlBuilder {
     ///     .sql()?;
     ///
     /// assert_eq!("SELECT 10, '100';", &sql);
+    /// // add             ^^^^^^^^^
+    /// // here             values
     /// # Ok(())
     /// # }
     /// ```
@@ -164,6 +168,8 @@ impl SqlBuilder {
     ///     .sql()?;
     ///
     /// assert_eq!("INSERT INTO books (title, price) VALUES ('In Search of Lost Time', 150), ('Don Quixote', 200);", &sql);
+    /// // add                  ^^^^^
+    /// // here                 table
     /// # Ok(())
     /// # }
     /// ```
@@ -189,6 +195,8 @@ impl SqlBuilder {
     ///     .sql()?;
     ///
     /// assert_eq!("UPDATE books SET price = price + 10;", &sql);
+    /// // add             ^^^^^
+    /// // here            table
     /// # Ok(())
     /// # }
     /// ```
@@ -214,6 +222,8 @@ impl SqlBuilder {
     ///     .sql()?;
     ///
     /// assert_eq!("DELETE FROM books WHERE price > 100;", &sql);
+    /// // add                  ^^^^^
+    /// // here                 table
     /// # Ok(())
     /// # }
     /// ```
@@ -241,6 +251,8 @@ impl SqlBuilder {
     ///     .sql()?;
     ///
     /// assert_eq!("SELECT b.title, s.total FROM books AS b LEFT OUTER JOIN shops AS s ON b.id = s.book;", &sql);
+    /// // add                                              ^^^^^^^^^^      ^^^^^^^^^^ ^^^^^^^^^^^^^^^^
+    /// // here                                              operator         table       constraint
     /// # Ok(())
     /// # }
     /// ```
@@ -283,6 +295,7 @@ impl SqlBuilder {
     ///     .sql()?;
     ///
     /// assert_eq!("SELECT DISTINCT price FROM books;", &sql);
+    /// // add here        ^^^^^^^^
     /// # Ok(())
     /// # }
     /// ```
@@ -305,6 +318,8 @@ impl SqlBuilder {
     ///     .sql()?;
     ///
     /// assert_eq!("SELECT title, price FROM books;", &sql);
+    /// // add             ^^^^^^^^^^^^
+    /// // here               fields
     /// # Ok(())
     /// # }
     /// ```
@@ -391,6 +406,8 @@ impl SqlBuilder {
     ///     .sql()?;
     ///
     /// assert_eq!("SELECT title, price FROM books;", &sql);
+    /// // add             ^^^^^  ^^^^^
+    /// // here            field  field
     /// # Ok(())
     /// # }
     /// ```
@@ -470,6 +487,8 @@ impl SqlBuilder {
     ///     .sql()?;
     ///
     /// assert_eq!("UPDATE books SET price = price + 10;", &sql);
+    /// // add                       ^^^^^   ^^^^^^^^^^
+    /// // here                      field     value
     /// # Ok(())
     /// # }
     /// ```
@@ -496,6 +515,8 @@ impl SqlBuilder {
     ///     .sql()?;
     ///
     /// assert_eq!("INSERT INTO books (title, price) VALUES ('In Search of Lost Time', 150), ('Don Quixote', 200);", &sql);
+    /// // add                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^    ^^^^^^^^^^^^^^^^^^
+    /// // here                                                         values                      values
     /// # Ok(())
     /// # }
     /// ```
@@ -538,6 +559,8 @@ impl SqlBuilder {
     ///     .sql()?;
     ///
     /// assert_eq!("INSERT INTO books (title, price) SELECT title, preliminary_price * 2 FROM warehouse;", &sql);
+    /// // add                                       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    /// // here                                                            query
     /// # Ok(())
     /// # }
     /// ```
@@ -563,6 +586,8 @@ impl SqlBuilder {
     ///     .sql()?;
     ///
     /// assert_eq!("SELECT price, COUNT(price) AS cnt FROM books GROUP BY price ORDER BY cnt DESC;", &sql);
+    /// // add                                                            ^^^^^
+    /// // here                                                           field
     /// # Ok(())
     /// # }
     /// ```
@@ -589,6 +614,8 @@ impl SqlBuilder {
     ///     .sql()?;
     ///
     /// assert_eq!("SELECT price, COUNT(price) AS cnt FROM books GROUP BY price HAVING price > 100 ORDER BY cnt DESC;", &sql);
+    /// // add                                                                         ^^^^^^^^^^^
+    /// // here                                                                           cond
     /// # Ok(())
     /// # }
     /// ```
@@ -613,10 +640,9 @@ impl SqlBuilder {
     ///     .and_where("title LIKE 'Harry Potter%'")
     ///     .sql()?;
     ///
-    /// assert_eq!(
-    ///     "SELECT title, price FROM books WHERE (price > 100) AND (title LIKE 'Harry Potter%');",
-    ///     &sql
-    /// );
+    /// assert_eq!("SELECT title, price FROM books WHERE (price > 100) AND (title LIKE 'Harry Potter%');", &sql);
+    /// // add                                            ^^^^^^^^^^^       ^^^^^^^^^^^^^^^^^^^^^^^^^^
+    /// // here                                              cond                      cond
     /// # Ok(())
     /// # }
     /// ```
@@ -639,10 +665,9 @@ impl SqlBuilder {
     ///     .and_where_eq("title", &quote("Harry Potter and the Philosopher's Stone"))
     ///     .sql()?;
     ///
-    /// assert_eq!(
-    ///     "SELECT price FROM books WHERE title = 'Harry Potter and the Philosopher''s Stone';",
-    ///     &sql
-    /// );
+    /// assert_eq!("SELECT price FROM books WHERE title = 'Harry Potter and the Philosopher''s Stone';", &sql);
+    /// // add                                    ^^^^^   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    /// // here                                   field                      value
     /// # Ok(())
     /// # }
     /// ```
@@ -665,10 +690,9 @@ impl SqlBuilder {
     ///     .and_where_ne("title", &quote("Harry Potter and the Philosopher's Stone"))
     ///     .sql()?;
     ///
-    /// assert_eq!(
-    ///     "SELECT price FROM books WHERE title <> 'Harry Potter and the Philosopher''s Stone';",
-    ///     &sql
-    /// );
+    /// assert_eq!("SELECT price FROM books WHERE title <> 'Harry Potter and the Philosopher''s Stone';", &sql);
+    /// // add                                    ^^^^^    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    /// // here                                   field                       value
     /// # Ok(())
     /// # }
     /// ```
@@ -692,6 +716,8 @@ impl SqlBuilder {
     ///     .sql()?;
     ///
     /// assert_eq!("SELECT price FROM books WHERE title LIKE '%Philosopher''s%';", &sql);
+    /// // add                                    ^^^^^       ^^^^^^^^^^^^^^^^
+    /// // here                                   field             mask
     /// # Ok(())
     /// # }
     /// ```
@@ -715,6 +741,8 @@ impl SqlBuilder {
     ///     .sql()?;
     ///
     /// assert_eq!("SELECT title FROM books WHERE title NOT LIKE '%Alice''s%';", &sql);
+    /// // add                                    ^^^^^           ^^^^^^^^^^
+    /// // here                                   field              mask
     /// # Ok(())
     /// # }
     /// ```
@@ -738,6 +766,8 @@ impl SqlBuilder {
     ///     .sql()?;
     ///
     /// assert_eq!("SELECT title FROM books WHERE price IS NULL;", &sql);
+    /// // add                                    ^^^^^
+    /// // here                                   field
     /// # Ok(())
     /// # }
     /// ```
@@ -761,6 +791,8 @@ impl SqlBuilder {
     ///     .sql()?;
     ///
     /// assert_eq!("SELECT title FROM books WHERE price IS NOT NULL;", &sql);
+    /// // add                                    ^^^^^
+    /// // here                                   field
     /// # Ok(())
     /// # }
     /// ```
@@ -794,10 +826,9 @@ impl SqlBuilder {
     ///     .union(&append)
     ///     .sql()?;
     ///
-    /// assert_eq!(
-    ///     "SELECT title, price FROM books WHERE title LIKE 'Harry Potter%' UNION SELECT title, price FROM books WHERE price < 100 ORDER BY title;",
-    ///     &sql
-    /// );
+    /// assert_eq!("SELECT title, price FROM books WHERE title LIKE 'Harry Potter%' UNION SELECT title, price FROM books WHERE price < 100 ORDER BY title;", &sql);
+    /// // add                                                                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    /// // here                                                                                                        query
     /// # Ok(())
     /// # }
     /// ```
@@ -828,10 +859,9 @@ impl SqlBuilder {
     ///     .union_all(&append)
     ///     .sql()?;
     ///
-    /// assert_eq!(
-    ///     "SELECT title, price FROM books WHERE title LIKE 'Harry Potter%' UNION ALL SELECT 'The Great Gatsby', 124;",
-    ///     &sql
-    /// );
+    /// assert_eq!("SELECT title, price FROM books WHERE title LIKE 'Harry Potter%' UNION ALL SELECT 'The Great Gatsby', 124;", &sql);
+    /// // add                                                                                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    /// // here                                                                                           query
     /// # Ok(())
     /// # }
     /// ```
@@ -857,10 +887,9 @@ impl SqlBuilder {
     ///     .order_by("price", false)
     ///     .sql()?;
     ///
-    /// assert_eq!(
-    ///     "SELECT title, price FROM books WHERE title LIKE 'Harry Potter%' ORDER BY price;",
-    ///     &sql
-    /// );
+    /// assert_eq!("SELECT title, price FROM books WHERE title LIKE 'Harry Potter%' ORDER BY price;", &sql);
+    /// // add                                                                               ^^^^^
+    /// // here                                                                              field
     /// # Ok(())
     /// # }
     /// ```
@@ -890,10 +919,9 @@ impl SqlBuilder {
     ///     .order_asc("title")
     ///     .sql()?;
     ///
-    /// assert_eq!(
-    ///     "SELECT title, price FROM books WHERE title LIKE 'Harry Potter%' ORDER BY title;",
-    ///     &sql
-    /// );
+    /// assert_eq!("SELECT title, price FROM books WHERE title LIKE 'Harry Potter%' ORDER BY title;", &sql);
+    /// // add                                                                               ^^^^^
+    /// // here                                                                              field
     /// # Ok(())
     /// # }
     /// ```
@@ -917,10 +945,9 @@ impl SqlBuilder {
     ///     .order_desc("price")
     ///     .sql()?;
     ///
-    /// assert_eq!(
-    ///     "SELECT title, price FROM books WHERE title LIKE 'Harry Potter%' ORDER BY price DESC;",
-    ///     &sql
-    /// );
+    /// assert_eq!("SELECT title, price FROM books WHERE title LIKE 'Harry Potter%' ORDER BY price DESC;", &sql);
+    /// // add                                                                               ^^^^^
+    /// // here                                                                              field
     /// # Ok(())
     /// # }
     /// ```
@@ -945,10 +972,9 @@ impl SqlBuilder {
     ///     .limit(10)
     ///     .sql()?;
     ///
-    /// assert_eq!(
-    ///     "SELECT title, price FROM books WHERE title LIKE 'Harry Potter%' ORDER BY price DESC LIMIT 10;",
-    ///     &sql
-    /// );
+    /// assert_eq!("SELECT title, price FROM books WHERE title LIKE 'Harry Potter%' ORDER BY price DESC LIMIT 10;", &sql);
+    /// // add                                                                                                ^^
+    /// // here                                                                                              limit
     /// # Ok(())
     /// # }
     /// ```
@@ -975,10 +1001,9 @@ impl SqlBuilder {
     ///     .offset(100)
     ///     .sql()?;
     ///
-    /// assert_eq!(
-    ///     "SELECT title, price FROM books WHERE title LIKE 'Harry Potter%' ORDER BY price DESC LIMIT 10 OFFSET 100;",
-    ///     &sql
-    /// );
+    /// assert_eq!("SELECT title, price FROM books WHERE title LIKE 'Harry Potter%' ORDER BY price DESC LIMIT 10 OFFSET 100;", &sql);
+    /// // add                                                                                                          ^^^
+    /// // here                                                                                                        offset
     /// # Ok(())
     /// # }
     /// ```
@@ -1085,6 +1110,8 @@ impl SqlBuilder {
     ///     .subquery_as("category")?;
     ///
     /// assert_eq!("(SELECT CASE WHEN price < 100 THEN 'cheap' ELSE 'expensive' END FROM books) AS category", &cat);
+    /// // add                                                                                     ^^^^^^^^
+    /// // here                                                                                      name
     ///
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
