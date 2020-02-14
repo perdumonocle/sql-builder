@@ -6,7 +6,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! sql-builder = "0.2"
+//! sql-builder = "0.3"
 //! ```
 //!
 //! Next, add this to your crate:
@@ -801,6 +801,194 @@ impl SqlBuilder {
         self.and_where(&cond)
     }
 
+    /// Add OR condition to the last WHERE condition.
+    ///
+    /// ```
+    /// extern crate sql_builder;
+    ///
+    /// # use std::error::Error;
+    /// use sql_builder::{SqlBuilder, quote};
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("title")
+    ///     .field("price")
+    ///     .and_where("price < 10")
+    ///     .or_where("price > 1000")
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title, price FROM books WHERE price < 10 OR price > 1000;", &sql);
+    /// // add                                                         ^^^^^^^^^^^^
+    /// // here                                                            cond
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn or_where(&mut self, cond: &str) -> &mut Self {
+        if self.wheres.is_empty() {
+            self.wheres.push(cond.to_string());
+        } else if let Some(last) = self.wheres.last_mut() {
+            last.push_str(" OR ");
+            last.push_str(&cond);
+        }
+        self
+    }
+
+    /// Add OR condition of equal parts to the last WHERE condition.
+    ///
+    /// ```
+    /// extern crate sql_builder;
+    ///
+    /// # use std::error::Error;
+    /// use sql_builder::{SqlBuilder, quote};
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("price")
+    ///     .and_where_eq("title", &quote("Harry Potter and the Philosopher's Stone"))
+    ///     .or_where_eq("title", &quote("Harry Potter and the Chamber of Secrets"))
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT price FROM books WHERE title = 'Harry Potter and the Philosopher''s Stone' OR title = 'Harry Potter and the Chamber of Secrets';", &sql);
+    /// // add                                                                                           ^^^^^   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    /// // here                                                                                          field                     value
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn or_where_eq(&mut self, field: &str, value: &str) -> &mut Self {
+        let cond = format!("{} = {}", &field, &value);
+        self.or_where(&cond)
+    }
+
+    /// Add OR condition of non-equal parts to the last WHERE condition.
+    ///
+    /// ```
+    /// extern crate sql_builder;
+    ///
+    /// # use std::error::Error;
+    /// use sql_builder::{SqlBuilder, quote};
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("price")
+    ///     .or_where_ne("title", &quote("Harry Potter and the Philosopher's Stone"))
+    ///     .or_where_ne("title", &quote("Harry Potter and the Chamber of Secrets"))
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT price FROM books WHERE title <> 'Harry Potter and the Philosopher''s Stone' OR title <> 'Harry Potter and the Chamber of Secrets';", &sql);
+    /// // add                                    ^^^^^    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^    ^^^^^    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    /// // here                                   field                       value                       field                      value
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn or_where_ne(&mut self, field: &str, value: &str) -> &mut Self {
+        let cond = format!("{} <> {}", &field, &value);
+        self.or_where(&cond)
+    }
+
+    /// Add OR LIKE condition to the last WHERE condition.
+    ///
+    /// ```
+    /// extern crate sql_builder;
+    ///
+    /// # use std::error::Error;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("price")
+    ///     .or_where_like("title", "%Alice's%")
+    ///     .or_where_like("title", "%Philosopher's%")
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT price FROM books WHERE title LIKE '%Alice''s%' OR title LIKE '%Philosopher''s%';", &sql);
+    /// // add                                    ^^^^^      ^^^^^^^^^^^^    ^^^^^      ^^^^^^^^^^^^^^^^^^
+    /// // here                                   field          mask        field             mask
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn or_where_like(&mut self, field: &str, mask: &str) -> &mut Self {
+        let cond = format!("{} LIKE '{}'", &field, &esc(&mask));
+        self.or_where(&cond)
+    }
+
+    /// Add OR NOT LIKE condition to the last WHERE condition.
+    ///
+    /// ```
+    /// extern crate sql_builder;
+    ///
+    /// # use std::error::Error;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("title")
+    ///     .and_where_not_like("title", "%Alice's%")
+    ///     .or_where_not_like("title", "%Philosopher's%")
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title FROM books WHERE title NOT LIKE '%Alice''s%' OR title NOT LIKE '%Philosopher''s%';", &sql);
+    /// // add                                                                   ^^^^^          ^^^^^^^^^^^^^^^^^^
+    /// // here                                                                  field                 mask
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn or_where_not_like(&mut self, field: &str, mask: &str) -> &mut Self {
+        let cond = format!("{} NOT LIKE '{}'", &field, &esc(&mask));
+        self.or_where(&cond)
+    }
+
+    /// Add OR IS NULL condition to the last WHERE condition.
+    ///
+    /// ```
+    /// extern crate sql_builder;
+    ///
+    /// # use std::error::Error;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("title")
+    ///     .and_where_eq("price", "0")
+    ///     .or_where_is_null("price")
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title FROM books WHERE price = 0 OR price IS NULL;", &sql);
+    /// // add                                                 ^^^^^
+    /// // here                                                field
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn or_where_is_null(&mut self, field: &str) -> &mut Self {
+        let cond = format!("{} IS NULL", &field);
+        self.or_where(&cond)
+    }
+
+    /// Add OR IS NOT NULL condition to the last WHERE condition.
+    ///
+    /// ```
+    /// extern crate sql_builder;
+    ///
+    /// # use std::error::Error;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("title")
+    ///     .or_where_is_not_null("title")
+    ///     .or_where_is_not_null("price")
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title FROM books WHERE title IS NOT NULL OR price IS NOT NULL;", &sql);
+    /// // add                                    ^^^^^                ^^^^^
+    /// // here                                   field                field
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn or_where_is_not_null(&mut self, field: &str) -> &mut Self {
+        let cond = format!("{} IS NOT NULL", &field);
+        self.or_where(&cond)
+    }
+
     /// Union query with subquery.
     /// ORDER BY must be in the last subquery.
     ///
@@ -1507,6 +1695,29 @@ mod tests {
         assert_eq!(
             &sql,
             "SELECT title, price FROM books WHERE (price > 100) AND (title LIKE 'Harry Potter%');"
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_select_strange_books() -> Result<(), Box<dyn Error>> {
+        let sql = SqlBuilder::select_from("books")
+            .field("title")
+            .field("price")
+            .and_where("price < 2")
+            .or_where("price > 1000")
+            .or_where_eq("title", &quote("Harry Potter and the Philosopher's Stone"))
+            .or_where_ne("price", "100")
+            .or_where_like("title", "Alice's")
+            .or_where_not_like("title", "% the %")
+            .or_where_is_null("title")
+            .or_where_is_not_null("price")
+            .sql()?;
+
+        assert_eq!(
+            &sql,
+            "SELECT title, price FROM books WHERE price < 2 OR price > 1000 OR title = 'Harry Potter and the Philosopher''s Stone' OR price <> 100 OR title LIKE 'Alice''s' OR title NOT LIKE '% the %' OR title IS NULL OR price IS NOT NULL;"
         );
 
         Ok(())
