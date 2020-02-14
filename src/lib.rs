@@ -677,7 +677,7 @@ impl SqlBuilder {
         self.and_where(&cond)
     }
 
-    /// Add WHERE LIKE condition
+    /// Add WHERE LIKE condition.
     ///
     /// ```
     /// extern crate sql_builder;
@@ -700,7 +700,7 @@ impl SqlBuilder {
         self.and_where(&cond)
     }
 
-    /// Add WHERE NOT LIKE condition
+    /// Add WHERE NOT LIKE condition.
     ///
     /// ```
     /// extern crate sql_builder;
@@ -720,6 +720,52 @@ impl SqlBuilder {
     /// ```
     pub fn and_where_not_like(&mut self, field: &str, mask: &str) -> &mut Self {
         let cond = format!("{} NOT LIKE '{}'", &field, &esc(&mask));
+        self.and_where(&cond)
+    }
+
+    /// Add WHERE IS NULL condition.
+    ///
+    /// ```
+    /// extern crate sql_builder;
+    ///
+    /// # use std::error::Error;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("title")
+    ///     .and_where_is_null("price")
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title FROM books WHERE price IS NULL;", &sql);
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn and_where_is_null(&mut self, field: &str) -> &mut Self {
+        let cond = format!("{} IS NULL", &field);
+        self.and_where(&cond)
+    }
+
+    /// Add WHERE IS NOT NULL condition.
+    ///
+    /// ```
+    /// extern crate sql_builder;
+    ///
+    /// # use std::error::Error;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("title")
+    ///     .and_where_is_not_null("price")
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title FROM books WHERE price IS NOT NULL;", &sql);
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn and_where_is_not_null(&mut self, field: &str) -> &mut Self {
+        let cond = format!("{} IS NOT NULL", &field);
         self.and_where(&cond)
     }
 
@@ -1570,6 +1616,25 @@ mod tests {
             "SELECT title FROM books WHERE title NOT LIKE '%Alice''s%';",
             &sql
         );
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_books_without_price() -> Result<(), Box<dyn Error>> {
+        let sql = SqlBuilder::select_from("books")
+            .field("title")
+            .and_where_is_null("price")
+            .sql()?;
+
+        assert_eq!(&sql, "SELECT title FROM books WHERE price IS NULL;");
+
+        let sql = SqlBuilder::select_from("books")
+            .field("title")
+            .and_where_is_not_null("price")
+            .sql()?;
+
+        assert_eq!(&sql, "SELECT title FROM books WHERE price IS NOT NULL;");
 
         Ok(())
     }
