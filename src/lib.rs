@@ -53,8 +53,8 @@ pub struct SqlBuilder {
     unions: String,
     wheres: Vec<String>,
     order_by: Vec<String>,
-    limit: Option<usize>,
-    offset: Option<usize>,
+    limit: Option<String>,
+    offset: Option<String>,
 }
 
 /// SQL query statement
@@ -117,7 +117,7 @@ impl SqlBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn select_from(table: &str) -> Self {
+    pub fn select_from<S: ToString>(table: S) -> Self {
         Self {
             table: table.to_string(),
             ..Self::default()
@@ -142,7 +142,7 @@ impl SqlBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn select_values(values: &[&str]) -> Self {
+    pub fn select_values<S: ToString>(values: &[S]) -> Self {
         let mut sel = Self {
             statement: Statement::SelectValues,
             ..Self::default()
@@ -163,7 +163,7 @@ impl SqlBuilder {
     /// let sql = SqlBuilder::insert_into("books")
     ///     .field("title")
     ///     .field("price")
-    ///     .values(&[&quote("In Search of Lost Time"), "150"])
+    ///     .values(&[quote("In Search of Lost Time"), 150.to_string()])
     ///     .values(&["'Don Quixote', 200"])
     ///     .sql()?;
     ///
@@ -173,7 +173,7 @@ impl SqlBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn insert_into(table: &str) -> Self {
+    pub fn insert_into<S: ToString>(table: S) -> Self {
         Self {
             statement: Statement::InsertInto,
             table: table.to_string(),
@@ -200,7 +200,7 @@ impl SqlBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn update_table(table: &str) -> Self {
+    pub fn update_table<S: ToString>(table: S) -> Self {
         Self {
             statement: Statement::UpdateTable,
             table: table.to_string(),
@@ -227,7 +227,7 @@ impl SqlBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn delete_from(table: &str) -> Self {
+    pub fn delete_from<S: ToString>(table: S) -> Self {
         Self {
             statement: Statement::DeleteFrom,
             table: table.to_string(),
@@ -256,25 +256,25 @@ impl SqlBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn join(
+    pub fn join<S: ToString>(
         &mut self,
-        table: &str,
-        operator: Option<&str>,
-        constraint: Option<&str>,
+        table: S,
+        operator: Option<S>,
+        constraint: Option<S>,
     ) -> &mut Self {
         let operator = if let Some(oper) = operator {
-            format!("{} JOIN ", &oper)
+            format!("{} JOIN ", &oper.to_string())
         } else {
             String::new()
         };
 
         let constraint = if let Some(cons) = constraint {
-            format!(" {}", &cons)
+            format!(" {}", &cons.to_string())
         } else {
             String::new()
         };
 
-        let text = format!("{}{}{}", &operator, &table, &constraint);
+        let text = format!("{}{}{}", &operator, &table.to_string(), &constraint);
 
         self.joins.push(text);
         self
@@ -323,7 +323,7 @@ impl SqlBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn fields(&mut self, fields: &[&str]) -> &mut Self {
+    pub fn fields<S: ToString>(&mut self, fields: &[S]) -> &mut Self {
         let mut fields = fields
             .iter()
             .map(|f| (*f).to_string())
@@ -382,7 +382,7 @@ impl SqlBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn set_fields(&mut self, fields: &[&str]) -> &mut Self {
+    pub fn set_fields<S: ToString>(&mut self, fields: &[S]) -> &mut Self {
         let fields = fields
             .iter()
             .map(|f| (*f).to_string())
@@ -411,7 +411,7 @@ impl SqlBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn field(&mut self, field: &str) -> &mut Self {
+    pub fn field<S: ToString>(&mut self, field: S) -> &mut Self {
         self.fields.push(field.to_string());
         self
     }
@@ -468,7 +468,7 @@ impl SqlBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn set_field(&mut self, field: &str) -> &mut Self {
+    pub fn set_field<S: ToString>(&mut self, field: S) -> &mut Self {
         self.fields = vec![field.to_string()];
         self
     }
@@ -492,8 +492,12 @@ impl SqlBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn set(&mut self, field: &str, value: &str) -> &mut Self {
-        let expr = format!("{} = {}", &field, &value);
+    pub fn set<S, T>(&mut self, field: S, value: T) -> &mut Self
+    where
+        S: ToString,
+        T: ToString,
+    {
+        let expr = format!("{} = {}", &field.to_string(), &value.to_string());
         self.sets.push(expr);
         self
     }
@@ -510,7 +514,7 @@ impl SqlBuilder {
     /// let sql = SqlBuilder::insert_into("books")
     ///     .field("title")
     ///     .field("price")
-    ///     .values(&[&quote("In Search of Lost Time"), "150"])
+    ///     .values(&[quote("In Search of Lost Time"), 150.to_string()])
     ///     .values(&["'Don Quixote', 200"])
     ///     .sql()?;
     ///
@@ -520,7 +524,7 @@ impl SqlBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn values(&mut self, values: &[&str]) -> &mut Self {
+    pub fn values<S: ToString>(&mut self, values: &[S]) -> &mut Self {
         let values: Vec<String> = values
             .iter()
             .map(|v| (*v).to_string())
@@ -564,7 +568,7 @@ impl SqlBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn select(&mut self, query: &str) -> &mut Self {
+    pub fn select<S: ToString>(&mut self, query: S) -> &mut Self {
         self.values = Values::Select(query.to_string());
         self
     }
@@ -591,7 +595,7 @@ impl SqlBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn group_by(&mut self, field: &str) -> &mut Self {
+    pub fn group_by<S: ToString>(&mut self, field: S) -> &mut Self {
         self.group_by.push(field.to_string());
         self
     }
@@ -619,7 +623,7 @@ impl SqlBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn having(&mut self, cond: &str) -> &mut Self {
+    pub fn having<S: ToString>(&mut self, cond: S) -> &mut Self {
         self.having = Some(cond.to_string());
         self
     }
@@ -646,7 +650,7 @@ impl SqlBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn and_where(&mut self, cond: &str) -> &mut Self {
+    pub fn and_where<S: ToString>(&mut self, cond: S) -> &mut Self {
         self.wheres.push(cond.to_string());
         self
     }
@@ -671,8 +675,14 @@ impl SqlBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn and_where_eq(&mut self, field: &str, value: &str) -> &mut Self {
-        let cond = format!("{} = {}", &field, &value);
+    pub fn and_where_eq<S, T>(&mut self, field: S, value: T) -> &mut Self
+    where
+        S: ToString,
+        T: ToString,
+    {
+        let mut cond = field.to_string();
+        cond.push_str(" = ");
+        cond.push_str(&value.to_string());
         self.and_where(&cond)
     }
 
@@ -696,8 +706,14 @@ impl SqlBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn and_where_ne(&mut self, field: &str, value: &str) -> &mut Self {
-        let cond = format!("{} <> {}", &field, &value);
+    pub fn and_where_ne<S, T>(&mut self, field: S, value: T) -> &mut Self
+    where
+        S: ToString,
+        T: ToString,
+    {
+        let mut cond = field.to_string();
+        cond.push_str(" <> ");
+        cond.push_str(&value.to_string());
         self.and_where(&cond)
     }
 
@@ -721,8 +737,15 @@ impl SqlBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn and_where_like(&mut self, field: &str, mask: &str) -> &mut Self {
-        let cond = format!("{} LIKE '{}'", &field, &esc(&mask));
+    pub fn and_where_like<S, T>(&mut self, field: S, mask: T) -> &mut Self
+    where
+        S: ToString,
+        T: ToString,
+    {
+        let mut cond = field.to_string();
+        cond.push_str(" LIKE '");
+        cond.push_str(&esc(&mask.to_string()));
+        cond.push('\'');
         self.and_where(&cond)
     }
 
@@ -746,8 +769,15 @@ impl SqlBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn and_where_not_like(&mut self, field: &str, mask: &str) -> &mut Self {
-        let cond = format!("{} NOT LIKE '{}'", &field, &esc(&mask));
+    pub fn and_where_not_like<S, T>(&mut self, field: S, mask: T) -> &mut Self
+    where
+        S: ToString,
+        T: ToString,
+    {
+        let mut cond = field.to_string();
+        cond.push_str(" NOT LIKE '");
+        cond.push_str(&esc(&mask.to_string()));
+        cond.push('\'');
         self.and_where(&cond)
     }
 
@@ -771,8 +801,9 @@ impl SqlBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn and_where_is_null(&mut self, field: &str) -> &mut Self {
-        let cond = format!("{} IS NULL", &field);
+    pub fn and_where_is_null<S: ToString>(&mut self, field: S) -> &mut Self {
+        let mut cond = field.to_string();
+        cond.push_str(" IS NULL");
         self.and_where(&cond)
     }
 
@@ -796,8 +827,9 @@ impl SqlBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn and_where_is_not_null(&mut self, field: &str) -> &mut Self {
-        let cond = format!("{} IS NOT NULL", &field);
+    pub fn and_where_is_not_null<S: ToString>(&mut self, field: S) -> &mut Self {
+        let mut cond = field.to_string();
+        cond.push_str(" IS NOT NULL");
         self.and_where(&cond)
     }
 
@@ -823,12 +855,12 @@ impl SqlBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn or_where(&mut self, cond: &str) -> &mut Self {
+    pub fn or_where<S: ToString>(&mut self, cond: S) -> &mut Self {
         if self.wheres.is_empty() {
             self.wheres.push(cond.to_string());
         } else if let Some(last) = self.wheres.last_mut() {
             last.push_str(" OR ");
-            last.push_str(&cond);
+            last.push_str(&cond.to_string());
         }
         self
     }
@@ -854,8 +886,14 @@ impl SqlBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn or_where_eq(&mut self, field: &str, value: &str) -> &mut Self {
-        let cond = format!("{} = {}", &field, &value);
+    pub fn or_where_eq<S, T>(&mut self, field: S, value: T) -> &mut Self
+    where
+        S: ToString,
+        T: ToString,
+    {
+        let mut cond = field.to_string();
+        cond.push_str(" = ");
+        cond.push_str(&value.to_string());
         self.or_where(&cond)
     }
 
@@ -880,8 +918,14 @@ impl SqlBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn or_where_ne(&mut self, field: &str, value: &str) -> &mut Self {
-        let cond = format!("{} <> {}", &field, &value);
+    pub fn or_where_ne<S, T>(&mut self, field: S, value: T) -> &mut Self
+    where
+        S: ToString,
+        T: ToString,
+    {
+        let mut cond = field.to_string();
+        cond.push_str(" <> ");
+        cond.push_str(&value.to_string());
         self.or_where(&cond)
     }
 
@@ -906,8 +950,15 @@ impl SqlBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn or_where_like(&mut self, field: &str, mask: &str) -> &mut Self {
-        let cond = format!("{} LIKE '{}'", &field, &esc(&mask));
+    pub fn or_where_like<S, T>(&mut self, field: S, mask: T) -> &mut Self
+    where
+        S: ToString,
+        T: ToString,
+    {
+        let mut cond = field.to_string();
+        cond.push_str(" LIKE '");
+        cond.push_str(&esc(&mask.to_string()));
+        cond.push('\'');
         self.or_where(&cond)
     }
 
@@ -932,8 +983,15 @@ impl SqlBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn or_where_not_like(&mut self, field: &str, mask: &str) -> &mut Self {
-        let cond = format!("{} NOT LIKE '{}'", &field, &esc(&mask));
+    pub fn or_where_not_like<S, T>(&mut self, field: S, mask: T) -> &mut Self
+    where
+        S: ToString,
+        T: ToString,
+    {
+        let mut cond = field.to_string();
+        cond.push_str(" NOT LIKE '");
+        cond.push_str(&esc(&mask.to_string()));
+        cond.push('\'');
         self.or_where(&cond)
     }
 
@@ -948,7 +1006,7 @@ impl SqlBuilder {
     /// # fn main() -> Result<(), Box<dyn Error>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
-    ///     .and_where_eq("price", "0")
+    ///     .and_where_eq("price", 0)
     ///     .or_where_is_null("price")
     ///     .sql()?;
     ///
@@ -958,8 +1016,9 @@ impl SqlBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn or_where_is_null(&mut self, field: &str) -> &mut Self {
-        let cond = format!("{} IS NULL", &field);
+    pub fn or_where_is_null<S: ToString>(&mut self, field: S) -> &mut Self {
+        let mut cond = field.to_string();
+        cond.push_str(" IS NULL");
         self.or_where(&cond)
     }
 
@@ -984,8 +1043,9 @@ impl SqlBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn or_where_is_not_null(&mut self, field: &str) -> &mut Self {
-        let cond = format!("{} IS NOT NULL", &field);
+    pub fn or_where_is_not_null<S: ToString>(&mut self, field: S) -> &mut Self {
+        let mut cond = field.to_string();
+        cond.push_str(" IS NOT NULL");
         self.or_where(&cond)
     }
 
@@ -1020,8 +1080,8 @@ impl SqlBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn union(&mut self, query: &str) -> &mut Self {
-        let append = format!(" UNION {}", &query);
+    pub fn union<S: ToString>(&mut self, query: S) -> &mut Self {
+        let append = format!(" UNION {}", &query.to_string());
         self.unions.push_str(&append);
         self
     }
@@ -1053,9 +1113,9 @@ impl SqlBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn union_all(&mut self, query: &str) -> &mut Self {
-        let append = format!(" UNION ALL {}", &query);
-        self.unions.push_str(&append);
+    pub fn union_all<S: ToString>(&mut self, query: S) -> &mut Self {
+        self.unions.push_str(" UNION ALL ");
+        self.unions.push_str(&query.to_string());
         self
     }
 
@@ -1081,9 +1141,9 @@ impl SqlBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn order_by(&mut self, field: &str, desc: bool) -> &mut Self {
+    pub fn order_by<S: ToString>(&mut self, field: S, desc: bool) -> &mut Self {
         let order = if desc {
-            format!("{} DESC", &field)
+            format!("{} DESC", &field.to_string())
         } else {
             field.to_string()
         };
@@ -1113,8 +1173,8 @@ impl SqlBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn order_asc(&mut self, field: &str) -> &mut Self {
-        self.order_by(&field, false)
+    pub fn order_asc<S: ToString>(&mut self, field: S) -> &mut Self {
+        self.order_by(&field.to_string(), false)
     }
 
     /// Add ORDER BY DESC.
@@ -1139,8 +1199,8 @@ impl SqlBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn order_desc(&mut self, field: &str) -> &mut Self {
-        self.order_by(&field, true)
+    pub fn order_desc<S: ToString>(&mut self, field: S) -> &mut Self {
+        self.order_by(&field.to_string(), true)
     }
 
     /// Set LIMIT.
@@ -1166,8 +1226,8 @@ impl SqlBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn limit(&mut self, limit: usize) -> &mut Self {
-        self.limit = Some(limit);
+    pub fn limit<S: ToString>(&mut self, limit: S) -> &mut Self {
+        self.limit = Some(limit.to_string());
         self
     }
 
@@ -1195,8 +1255,8 @@ impl SqlBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn offset(&mut self, offset: usize) -> &mut Self {
-        self.offset = Some(offset);
+    pub fn offset<S: ToString>(&mut self, offset: S) -> &mut Self {
+        self.offset = Some(offset.to_string());
         self
     }
 
@@ -1311,9 +1371,11 @@ impl SqlBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn subquery_as(&self, name: &str) -> Result<String, Box<dyn Error>> {
-        let text = self.query()?;
-        let text = format!("({}) AS {}", &text, &name);
+    pub fn subquery_as<S: ToString>(&self, name: S) -> Result<String, Box<dyn Error>> {
+        let mut text = "(".to_string();
+        text.push_str(&self.query()?);
+        text.push_str(") AS ");
+        text.push_str(&name.to_string());
         Ok(text)
     }
 
@@ -1384,13 +1446,13 @@ impl SqlBuilder {
         };
 
         // Make LIMIT part
-        let limit = match self.limit {
+        let limit = match &self.limit {
             Some(limit) => format!(" LIMIT {}", limit),
             None => String::new(),
         };
 
         // Make OFFSET part
-        let offset = match self.offset {
+        let offset = match &self.offset {
             Some(offset) => format!(" OFFSET {}", offset),
             None => String::new(),
         };
@@ -1551,8 +1613,8 @@ impl SqlBuilder {
 ///
 /// assert_eq!(&sql, "Hello, ''World''");
 /// ```
-pub fn esc(src: &str) -> String {
-    src.replace("'", "''")
+pub fn esc<S: ToString>(src: S) -> String {
+    src.to_string().replace("'", "''")
 }
 
 /// Quote string for SQL.
@@ -1566,8 +1628,8 @@ pub fn esc(src: &str) -> String {
 ///
 /// assert_eq!(&sql, "'Hello, ''World'''");
 /// ```
-pub fn quote(src: &str) -> String {
-    format!("'{}'", esc(src))
+pub fn quote<S: ToString>(src: S) -> String {
+    format!("'{}'", esc(src.to_string()))
 }
 
 #[cfg(test)]
@@ -1708,7 +1770,7 @@ mod tests {
             .and_where("price < 2")
             .or_where("price > 1000")
             .or_where_eq("title", &quote("Harry Potter and the Philosopher's Stone"))
-            .or_where_ne("price", "100")
+            .or_where_ne("price", 100)
             .or_where_like("title", "Alice's")
             .or_where_not_like("title", "% the %")
             .or_where_is_null("title")
@@ -1965,7 +2027,7 @@ mod tests {
         let sql = SqlBuilder::insert_into("books")
             .field("title")
             .field("price")
-            .values(&[&quote("In Search of Lost Time"), "150"])
+            .values(&[quote("In Search of Lost Time"), 150.to_string()])
             .values(&["'Don Quixote', 200"])
             .sql()?;
 
@@ -2000,7 +2062,7 @@ mod tests {
     #[test]
     fn test_sold_all_harry_potter() -> Result<(), Box<dyn Error>> {
         let sql = SqlBuilder::update_table("books")
-            .set("price", "0")
+            .set("price", 0)
             .set("title", "'[SOLD!]' || title")
             .and_where_like("title", "Harry Potter%")
             .sql()?;
