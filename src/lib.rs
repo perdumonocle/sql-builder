@@ -357,18 +357,16 @@ impl SqlBuilder {
     /// db.field("COUNT(id)");
     ///
     /// if let Some(filter) = &req_data.filter {
-    ///   let item = format!("LOWER(title) LIKE '%{}%'", filter.to_lowercase());
-    ///   db.and_where(&item);
+    ///   let mask = format!("%{}%", filter.to_lowercase());
+    ///   db.and_where_like("LOWER(title)", mask);
     /// }
     ///
     /// if let Some(price_min) = &req_data.price_min {
-    ///   let item = format!("price >= {}", price_min);
-    ///   db.and_where(&item);
+    ///   db.and_where_ge("price", price_min);
     /// }
     ///
     /// if let Some(price_max) = &req_data.price_max {
-    ///   let item = format!("price <= {}", price_max);
-    ///   db.and_where(&item);
+    ///   db.and_where_le("price", price_max);
     /// }
     ///
     /// let sql_count = db.sql()?;
@@ -441,18 +439,16 @@ impl SqlBuilder {
     /// db.field("COUNT(id)");
     ///
     /// if let Some(filter) = &req_data.filter {
-    ///   let item = format!("LOWER(title) LIKE '%{}%'", filter.to_lowercase());
-    ///   db.and_where(&item);
+    ///   let mask = format!("%{}%", filter.to_lowercase());
+    ///   db.and_where_like("LOWER(title)", mask);
     /// }
     ///
     /// if let Some(price_min) = &req_data.price_min {
-    ///   let item = format!("price >= {}", price_min);
-    ///   db.and_where(&item);
+    ///   db.and_where_ge("price", price_min);
     /// }
     ///
     /// if let Some(price_max) = &req_data.price_max {
-    ///   let item = format!("price <= {}", price_max);
-    ///   db.and_where(&item);
+    ///   db.and_where_le("price", price_max);
     /// }
     ///
     /// let sql_count = db.sql()?;
