@@ -734,6 +734,36 @@ impl SqlBuilder {
         self
     }
 
+    /// Add SET part with escaped string value (for UPDATE).
+    ///
+    /// ```
+    /// extern crate sql_builder;
+    ///
+    /// # use std::error::Error;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let sql = SqlBuilder::update_table("books")
+    ///     .set_str("comment", "Don't distribute!")
+    ///     .and_where_le("price", "100")
+    ///     .sql()?;
+    ///
+    /// assert_eq!("UPDATE books SET comment = 'Don''t distribute!' WHERE price <= 100;", &sql);
+    /// // add                       ^^^^^^^    ^^^^^^^^^^^^^^^^^^
+    /// // here                       field           value
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn set_str<S, T>(&mut self, field: S, value: T) -> &mut Self
+    where
+        S: ToString,
+        T: ToString,
+    {
+        let expr = format!("{} = '{}'", &field.to_string(), &esc(&value.to_string()));
+        self.sets.push(expr);
+        self
+    }
+
     /// Add VALUES part (for INSERT).
     ///
     /// ```
@@ -2966,6 +2996,21 @@ mod tests {
             .sql()?;
 
         assert_eq!(&sql, "UPDATE books SET price = 0, title = '[SOLD!]' || title WHERE title LIKE 'Harry Potter%';");
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_mark_as_not_distr() -> Result<(), Box<dyn Error>> {
+        let sql = SqlBuilder::update_table("books")
+            .set_str("comment", "Don't distribute!")
+            .and_where_le("price", "100")
+            .sql()?;
+
+        assert_eq!(
+            "UPDATE books SET comment = 'Don''t distribute!' WHERE price <= 100;",
+            &sql
+        );
 
         Ok(())
     }
