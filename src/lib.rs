@@ -6,7 +6,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! sql-builder = "0.5"
+//! sql-builder = "0.6"
 //! ```
 //!
 //! Next, add this to your crate:
