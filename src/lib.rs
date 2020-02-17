@@ -584,7 +584,7 @@ impl SqlBuilder {
     /// extern crate sql_builder;
     ///
     /// # use std::error::Error;
-    /// use sql_builder::{SqlBuilder, quote};
+    /// use sql_builder::SqlBuilder;
     ///
     /// # fn main() -> Result<(), Box<dyn Error>> {
     /// let sql = SqlBuilder::select_from("books")
@@ -611,7 +611,7 @@ impl SqlBuilder {
     /// extern crate sql_builder;
     ///
     /// # use std::error::Error;
-    /// use sql_builder::{SqlBuilder, quote};
+    /// use sql_builder::SqlBuilder;
     ///
     /// # fn main() -> Result<(), Box<dyn Error>> {
     /// let sql = SqlBuilder::select_from("books")
@@ -639,7 +639,7 @@ impl SqlBuilder {
     /// extern crate sql_builder;
     ///
     /// # use std::error::Error;
-    /// use sql_builder::{SqlBuilder, quote};
+    /// use sql_builder::SqlBuilder;
     ///
     /// # fn main() -> Result<(), Box<dyn Error>> {
     /// let sql = SqlBuilder::select_from("books")
@@ -728,7 +728,7 @@ impl SqlBuilder {
     /// extern crate sql_builder;
     ///
     /// # use std::error::Error;
-    /// use sql_builder::{SqlBuilder, quote};
+    /// use sql_builder::SqlBuilder;
     ///
     /// # fn main() -> Result<(), Box<dyn Error>> {
     /// let sql = SqlBuilder::select_from("books")
@@ -760,7 +760,7 @@ impl SqlBuilder {
     /// extern crate sql_builder;
     ///
     /// # use std::error::Error;
-    /// use sql_builder::{SqlBuilder, quote};
+    /// use sql_builder::SqlBuilder;
     ///
     /// # fn main() -> Result<(), Box<dyn Error>> {
     /// let sql = SqlBuilder::select_from("books")
@@ -792,7 +792,7 @@ impl SqlBuilder {
     /// extern crate sql_builder;
     ///
     /// # use std::error::Error;
-    /// use sql_builder::{SqlBuilder, quote};
+    /// use sql_builder::SqlBuilder;
     ///
     /// # fn main() -> Result<(), Box<dyn Error>> {
     /// let sql = SqlBuilder::select_from("books")
@@ -824,7 +824,7 @@ impl SqlBuilder {
     /// extern crate sql_builder;
     ///
     /// # use std::error::Error;
-    /// use sql_builder::{SqlBuilder, quote};
+    /// use sql_builder::SqlBuilder;
     ///
     /// # fn main() -> Result<(), Box<dyn Error>> {
     /// let sql = SqlBuilder::select_from("books")
@@ -972,7 +972,7 @@ impl SqlBuilder {
     /// extern crate sql_builder;
     ///
     /// # use std::error::Error;
-    /// use sql_builder::{SqlBuilder, quote};
+    /// use sql_builder::SqlBuilder;
     ///
     /// # fn main() -> Result<(), Box<dyn Error>> {
     /// let sql = SqlBuilder::select_from("books")
@@ -1068,7 +1068,7 @@ impl SqlBuilder {
     /// extern crate sql_builder;
     ///
     /// # use std::error::Error;
-    /// use sql_builder::{SqlBuilder, quote};
+    /// use sql_builder::SqlBuilder;
     ///
     /// # fn main() -> Result<(), Box<dyn Error>> {
     /// let sql = SqlBuilder::select_from("books")
@@ -1101,7 +1101,7 @@ impl SqlBuilder {
     /// extern crate sql_builder;
     ///
     /// # use std::error::Error;
-    /// use sql_builder::{SqlBuilder, quote};
+    /// use sql_builder::SqlBuilder;
     ///
     /// # fn main() -> Result<(), Box<dyn Error>> {
     /// let sql = SqlBuilder::select_from("books")
@@ -1112,8 +1112,8 @@ impl SqlBuilder {
     ///     .sql()?;
     ///
     /// assert_eq!("SELECT title, price FROM books WHERE price < 100 OR price >= 300;", &sql);
-    /// // add                                                          ^^^^^    ^^^
-    /// // here                                                         field   value
+    /// // add                                           ^^^^^   ^^^    ^^^^^    ^^^
+    /// // here                                          field  value   field   value
     /// # Ok(())
     /// # }
     /// ```
@@ -1134,7 +1134,7 @@ impl SqlBuilder {
     /// extern crate sql_builder;
     ///
     /// # use std::error::Error;
-    /// use sql_builder::{SqlBuilder, quote};
+    /// use sql_builder::SqlBuilder;
     ///
     /// # fn main() -> Result<(), Box<dyn Error>> {
     /// let sql = SqlBuilder::select_from("books")
@@ -1167,7 +1167,7 @@ impl SqlBuilder {
     /// extern crate sql_builder;
     ///
     /// # use std::error::Error;
-    /// use sql_builder::{SqlBuilder, quote};
+    /// use sql_builder::SqlBuilder;
     ///
     /// # fn main() -> Result<(), Box<dyn Error>> {
     /// let sql = SqlBuilder::select_from("books")
@@ -1178,8 +1178,8 @@ impl SqlBuilder {
     ///     .sql()?;
     ///
     /// assert_eq!("SELECT title, price FROM books WHERE price < 100 OR price <= 300;", &sql);
-    /// // add                                                          ^^^^^    ^^^
-    /// // here                                                         field   value
+    /// // add                                           ^^^^^   ^^^    ^^^^^    ^^^
+    /// // here                                          field  value   field   value
     /// # Ok(())
     /// # }
     /// ```
@@ -2000,7 +2000,7 @@ mod tests {
     fn test_select_price_for_harry_potter_and_phil_stone() -> Result<(), Box<dyn Error>> {
         let sql = SqlBuilder::select_from("books")
             .field("price")
-            .and_where_eq("title", &quote("Harry Potter and the Philosopher's Stone"))
+            .and_where_eq("title", quote("Harry Potter and the Philosopher's Stone"))
             .sql()?;
 
         assert_eq!(
@@ -2015,7 +2015,7 @@ mod tests {
     fn test_select_price_not_for_harry_potter_and_phil_stone() -> Result<(), Box<dyn Error>> {
         let sql = SqlBuilder::select_from("books")
             .field("price")
-            .and_where_ne("title", &quote("Harry Potter and the Philosopher's Stone"))
+            .and_where_ne("title", quote("Harry Potter and the Philosopher's Stone"))
             .sql()?;
 
         assert_eq!(
@@ -2050,7 +2050,7 @@ mod tests {
             .field("price")
             .and_where("price < 2")
             .or_where("price > 1000")
-            .or_where_eq("title", &quote("Harry Potter and the Philosopher's Stone"))
+            .or_where_eq("title", quote("Harry Potter and the Philosopher's Stone"))
             .or_where_ne("price", 100)
             .or_where_like("title", "Alice's")
             .or_where_not_like("title", "% the %")
