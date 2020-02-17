@@ -477,7 +477,8 @@ impl SqlBuilder {
             JoinOperator::InnerJoin => "INNER JOIN ",
             JoinOperator::CrossJoin if self.join_natural => "NATURAL CROSS JOIN ",
             JoinOperator::CrossJoin => "CROSS JOIN ",
-        }.to_string();
+        }
+        .to_string();
 
         self.join_natural = false;
 
