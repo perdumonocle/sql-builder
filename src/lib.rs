@@ -1592,13 +1592,13 @@ impl SqlBuilder {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
-    ///     .or_where_lt("price", 100.to_string())
+    ///     .or_where_le("price", 100.to_string())
     ///     .or_where_le("price", 300.to_string())
     ///     .sql()?;
     ///
-    /// assert_eq!("SELECT title, price FROM books WHERE price < 100 OR price <= 300;", &sql);
-    /// // add                                           ^^^^^   ^^^    ^^^^^    ^^^
-    /// // here                                          field  value   field   value
+    /// assert_eq!("SELECT title, price FROM books WHERE price <= 100 OR price <= 300;", &sql);
+    /// // add                                           ^^^^^    ^^^    ^^^^^    ^^^
+    /// // here                                          field   value   field   value
     /// # Ok(())
     /// # }
     /// ```
@@ -1662,8 +1662,8 @@ impl SqlBuilder {
     ///     .sql()?;
     ///
     /// assert_eq!("SELECT price FROM books WHERE title LIKE '%Alice''s' OR title LIKE '%Philosopher''s';", &sql);
-    /// // add                                    ^^^^^      ^^^^^^^^^^^    ^^^^^      ^^^^^^^^^^^^^^^^^
-    /// // here                                   field         mask        field            mask
+    /// // add                                    ^^^^^        ^^^^^^^^     ^^^^^        ^^^^^^^^^^^^^^
+    /// // here                                   field          mask       field             mask
     /// # Ok(())
     /// # }
     /// ```
@@ -1695,7 +1695,7 @@ impl SqlBuilder {
     ///     .sql()?;
     ///
     /// assert_eq!("SELECT price FROM books WHERE title LIKE 'Alice''s%' OR title LIKE 'Philosopher''s%';", &sql);
-    /// // add                                    ^^^^^      ^^^^^^^^^^^    ^^^^^      ^^^^^^^^^^^^^^^^^
+    /// // add                                    ^^^^^       ^^^^^^^^      ^^^^^       ^^^^^^^^^^^^^^  
     /// // here                                   field         mask        field            mask
     /// # Ok(())
     /// # }
@@ -1794,8 +1794,8 @@ impl SqlBuilder {
     ///     .sql()?;
     ///
     /// assert_eq!("SELECT price FROM books WHERE title NOT LIKE '%Alice''s' OR title NOT LIKE '%Philosopher''s';", &sql);
-    /// // add                                    ^^^^^          ^^^^^^^^^^^    ^^^^^          ^^^^^^^^^^^^^^^^^
-    /// // here                                   field             mask        field                mask
+    /// // add                                    ^^^^^            ^^^^^^^^     ^^^^^            ^^^^^^^^^^^^^^
+    /// // here                                   field              mask       field                 mask
     /// # Ok(())
     /// # }
     /// ```
@@ -1827,7 +1827,7 @@ impl SqlBuilder {
     ///     .sql()?;
     ///
     /// assert_eq!("SELECT price FROM books WHERE title NOT LIKE 'Alice''s%' OR title NOT LIKE 'Philosopher''s%';", &sql);
-    /// // add                                    ^^^^^          ^^^^^^^^^^^    ^^^^^          ^^^^^^^^^^^^^^^^^
+    /// // add                                    ^^^^^           ^^^^^^^^      ^^^^^           ^^^^^^^^^^^^^^  
     /// // here                                   field             mask        field                mask
     /// # Ok(())
     /// # }
