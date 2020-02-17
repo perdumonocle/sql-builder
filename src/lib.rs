@@ -43,6 +43,8 @@ use std::error::Error;
 pub struct SqlBuilder {
     statement: Statement,
     table: String,
+    join_natural: bool,
+    join_operator: JoinOperator,
     joins: Vec<String>,
     distinct: bool,
     fields: Vec<String>,
@@ -66,6 +68,17 @@ enum Statement {
     DeleteFrom,
 }
 
+/// Operator for JOIN
+enum JoinOperator {
+    Join,
+    LeftJoin,
+    LeftOuterJoin,
+    RightJoin,
+    RightOuterJoin,
+    InnerJoin,
+    CrossJoin,
+}
+
 /// INSERT values
 enum Values {
     Empty,
@@ -79,6 +92,8 @@ impl SqlBuilder {
         Self {
             statement: Statement::SelectFrom,
             table: String::new(),
+            join_natural: false,
+            join_operator: JoinOperator::Join,
             joins: Vec::new(),
             distinct: false,
             fields: Vec::new(),
@@ -235,6 +250,194 @@ impl SqlBuilder {
         }
     }
 
+    /// Use NATURAL JOIN
+    ///
+    /// ```
+    /// extern crate sql_builder;
+    ///
+    /// # use std::error::Error;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("title")
+    ///     .field("total")
+    ///     .natural()
+    ///     .join("orders")
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title, total FROM books NATURAL JOIN orders;", &sql);
+    /// // add here                                ^^^^^^^
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn natural(&mut self) -> &mut Self {
+        self.join_natural = true;
+        self
+    }
+
+    /// Use LEFT JOIN
+    ///
+    /// ```
+    /// extern crate sql_builder;
+    ///
+    /// # use std::error::Error;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("title")
+    ///     .field("total")
+    ///     .natural()
+    ///     .left()
+    ///     .join("orders")
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title, total FROM books NATURAL LEFT JOIN orders;", &sql);
+    /// // add here                                        ^^^^
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn left(&mut self) -> &mut Self {
+        self.join_operator = JoinOperator::LeftJoin;
+        self
+    }
+
+    /// Use LEFT OUTER JOIN
+    ///
+    /// ```
+    /// extern crate sql_builder;
+    ///
+    /// # use std::error::Error;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("title")
+    ///     .field("total")
+    ///     .natural()
+    ///     .left_outer()
+    ///     .join("orders")
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title, total FROM books NATURAL LEFT OUTER JOIN orders;", &sql);
+    /// // add here                                        ^^^^^^^^^^
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn left_outer(&mut self) -> &mut Self {
+        self.join_operator = JoinOperator::LeftOuterJoin;
+        self
+    }
+
+    /// Use RIGHT JOIN
+    ///
+    /// ```
+    /// extern crate sql_builder;
+    ///
+    /// # use std::error::Error;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("title")
+    ///     .field("total")
+    ///     .natural()
+    ///     .right()
+    ///     .join("orders")
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title, total FROM books NATURAL RIGHT JOIN orders;", &sql);
+    /// // add here                                        ^^^^^
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn right(&mut self) -> &mut Self {
+        self.join_operator = JoinOperator::RightJoin;
+        self
+    }
+
+    /// Use RIGHT OUTER JOIN
+    ///
+    /// ```
+    /// extern crate sql_builder;
+    ///
+    /// # use std::error::Error;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("title")
+    ///     .field("total")
+    ///     .natural()
+    ///     .right_outer()
+    ///     .join("orders")
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title, total FROM books NATURAL RIGHT OUTER JOIN orders;", &sql);
+    /// // add here                                        ^^^^^^^^^^^
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn right_outer(&mut self) -> &mut Self {
+        self.join_operator = JoinOperator::RightOuterJoin;
+        self
+    }
+
+    /// Use INNER JOIN
+    ///
+    /// ```
+    /// extern crate sql_builder;
+    ///
+    /// # use std::error::Error;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("title")
+    ///     .field("total")
+    ///     .natural()
+    ///     .inner()
+    ///     .join("orders")
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title, total FROM books NATURAL INNER JOIN orders;", &sql);
+    /// // add here                                        ^^^^^
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn inner(&mut self) -> &mut Self {
+        self.join_operator = JoinOperator::InnerJoin;
+        self
+    }
+
+    /// Use CROSS JOIN
+    ///
+    /// ```
+    /// extern crate sql_builder;
+    ///
+    /// # use std::error::Error;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("title")
+    ///     .field("total")
+    ///     .natural()
+    ///     .cross()
+    ///     .join("orders")
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title, total FROM books NATURAL CROSS JOIN orders;", &sql);
+    /// // add here                                        ^^^^^
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn cross(&mut self) -> &mut Self {
+        self.join_operator = JoinOperator::CrossJoin;
+        self
+    }
+
     /// Join with table.
     ///
     /// ```
@@ -247,41 +450,70 @@ impl SqlBuilder {
     /// let sql = SqlBuilder::select_from("books AS b")
     ///     .field("b.title")
     ///     .field("s.total")
-    ///     .join("shops AS s", Some("LEFT OUTER"), Some("ON b.id = s.book"))
+    ///     .left()
+    ///     .join("shops AS s")
+    ///     .on("b.id = s.book")
     ///     .sql()?;
     ///
-    /// assert_eq!("SELECT b.title, s.total FROM books AS b LEFT OUTER JOIN shops AS s ON b.id = s.book;", &sql);
-    /// // add                                              ^^^^^^^^^^      ^^^^^^^^^^ ^^^^^^^^^^^^^^^^
-    /// // here                                              operator         table       constraint
+    /// assert_eq!("SELECT b.title, s.total FROM books AS b LEFT JOIN shops AS s ON b.id = s.book;", &sql);
+    /// // add                                                        ^^^^^^^^^^
+    /// // here                                                         table
     /// # Ok(())
     /// # }
     /// ```
-    pub fn join<S, T, U>(
-        &mut self,
-        table: S,
-        operator: Option<T>,
-        constraint: Option<U>,
-    ) -> &mut Self
-    where
-        S: ToString,
-        T: ToString,
-        U: ToString,
-    {
-        let operator = if let Some(oper) = operator {
-            format!("{} JOIN ", &oper.to_string())
-        } else {
-            String::new()
-        };
+    pub fn join<S: ToString>(&mut self, table: S) -> &mut Self {
+        let mut text = match &self.join_operator {
+            JoinOperator::Join if self.join_natural => "NATURAL JOIN ",
+            JoinOperator::Join => "JOIN ",
+            JoinOperator::LeftJoin if self.join_natural => "NATURAL LEFT JOIN ",
+            JoinOperator::LeftJoin => "LEFT JOIN ",
+            JoinOperator::LeftOuterJoin if self.join_natural => "NATURAL LEFT OUTER JOIN ",
+            JoinOperator::LeftOuterJoin => "LEFT OUTER JOIN ",
+            JoinOperator::RightJoin if self.join_natural => "NATURAL RIGHT JOIN ",
+            JoinOperator::RightJoin => "RIGHT JOIN ",
+            JoinOperator::RightOuterJoin if self.join_natural => "NATURAL RIGHT OUTER JOIN ",
+            JoinOperator::RightOuterJoin => "RIGHT OUTER JOIN ",
+            JoinOperator::InnerJoin if self.join_natural => "NATURAL INNER JOIN ",
+            JoinOperator::InnerJoin => "INNER JOIN ",
+            JoinOperator::CrossJoin if self.join_natural => "NATURAL CROSS JOIN ",
+            JoinOperator::CrossJoin => "CROSS JOIN ",
+        }.to_string();
 
-        let constraint = if let Some(cons) = constraint {
-            format!(" {}", &cons.to_string())
-        } else {
-            String::new()
-        };
+        self.join_natural = false;
 
-        let text = format!("{}{}{}", &operator, &table.to_string(), &constraint);
+        text.push_str(&table.to_string());
 
         self.joins.push(text);
+        self
+    }
+
+    /// Join constraint to the last JOIN part.
+    ///
+    /// ```
+    /// extern crate sql_builder;
+    ///
+    /// # use std::error::Error;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let sql = SqlBuilder::select_from("books AS b")
+    ///     .field("b.title")
+    ///     .field("s.total")
+    ///     .join("shops AS s")
+    ///     .on("b.id = s.book")
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT b.title, s.total FROM books AS b JOIN shops AS s ON b.id = s.book;", &sql);
+    /// // add                                                                 ^^^^^^^^^^^^^
+    /// // here                                                                 constraint
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn on<S: ToString>(&mut self, constraint: S) -> &mut Self {
+        if let Some(last) = self.joins.last_mut() {
+            last.push_str(" ON ");
+            last.push_str(&constraint.to_string());
+        }
         self
     }
 
@@ -2365,7 +2597,9 @@ mod tests {
         let sql = SqlBuilder::select_from("books AS b")
             .field("b.title")
             .field("s.total")
-            .join("shops AS s", Some("LEFT OUTER"), Some("ON b.id = s.book"))
+            .left_outer()
+            .join("shops AS s")
+            .on("b.id = s.book")
             .sql()?;
 
         assert_eq!(
