@@ -256,12 +256,17 @@ impl SqlBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn join<S: ToString>(
+    pub fn join<S, T, U>(
         &mut self,
         table: S,
-        operator: Option<S>,
-        constraint: Option<S>,
-    ) -> &mut Self {
+        operator: Option<T>,
+        constraint: Option<U>,
+    ) -> &mut Self
+    where
+        S: ToString,
+        T: ToString,
+        U: ToString,
+    {
         let operator = if let Some(oper) = operator {
             format!("{} JOIN ", &oper.to_string())
         } else {
@@ -717,6 +722,134 @@ impl SqlBuilder {
         self.and_where(&cond)
     }
 
+    /// Add WHERE condition for field greater than value.
+    ///
+    /// ```
+    /// extern crate sql_builder;
+    ///
+    /// # use std::error::Error;
+    /// use sql_builder::{SqlBuilder, quote};
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("title")
+    ///     .field("price")
+    ///     .and_where_gt("price", 300.to_string())
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title, price FROM books WHERE price > 300;", &sql);
+    /// // add                                           ^^^^^   ^^^
+    /// // here                                          field  value
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn and_where_gt<S, T>(&mut self, field: S, value: T) -> &mut Self
+    where
+        S: ToString,
+        T: ToString,
+    {
+        let mut cond = field.to_string();
+        cond.push_str(" > ");
+        cond.push_str(&value.to_string());
+        self.and_where(&cond)
+    }
+
+    /// Add WHERE condition for field not less than value.
+    ///
+    /// ```
+    /// extern crate sql_builder;
+    ///
+    /// # use std::error::Error;
+    /// use sql_builder::{SqlBuilder, quote};
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("title")
+    ///     .field("price")
+    ///     .and_where_ge("price", 300.to_string())
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title, price FROM books WHERE price >= 300;", &sql);
+    /// // add                                           ^^^^^    ^^^
+    /// // here                                          field   value
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn and_where_ge<S, T>(&mut self, field: S, value: T) -> &mut Self
+    where
+        S: ToString,
+        T: ToString,
+    {
+        let mut cond = field.to_string();
+        cond.push_str(" >= ");
+        cond.push_str(&value.to_string());
+        self.and_where(&cond)
+    }
+
+    /// Add WHERE condition for field less than value.
+    ///
+    /// ```
+    /// extern crate sql_builder;
+    ///
+    /// # use std::error::Error;
+    /// use sql_builder::{SqlBuilder, quote};
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("title")
+    ///     .field("price")
+    ///     .and_where_lt("price", 300.to_string())
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title, price FROM books WHERE price < 300;", &sql);
+    /// // add                                           ^^^^^   ^^^
+    /// // here                                          field  value
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn and_where_lt<S, T>(&mut self, field: S, value: T) -> &mut Self
+    where
+        S: ToString,
+        T: ToString,
+    {
+        let mut cond = field.to_string();
+        cond.push_str(" < ");
+        cond.push_str(&value.to_string());
+        self.and_where(&cond)
+    }
+
+    /// Add WHERE condition for field not greater than value.
+    ///
+    /// ```
+    /// extern crate sql_builder;
+    ///
+    /// # use std::error::Error;
+    /// use sql_builder::{SqlBuilder, quote};
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("title")
+    ///     .field("price")
+    ///     .and_where_le("price", 300.to_string())
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title, price FROM books WHERE price <= 300;", &sql);
+    /// // add                                           ^^^^^    ^^^
+    /// // here                                          field   value
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn and_where_le<S, T>(&mut self, field: S, value: T) -> &mut Self
+    where
+        S: ToString,
+        T: ToString,
+    {
+        let mut cond = field.to_string();
+        cond.push_str(" <= ");
+        cond.push_str(&value.to_string());
+        self.and_where(&cond)
+    }
+
     /// Add WHERE LIKE condition.
     ///
     /// ```
@@ -925,6 +1058,134 @@ impl SqlBuilder {
     {
         let mut cond = field.to_string();
         cond.push_str(" <> ");
+        cond.push_str(&value.to_string());
+        self.or_where(&cond)
+    }
+
+    /// Add OR condition for field greater than value to the last WHERE condition.
+    ///
+    /// ```
+    /// extern crate sql_builder;
+    ///
+    /// # use std::error::Error;
+    /// use sql_builder::{SqlBuilder, quote};
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("title")
+    ///     .field("price")
+    ///     .or_where_gt("price", 300.to_string())
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title, price FROM books WHERE price > 300;", &sql);
+    /// // add                                           ^^^^^   ^^^
+    /// // here                                          field  value
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn or_where_gt<S, T>(&mut self, field: S, value: T) -> &mut Self
+    where
+        S: ToString,
+        T: ToString,
+    {
+        let mut cond = field.to_string();
+        cond.push_str(" > ");
+        cond.push_str(&value.to_string());
+        self.or_where(&cond)
+    }
+
+    /// Add OR condition for field not less than value to the last WHERE condition.
+    ///
+    /// ```
+    /// extern crate sql_builder;
+    ///
+    /// # use std::error::Error;
+    /// use sql_builder::{SqlBuilder, quote};
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("title")
+    ///     .field("price")
+    ///     .or_where_ge("price", 300.to_string())
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title, price FROM books WHERE price >= 300;", &sql);
+    /// // add                                           ^^^^^    ^^^
+    /// // here                                          field   value
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn or_where_ge<S, T>(&mut self, field: S, value: T) -> &mut Self
+    where
+        S: ToString,
+        T: ToString,
+    {
+        let mut cond = field.to_string();
+        cond.push_str(" >= ");
+        cond.push_str(&value.to_string());
+        self.or_where(&cond)
+    }
+
+    /// Add OR condition for field less than value to the last WHERE condition.
+    ///
+    /// ```
+    /// extern crate sql_builder;
+    ///
+    /// # use std::error::Error;
+    /// use sql_builder::{SqlBuilder, quote};
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("title")
+    ///     .field("price")
+    ///     .or_where_lt("price", 300.to_string())
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title, price FROM books WHERE price < 300;", &sql);
+    /// // add                                           ^^^^^   ^^^
+    /// // here                                          field  value
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn or_where_lt<S, T>(&mut self, field: S, value: T) -> &mut Self
+    where
+        S: ToString,
+        T: ToString,
+    {
+        let mut cond = field.to_string();
+        cond.push_str(" < ");
+        cond.push_str(&value.to_string());
+        self.or_where(&cond)
+    }
+
+    /// Add OR condition for field not greater than value to the last WHERE condition.
+    ///
+    /// ```
+    /// extern crate sql_builder;
+    ///
+    /// # use std::error::Error;
+    /// use sql_builder::{SqlBuilder, quote};
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("title")
+    ///     .field("price")
+    ///     .or_where_le("price", 300.to_string())
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title, price FROM books WHERE price <= 300;", &sql);
+    /// // add                                           ^^^^^    ^^^
+    /// // here                                          field   value
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn or_where_le<S, T>(&mut self, field: S, value: T) -> &mut Self
+    where
+        S: ToString,
+        T: ToString,
+    {
+        let mut cond = field.to_string();
+        cond.push_str(" <= ");
         cond.push_str(&value.to_string());
         self.or_where(&cond)
     }
@@ -1344,7 +1605,7 @@ impl SqlBuilder {
         Ok(text)
     }
 
-    /// Build named subquery SQL command
+    /// Build named subquery SQL command.
     ///
     /// ```
     /// extern crate sql_builder;
@@ -1711,6 +1972,22 @@ mod tests {
             .sql()?;
 
         assert_eq!(&sql, "SELECT title, price FROM books WHERE price > 100;");
+
+        let sql = SqlBuilder::select_from("books")
+            .field("title")
+            .field("price")
+            .and_where_gt("price", 200.to_string())
+            .sql()?;
+
+        assert_eq!(&sql, "SELECT title, price FROM books WHERE price > 200;");
+
+        let sql = SqlBuilder::select_from("books")
+            .field("title")
+            .field("price")
+            .and_where_ge("price", 300.to_string())
+            .sql()?;
+
+        assert_eq!(&sql, "SELECT title, price FROM books WHERE price >= 300;");
 
         Ok(())
     }
