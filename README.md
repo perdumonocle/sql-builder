@@ -12,7 +12,7 @@ To use `sql-builder`, first add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-sql-builder = "0.4"
+sql-builder = "0.5"
 ```
 
 Next, add this to your crate:
