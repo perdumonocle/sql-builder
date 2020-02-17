@@ -6,7 +6,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! sql-builder = "0.6"
+//! sql-builder = "0.7"
 //! ```
 //!
 //! Next, add this to your crate:
@@ -123,7 +123,7 @@ impl SqlBuilder {
     ///     .field("title")
     ///     .field("price")
     ///     .and_where("price > 100")
-    ///     .and_where_like("title", "Harry Potter%")
+    ///     .and_where_like_left("title", "Harry Potter")
     ///     .sql()?;
     ///
     /// assert_eq!("SELECT title, price FROM books WHERE (price > 100) AND (title LIKE 'Harry Potter%');", &sql);
@@ -590,8 +590,7 @@ impl SqlBuilder {
     /// db.field("COUNT(id)");
     ///
     /// if let Some(filter) = &req_data.filter {
-    ///   let mask = format!("%{}%", filter.to_lowercase());
-    ///   db.and_where_like("LOWER(title)", mask);
+    ///   db.and_where_like_any("LOWER(title)", filter.to_lowercase());
     /// }
     ///
     /// if let Some(price_min) = &req_data.price_min {
@@ -672,8 +671,7 @@ impl SqlBuilder {
     /// db.field("COUNT(id)");
     ///
     /// if let Some(filter) = &req_data.filter {
-    ///   let mask = format!("%{}%", filter.to_lowercase());
-    ///   db.and_where_like("LOWER(title)", mask);
+    ///   db.and_where_like_any("LOWER(title)", filter.to_lowercase());
     /// }
     ///
     /// if let Some(price_min) = &req_data.price_min {
@@ -1111,6 +1109,102 @@ impl SqlBuilder {
         self.and_where(&cond)
     }
 
+    /// Add WHERE LIKE %condition.
+    ///
+    /// ```
+    /// extern crate sql_builder;
+    ///
+    /// # use std::error::Error;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("price")
+    ///     .and_where_like_right("title", "Stone")
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT price FROM books WHERE title LIKE '%Stone';", &sql);
+    /// // add                                    ^^^^^        ^^^^^
+    /// // here                                   field        mask
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn and_where_like_right<S, T>(&mut self, field: S, mask: T) -> &mut Self
+    where
+        S: ToString,
+        T: ToString,
+    {
+        let mut cond = field.to_string();
+        cond.push_str(" LIKE '%");
+        cond.push_str(&esc(&mask.to_string()));
+        cond.push('\'');
+        self.and_where(&cond)
+    }
+
+    /// Add WHERE LIKE condition%.
+    ///
+    /// ```
+    /// extern crate sql_builder;
+    ///
+    /// # use std::error::Error;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("price")
+    ///     .and_where_like_left("title", "Harry")
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT price FROM books WHERE title LIKE 'Harry%';", &sql);
+    /// // add                                    ^^^^^       ^^^^^
+    /// // here                                   field       mask
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn and_where_like_left<S, T>(&mut self, field: S, mask: T) -> &mut Self
+    where
+        S: ToString,
+        T: ToString,
+    {
+        let mut cond = field.to_string();
+        cond.push_str(" LIKE '");
+        cond.push_str(&esc(&mask.to_string()));
+        cond.push_str("%'");
+        self.and_where(&cond)
+    }
+
+    /// Add WHERE LIKE %condition%.
+    ///
+    /// ```
+    /// extern crate sql_builder;
+    ///
+    /// # use std::error::Error;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("price")
+    ///     .and_where_like_any("title", " and ")
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT price FROM books WHERE title LIKE '% and %';", &sql);
+    /// // add                                    ^^^^^        ^^^^^
+    /// // here                                   field        mask
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn and_where_like_any<S, T>(&mut self, field: S, mask: T) -> &mut Self
+    where
+        S: ToString,
+        T: ToString,
+    {
+        let mut cond = field.to_string();
+        cond.push_str(" LIKE '%");
+        cond.push_str(&esc(&mask.to_string()));
+        cond.push_str("%'");
+        self.and_where(&cond)
+    }
+
     /// Add WHERE NOT LIKE condition.
     ///
     /// ```
@@ -1140,6 +1234,102 @@ impl SqlBuilder {
         cond.push_str(" NOT LIKE '");
         cond.push_str(&esc(&mask.to_string()));
         cond.push('\'');
+        self.and_where(&cond)
+    }
+
+    /// Add WHERE NOT LIKE %condition.
+    ///
+    /// ```
+    /// extern crate sql_builder;
+    ///
+    /// # use std::error::Error;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("price")
+    ///     .and_where_not_like_right("title", "Stone")
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT price FROM books WHERE title NOT LIKE '%Stone';", &sql);
+    /// // add                                    ^^^^^            ^^^^^
+    /// // here                                   field            mask
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn and_where_not_like_right<S, T>(&mut self, field: S, mask: T) -> &mut Self
+    where
+        S: ToString,
+        T: ToString,
+    {
+        let mut cond = field.to_string();
+        cond.push_str(" NOT LIKE '%");
+        cond.push_str(&esc(&mask.to_string()));
+        cond.push('\'');
+        self.and_where(&cond)
+    }
+
+    /// Add WHERE NOT LIKE condition%.
+    ///
+    /// ```
+    /// extern crate sql_builder;
+    ///
+    /// # use std::error::Error;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("price")
+    ///     .and_where_not_like_left("title", "Harry")
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT price FROM books WHERE title NOT LIKE 'Harry%';", &sql);
+    /// // add                                    ^^^^^           ^^^^^
+    /// // here                                   field           mask
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn and_where_not_like_left<S, T>(&mut self, field: S, mask: T) -> &mut Self
+    where
+        S: ToString,
+        T: ToString,
+    {
+        let mut cond = field.to_string();
+        cond.push_str(" NOT LIKE '");
+        cond.push_str(&esc(&mask.to_string()));
+        cond.push_str("%'");
+        self.and_where(&cond)
+    }
+
+    /// Add WHERE NOT LIKE %condition%.
+    ///
+    /// ```
+    /// extern crate sql_builder;
+    ///
+    /// # use std::error::Error;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("price")
+    ///     .and_where_not_like_any("title", " and ")
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT price FROM books WHERE title NOT LIKE '% and %';", &sql);
+    /// // add                                    ^^^^^            ^^^^^
+    /// // here                                   field            mask
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn and_where_not_like_any<S, T>(&mut self, field: S, mask: T) -> &mut Self
+    where
+        S: ToString,
+        T: ToString,
+    {
+        let mut cond = field.to_string();
+        cond.push_str(" NOT LIKE '%");
+        cond.push_str(&esc(&mask.to_string()));
+        cond.push_str("%'");
         self.and_where(&cond)
     }
 
@@ -1456,6 +1646,105 @@ impl SqlBuilder {
         self.or_where(&cond)
     }
 
+    /// Add OR LIKE condition to the last WHERE %condition.
+    ///
+    /// ```
+    /// extern crate sql_builder;
+    ///
+    /// # use std::error::Error;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("price")
+    ///     .or_where_like_right("title", "Alice's")
+    ///     .or_where_like_right("title", "Philosopher's")
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT price FROM books WHERE title LIKE '%Alice''s' OR title LIKE '%Philosopher''s';", &sql);
+    /// // add                                    ^^^^^      ^^^^^^^^^^^    ^^^^^      ^^^^^^^^^^^^^^^^^
+    /// // here                                   field         mask        field            mask
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn or_where_like_right<S, T>(&mut self, field: S, mask: T) -> &mut Self
+    where
+        S: ToString,
+        T: ToString,
+    {
+        let mut cond = field.to_string();
+        cond.push_str(" LIKE '%");
+        cond.push_str(&esc(&mask.to_string()));
+        cond.push('\'');
+        self.or_where(&cond)
+    }
+
+    /// Add OR LIKE condition to the last WHERE condition%.
+    ///
+    /// ```
+    /// extern crate sql_builder;
+    ///
+    /// # use std::error::Error;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("price")
+    ///     .or_where_like_left("title", "Alice's")
+    ///     .or_where_like_left("title", "Philosopher's")
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT price FROM books WHERE title LIKE 'Alice''s%' OR title LIKE 'Philosopher''s%';", &sql);
+    /// // add                                    ^^^^^      ^^^^^^^^^^^    ^^^^^      ^^^^^^^^^^^^^^^^^
+    /// // here                                   field         mask        field            mask
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn or_where_like_left<S, T>(&mut self, field: S, mask: T) -> &mut Self
+    where
+        S: ToString,
+        T: ToString,
+    {
+        let mut cond = field.to_string();
+        cond.push_str(" LIKE '");
+        cond.push_str(&esc(&mask.to_string()));
+        cond.push_str("%'");
+        self.or_where(&cond)
+    }
+
+    /// Add OR LIKE condition to the last WHERE %condition%.
+    ///
+    /// ```
+    /// extern crate sql_builder;
+    ///
+    /// # use std::error::Error;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("price")
+    ///     .or_where_like_any("title", "Alice's")
+    ///     .or_where_like_any("title", "Philosopher's")
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT price FROM books WHERE title LIKE '%Alice''s%' OR title LIKE '%Philosopher''s%';", &sql);
+    /// // add                                    ^^^^^      ^^^^^^^^^^^^    ^^^^^      ^^^^^^^^^^^^^^^^^^
+    /// // here                                   field          mask        field             mask
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn or_where_like_any<S, T>(&mut self, field: S, mask: T) -> &mut Self
+    where
+        S: ToString,
+        T: ToString,
+    {
+        let mut cond = field.to_string();
+        cond.push_str(" LIKE '%");
+        cond.push_str(&esc(&mask.to_string()));
+        cond.push_str("%'");
+        self.or_where(&cond)
+    }
+
     /// Add OR NOT LIKE condition to the last WHERE condition.
     ///
     /// ```
@@ -1486,6 +1775,105 @@ impl SqlBuilder {
         cond.push_str(" NOT LIKE '");
         cond.push_str(&esc(&mask.to_string()));
         cond.push('\'');
+        self.or_where(&cond)
+    }
+
+    /// Add OR NOT LIKE condition to the last WHERE %condition.
+    ///
+    /// ```
+    /// extern crate sql_builder;
+    ///
+    /// # use std::error::Error;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("price")
+    ///     .or_where_not_like_right("title", "Alice's")
+    ///     .or_where_not_like_right("title", "Philosopher's")
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT price FROM books WHERE title NOT LIKE '%Alice''s' OR title NOT LIKE '%Philosopher''s';", &sql);
+    /// // add                                    ^^^^^          ^^^^^^^^^^^    ^^^^^          ^^^^^^^^^^^^^^^^^
+    /// // here                                   field             mask        field                mask
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn or_where_not_like_right<S, T>(&mut self, field: S, mask: T) -> &mut Self
+    where
+        S: ToString,
+        T: ToString,
+    {
+        let mut cond = field.to_string();
+        cond.push_str(" NOT LIKE '%");
+        cond.push_str(&esc(&mask.to_string()));
+        cond.push('\'');
+        self.or_where(&cond)
+    }
+
+    /// Add OR NOT LIKE condition to the last WHERE condition%.
+    ///
+    /// ```
+    /// extern crate sql_builder;
+    ///
+    /// # use std::error::Error;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("price")
+    ///     .or_where_not_like_left("title", "Alice's")
+    ///     .or_where_not_like_left("title", "Philosopher's")
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT price FROM books WHERE title NOT LIKE 'Alice''s%' OR title NOT LIKE 'Philosopher''s%';", &sql);
+    /// // add                                    ^^^^^          ^^^^^^^^^^^    ^^^^^          ^^^^^^^^^^^^^^^^^
+    /// // here                                   field             mask        field                mask
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn or_where_not_like_left<S, T>(&mut self, field: S, mask: T) -> &mut Self
+    where
+        S: ToString,
+        T: ToString,
+    {
+        let mut cond = field.to_string();
+        cond.push_str(" NOT LIKE '");
+        cond.push_str(&esc(&mask.to_string()));
+        cond.push_str("%'");
+        self.or_where(&cond)
+    }
+
+    /// Add OR NOT LIKE condition to the last WHERE %condition%.
+    ///
+    /// ```
+    /// extern crate sql_builder;
+    ///
+    /// # use std::error::Error;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("price")
+    ///     .or_where_not_like_any("title", "Alice's")
+    ///     .or_where_not_like_any("title", "Philosopher's")
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT price FROM books WHERE title NOT LIKE '%Alice''s%' OR title NOT LIKE '%Philosopher''s%';", &sql);
+    /// // add                                    ^^^^^          ^^^^^^^^^^^^    ^^^^^          ^^^^^^^^^^^^^^^^^^
+    /// // here                                   field              mask        field                 mask
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn or_where_not_like_any<S, T>(&mut self, field: S, mask: T) -> &mut Self
+    where
+        S: ToString,
+        T: ToString,
+    {
+        let mut cond = field.to_string();
+        cond.push_str(" NOT LIKE '%");
+        cond.push_str(&esc(&mask.to_string()));
+        cond.push_str("%'");
         self.or_where(&cond)
     }
 
@@ -1563,7 +1951,7 @@ impl SqlBuilder {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
-    ///     .and_where_like("title", "Harry Potter%")
+    ///     .and_where_like_left("title", "Harry Potter")
     ///     .order_desc("price")
     ///     .union(&append)
     ///     .sql()?;
@@ -1596,7 +1984,7 @@ impl SqlBuilder {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
-    ///     .and_where_like("title", "Harry Potter%")
+    ///     .and_where_like_left("title", "Harry Potter")
     ///     .order_desc("price")
     ///     .union_all(&append)
     ///     .sql()?;
@@ -1625,7 +2013,7 @@ impl SqlBuilder {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
-    ///     .and_where_like("title", "Harry Potter%")
+    ///     .and_where_like_left("title", "Harry Potter")
     ///     .order_by("price", false)
     ///     .sql()?;
     ///
@@ -1657,7 +2045,7 @@ impl SqlBuilder {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
-    ///     .and_where_like("title", "Harry Potter%")
+    ///     .and_where_like_left("title", "Harry Potter")
     ///     .order_asc("title")
     ///     .sql()?;
     ///
@@ -1683,7 +2071,7 @@ impl SqlBuilder {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
-    ///     .and_where_like("title", "Harry Potter%")
+    ///     .and_where_like_left("title", "Harry Potter")
     ///     .order_desc("price")
     ///     .sql()?;
     ///
@@ -1709,7 +2097,7 @@ impl SqlBuilder {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
-    ///     .and_where_like("title", "Harry Potter%")
+    ///     .and_where_like_left("title", "Harry Potter")
     ///     .order_desc("price")
     ///     .limit(10)
     ///     .sql()?;
@@ -1737,7 +2125,7 @@ impl SqlBuilder {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
-    ///     .and_where_like("title", "Harry Potter%")
+    ///     .and_where_like_left("title", "Harry Potter")
     ///     .order_desc("price")
     ///     .limit(10)
     ///     .offset(100)
@@ -2261,7 +2649,7 @@ mod tests {
             .field("title")
             .field("price")
             .and_where("price > 100")
-            .and_where_like("title", "Harry Potter%")
+            .and_where_like_left("title", "Harry Potter")
             .sql()?;
 
         assert_eq!(
@@ -2282,14 +2670,14 @@ mod tests {
             .or_where_eq("title", quote("Harry Potter and the Philosopher's Stone"))
             .or_where_ne("price", 100)
             .or_where_like("title", "Alice's")
-            .or_where_not_like("title", "% the %")
+            .or_where_not_like_any("LOWER(title)", " the ")
             .or_where_is_null("title")
             .or_where_is_not_null("price")
             .sql()?;
 
         assert_eq!(
             &sql,
-            "SELECT title, price FROM books WHERE price < 2 OR price > 1000 OR title = 'Harry Potter and the Philosopher''s Stone' OR price <> 100 OR title LIKE 'Alice''s' OR title NOT LIKE '% the %' OR title IS NULL OR price IS NOT NULL;"
+            "SELECT title, price FROM books WHERE price < 2 OR price > 1000 OR title = 'Harry Potter and the Philosopher''s Stone' OR price <> 100 OR title LIKE 'Alice''s' OR LOWER(title) NOT LIKE '% the %' OR title IS NULL OR price IS NOT NULL;"
         );
 
         Ok(())
@@ -2300,7 +2688,7 @@ mod tests {
         let sql = SqlBuilder::select_from("books")
             .field("title")
             .field("price")
-            .and_where_like("title", "Harry Potter%")
+            .and_where_like_left("title", "Harry Potter")
             .order_by("price", false)
             .sql()?;
 
@@ -2312,7 +2700,7 @@ mod tests {
         let sql = SqlBuilder::select_from("books")
             .field("title")
             .field("price")
-            .and_where_like("title", "Harry Potter%")
+            .and_where_like_left("title", "Harry Potter")
             .order_desc("price")
             .sql()?;
 
@@ -2324,7 +2712,7 @@ mod tests {
         let sql = SqlBuilder::select_from("books")
             .field("title")
             .field("price")
-            .and_where_like("title", "Harry Potter%")
+            .and_where_like_left("title", "Harry Potter")
             .order_desc("price")
             .order_asc("title")
             .sql()?;
@@ -2346,7 +2734,7 @@ mod tests {
         let sql = SqlBuilder::select_from("books")
             .field("title")
             .field("price")
-            .and_where_like("title", "Harry Potter%")
+            .and_where_like_left("title", "Harry Potter")
             .order_desc("price")
             .union(&append)
             .sql()?;
@@ -2361,7 +2749,7 @@ mod tests {
         let sql = SqlBuilder::select_from("books")
             .field("title")
             .field("price")
-            .and_where_like("title", "Harry Potter%")
+            .and_where_like_left("title", "Harry Potter")
             .order_desc("price")
             .union_all(&append)
             .sql()?;
@@ -2379,7 +2767,7 @@ mod tests {
         let sql = SqlBuilder::select_from("books")
             .field("title")
             .field("price")
-            .and_where_like("title", "Harry Potter%")
+            .and_where_like_left("title", "Harry Potter")
             .order_asc("title")
             .limit(3)
             .sql()?;
@@ -2394,7 +2782,7 @@ mod tests {
         let sql = SqlBuilder::select_from("books")
             .field("title")
             .field("price")
-            .and_where_like("title", "Harry Potter%")
+            .and_where_like_left("title", "Harry Potter")
             .order_asc("title")
             .offset(2)
             .sql()?;
@@ -2404,7 +2792,7 @@ mod tests {
         let sql = SqlBuilder::select_from("books")
             .field("title")
             .field("price")
-            .and_where_like("title", "Harry Potter%")
+            .and_where_like_left("title", "Harry Potter")
             .order_asc("title")
             .limit(3)
             .offset(2)
@@ -2419,7 +2807,7 @@ mod tests {
     fn test_find_books_not_about_alice() -> Result<(), Box<dyn Error>> {
         let sql = SqlBuilder::select_from("books")
             .field("title")
-            .and_where_not_like("title", "%Alice's%")
+            .and_where_not_like_any("title", "Alice's")
             .sql()?;
 
         assert_eq!(
@@ -2521,7 +2909,7 @@ mod tests {
 
         let sql = SqlBuilder::update_table("books")
             .set("price", "price * 0.1")
-            .and_where_like("title", "Harry Potter%")
+            .and_where_like_left("title", "Harry Potter")
             .sql()?;
 
         assert_eq!(
@@ -2574,7 +2962,7 @@ mod tests {
         let sql = SqlBuilder::update_table("books")
             .set("price", 0)
             .set("title", "'[SOLD!]' || title")
-            .and_where_like("title", "Harry Potter%")
+            .and_where_like_left("title", "Harry Potter")
             .sql()?;
 
         assert_eq!(&sql, "UPDATE books SET price = 0, title = '[SOLD!]' || title WHERE title LIKE 'Harry Potter%';");
