@@ -3036,6 +3036,18 @@ mod tests {
 
         assert_eq!(&sql, "INSERT INTO books (title, price) VALUES ('In Search of Lost Time', 150), ('Don Quixote', 200);");
 
+        let sql = SqlBuilder::insert_into("books")
+            .field("title")
+            .field("price")
+            .values(&["'Don Quixote', 200"])
+            .returning("id")
+            .sql()?;
+
+        assert_eq!(
+            &sql,
+            "INSERT INTO books (title, price) VALUES ('Don Quixote', 200) RETURNING id;"
+        );
+
         Ok(())
     }
 
