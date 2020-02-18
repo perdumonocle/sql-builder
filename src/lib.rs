@@ -37,8 +37,8 @@
 //! # }
 //! ```
 
-#![feature(test)]
-extern crate test;
+//#![feature(test)]
+//extern crate test;
 
 use std::error::Error;
 
@@ -3052,438 +3052,438 @@ mod tests {
     }
 }
 
-#[cfg(test)]
-mod benches {
-    use super::*;
-    use test::Bencher;
-
-    #[bench]
-    fn bench_select_from(b: &mut Bencher) {
-        b.iter(|| SqlBuilder::select_from("foo"));
-    }
-
-    #[bench]
-    fn bench_select_values(b: &mut Bencher) {
-        b.iter(|| SqlBuilder::select_values(&["foo", "bar"]));
-    }
-
-    #[bench]
-    fn bench_insert_into(b: &mut Bencher) {
-        b.iter(|| SqlBuilder::insert_into("foo"));
-    }
-
-    #[bench]
-    fn bench_update_table(b: &mut Bencher) {
-        b.iter(|| SqlBuilder::update_table("foo"));
-    }
-
-    #[bench]
-    fn bench_delete_from(b: &mut Bencher) {
-        b.iter(|| SqlBuilder::delete_from("foo"));
-    }
-
-    #[bench]
-    fn bench_natural(b: &mut Bencher) {
-        let builder = SqlBuilder::select_from("foo");
-        b.iter(|| {
-            let mut b = builder.clone();
-            b.natural();
-        });
-    }
-
-    //#[bench]
-    //fn bench_left(b: &mut Bencher) {
-    //    b.iter(|| left());
-    //}
-
-    //#[bench]
-    //fn bench_left_outer(b: &mut Bencher) {
-    //    b.iter(|| left_outer());
-    //}
-
-    //#[bench]
-    //fn bench_right(b: &mut Bencher) {
-    //    b.iter(|| right());
-    //}
-
-    //#[bench]
-    //fn bench_right_outer(b: &mut Bencher) {
-    //    b.iter(|| right_outer());
-    //}
-
-    //#[bench]
-    //fn bench_inner(b: &mut Bencher) {
-    //    b.iter(|| inner());
-    //}
-
-    //#[bench]
-    //fn bench_cross(b: &mut Bencher) {
-    //    b.iter(|| cross());
-    //}
-
-    //#[bench]
-    //fn bench_join(b: &mut Bencher) {
-    //    b.iter(|| join());
-    //}
-
-    //#[bench]
-    //fn bench_on(b: &mut Bencher) {
-    //    b.iter(|| on());
-    //}
-
-    //#[bench]
-    //fn bench_distinct(b: &mut Bencher) {
-    //    b.iter(|| distinct());
-    //}
-
-    //#[bench]
-    //fn bench_fields(b: &mut Bencher) {
-    //    b.iter(|| fields());
-    //}
-
-    //#[bench]
-    //fn bench_set_fields(b: &mut Bencher) {
-    //    b.iter(|| set_fields());
-    //}
-
-    //#[bench]
-    //fn bench_field(b: &mut Bencher) {
-    //    b.iter(|| field());
-    //}
-
-    //#[bench]
-    //fn bench_set_field(b: &mut Bencher) {
-    //    b.iter(|| set_field());
-    //}
-
-    //#[bench]
-    //fn bench_set(b: &mut Bencher) {
-    //    b.iter(|| set());
-    //}
-
-    //#[bench]
-    //fn bench_set_str(b: &mut Bencher) {
-    //    b.iter(|| set_str());
-    //}
-
-    //#[bench]
-    //fn bench_values(b: &mut Bencher) {
-    //    b.iter(|| values());
-    //}
-
-    //#[bench]
-    //fn bench_select(b: &mut Bencher) {
-    //    b.iter(|| select());
-    //}
-
-    //#[bench]
-    //fn bench_group_by(b: &mut Bencher) {
-    //    b.iter(|| group_by());
-    //}
-
-    //#[bench]
-    //fn bench_having(b: &mut Bencher) {
-    //    b.iter(|| having());
-    //}
-
-    //#[bench]
-    //fn bench_and_where(b: &mut Bencher) {
-    //    b.iter(|| and_where());
-    //}
-
-    //#[bench]
-    //fn bench_and_where_eq(b: &mut Bencher) {
-    //    b.iter(|| and_where_eq());
-    //}
-
-    //#[bench]
-    //fn bench_and_where_ne(b: &mut Bencher) {
-    //    b.iter(|| and_where_ne());
-    //}
-
-    //#[bench]
-    //fn bench_and_where_gt(b: &mut Bencher) {
-    //    b.iter(|| and_where_gt());
-    //}
-
-    //#[bench]
-    //fn bench_and_where_ge(b: &mut Bencher) {
-    //    b.iter(|| and_where_ge());
-    //}
-
-    //#[bench]
-    //fn bench_and_where_lt(b: &mut Bencher) {
-    //    b.iter(|| and_where_lt());
-    //}
-
-    //#[bench]
-    //fn bench_and_where_le(b: &mut Bencher) {
-    //    b.iter(|| and_where_le());
-    //}
-
-    //#[bench]
-    //fn bench_and_where_like(b: &mut Bencher) {
-    //    b.iter(|| and_where_like());
-    //}
-
-    //#[bench]
-    //fn bench_and_where_like_right(b: &mut Bencher) {
-    //    b.iter(|| and_where_like_right());
-    //}
-
-    //#[bench]
-    //fn bench_and_where_like_left(b: &mut Bencher) {
-    //    b.iter(|| and_where_like_left());
-    //}
-
-    //#[bench]
-    //fn bench_and_where_like_any(b: &mut Bencher) {
-    //    b.iter(|| and_where_like_any());
-    //}
-
-    //#[bench]
-    //fn bench_and_where_not_like(b: &mut Bencher) {
-    //    b.iter(|| and_where_not_like());
-    //}
-
-    //#[bench]
-    //fn bench_and_where_not_like_right(b: &mut Bencher) {
-    //    b.iter(|| and_where_not_like_right());
-    //}
-
-    //#[bench]
-    //fn bench_and_where_not_like_left(b: &mut Bencher) {
-    //    b.iter(|| and_where_not_like_left());
-    //}
-
-    //#[bench]
-    //fn bench_and_where_not_like_any(b: &mut Bencher) {
-    //    b.iter(|| and_where_not_like_any());
-    //}
-
-    //#[bench]
-    //fn bench_and_where_is_null(b: &mut Bencher) {
-    //    b.iter(|| and_where_is_null());
-    //}
-
-    //#[bench]
-    //fn bench_and_where_is_not_null(b: &mut Bencher) {
-    //    b.iter(|| and_where_is_not_null());
-    //}
-
-    //#[bench]
-    //fn bench_or_where(b: &mut Bencher) {
-    //    b.iter(|| or_where());
-    //}
-
-    //#[bench]
-    //fn bench_or_where_eq(b: &mut Bencher) {
-    //    b.iter(|| or_where_eq());
-    //}
-
-    //#[bench]
-    //fn bench_or_where_ne(b: &mut Bencher) {
-    //    b.iter(|| or_where_ne());
-    //}
-
-    //#[bench]
-    //fn bench_or_where_gt(b: &mut Bencher) {
-    //    b.iter(|| or_where_gt());
-    //}
-
-    //#[bench]
-    //fn bench_or_where_ge(b: &mut Bencher) {
-    //    b.iter(|| or_where_ge());
-    //}
-
-    //#[bench]
-    //fn bench_or_where_lt(b: &mut Bencher) {
-    //    b.iter(|| or_where_lt());
-    //}
-
-    //#[bench]
-    //fn bench_or_where_le(b: &mut Bencher) {
-    //    b.iter(|| or_where_le());
-    //}
-
-    //#[bench]
-    //fn bench_or_where_like(b: &mut Bencher) {
-    //    b.iter(|| or_where_like());
-    //}
-
-    //#[bench]
-    //fn bench_or_where_like_right(b: &mut Bencher) {
-    //    b.iter(|| or_where_like_right());
-    //}
-
-    //#[bench]
-    //fn bench_or_where_like_left(b: &mut Bencher) {
-    //    b.iter(|| or_where_like_left());
-    //}
-
-    //#[bench]
-    //fn bench_or_where_like_any(b: &mut Bencher) {
-    //    b.iter(|| or_where_like_any());
-    //}
-
-    //#[bench]
-    //fn bench_or_where_not_like(b: &mut Bencher) {
-    //    b.iter(|| or_where_not_like());
-    //}
-
-    //#[bench]
-    //fn bench_or_where_not_like_right(b: &mut Bencher) {
-    //    b.iter(|| or_where_not_like_right());
-    //}
-
-    //#[bench]
-    //fn bench_or_where_not_like_left(b: &mut Bencher) {
-    //    b.iter(|| or_where_not_like_left());
-    //}
-
-    //#[bench]
-    //fn bench_or_where_not_like_any(b: &mut Bencher) {
-    //    b.iter(|| or_where_not_like_any());
-    //}
-
-    //#[bench]
-    //fn bench_or_where_is_null(b: &mut Bencher) {
-    //    b.iter(|| or_where_is_null());
-    //}
-
-    //#[bench]
-    //fn bench_or_where_is_not_null(b: &mut Bencher) {
-    //    b.iter(|| or_where_is_not_null());
-    //}
-
-    //#[bench]
-    //fn bench_union(b: &mut Bencher) {
-    //    b.iter(|| union());
-    //}
-
-    //#[bench]
-    //fn bench_union_all(b: &mut Bencher) {
-    //    b.iter(|| union_all());
-    //}
-
-    //#[bench]
-    //fn bench_order_by(b: &mut Bencher) {
-    //    b.iter(|| order_by());
-    //}
-
-    //#[bench]
-    //fn bench_order_asc(b: &mut Bencher) {
-    //    b.iter(|| order_asc());
-    //}
-
-    //#[bench]
-    //fn bench_order_desc(b: &mut Bencher) {
-    //    b.iter(|| order_desc());
-    //}
-
-    //#[bench]
-    //fn bench_limit(b: &mut Bencher) {
-    //    b.iter(|| limit());
-    //}
-
-    //#[bench]
-    //fn bench_offset(b: &mut Bencher) {
-    //    b.iter(|| offset());
-    //}
-
-    //#[bench]
-    //fn bench_sql(b: &mut Bencher) {
-    //    b.iter(|| sql());
-    //}
-
-    //#[bench]
-    //fn bench_subquery(b: &mut Bencher) {
-    //    b.iter(|| subquery());
-    //}
-
-    //#[bench]
-    //fn bench_subquery_as(b: &mut Bencher) {
-    //    b.iter(|| subquery_as());
-    //}
-
-    //#[bench]
-    //fn bench_query(b: &mut Bencher) {
-    //    b.iter(|| query());
-    //}
-
-    //#[bench]
-    //fn bench_query_values(b: &mut Bencher) {
-    //    b.iter(|| query_values());
-    //}
-
-    #[bench]
-    fn bench_esc(b: &mut Bencher) {
-        b.iter(|| esc("Hello, 'World'"));
-    }
-
-    #[bench]
-    fn bench_quote(b: &mut Bencher) {
-        b.iter(|| quote("Hello, 'World'"));
-    }
-
-    #[bench]
-    fn bench_x_select_only_values(b: &mut Bencher) {
-        b.iter(|| SqlBuilder::select_values(&["10", &quote("100")]).sql());
-    }
-
-    #[bench]
-    fn bench_x_select_all_books(b: &mut Bencher) {
-        b.iter(|| SqlBuilder::select_from("books").sql());
-    }
-
-    #[bench]
-    fn bench_x_show_all_prices(b: &mut Bencher) {
-        b.iter(|| {
-            SqlBuilder::select_from("books")
-                .distinct()
-                .field("price")
-                .sql()
-        });
-    }
-
-    #[bench]
-    fn bench_x_select_title_and_price_1(b: &mut Bencher) {
-        b.iter(|| {
-            SqlBuilder::select_from("books")
-                .fields(&["title", "price"])
-                .sql()
-        });
-    }
-
-    #[bench]
-    fn bench_x_select_title_and_price_2(b: &mut Bencher) {
-        b.iter(|| {
-            SqlBuilder::select_from("books")
-                .field("title")
-                .field("price")
-                .sql()
-        });
-    }
-
-    #[bench]
-    fn bench_x_select_expensive_books_1(b: &mut Bencher) {
-        b.iter(|| {
-            SqlBuilder::select_from("books")
-                .field("title")
-                .field("price")
-                .and_where("price > 100")
-                .sql()
-        });
-    }
-
-    #[bench]
-    fn bench_x_select_expensive_books_2(b: &mut Bencher) {
-        b.iter(|| {
-            SqlBuilder::select_from("books")
-                .field("title")
-                .field("price")
-                .and_where_gt("price", 200.to_string())
-                .sql()
-        });
-    }
-}
+//#[cfg(test)]
+//mod benches {
+//    use super::*;
+//    use test::Bencher;
+//
+//    #[bench]
+//    fn bench_select_from(b: &mut Bencher) {
+//        b.iter(|| SqlBuilder::select_from("foo"));
+//    }
+//
+//    #[bench]
+//    fn bench_select_values(b: &mut Bencher) {
+//        b.iter(|| SqlBuilder::select_values(&["foo", "bar"]));
+//    }
+//
+//    #[bench]
+//    fn bench_insert_into(b: &mut Bencher) {
+//        b.iter(|| SqlBuilder::insert_into("foo"));
+//    }
+//
+//    #[bench]
+//    fn bench_update_table(b: &mut Bencher) {
+//        b.iter(|| SqlBuilder::update_table("foo"));
+//    }
+//
+//    #[bench]
+//    fn bench_delete_from(b: &mut Bencher) {
+//        b.iter(|| SqlBuilder::delete_from("foo"));
+//    }
+//
+//    #[bench]
+//    fn bench_natural(b: &mut Bencher) {
+//        let builder = SqlBuilder::select_from("foo");
+//        b.iter(|| {
+//            let mut b = builder.clone();
+//            b.natural();
+//        });
+//    }
+//
+//    //#[bench]
+//    //fn bench_left(b: &mut Bencher) {
+//    //    b.iter(|| left());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_left_outer(b: &mut Bencher) {
+//    //    b.iter(|| left_outer());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_right(b: &mut Bencher) {
+//    //    b.iter(|| right());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_right_outer(b: &mut Bencher) {
+//    //    b.iter(|| right_outer());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_inner(b: &mut Bencher) {
+//    //    b.iter(|| inner());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_cross(b: &mut Bencher) {
+//    //    b.iter(|| cross());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_join(b: &mut Bencher) {
+//    //    b.iter(|| join());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_on(b: &mut Bencher) {
+//    //    b.iter(|| on());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_distinct(b: &mut Bencher) {
+//    //    b.iter(|| distinct());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_fields(b: &mut Bencher) {
+//    //    b.iter(|| fields());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_set_fields(b: &mut Bencher) {
+//    //    b.iter(|| set_fields());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_field(b: &mut Bencher) {
+//    //    b.iter(|| field());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_set_field(b: &mut Bencher) {
+//    //    b.iter(|| set_field());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_set(b: &mut Bencher) {
+//    //    b.iter(|| set());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_set_str(b: &mut Bencher) {
+//    //    b.iter(|| set_str());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_values(b: &mut Bencher) {
+//    //    b.iter(|| values());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_select(b: &mut Bencher) {
+//    //    b.iter(|| select());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_group_by(b: &mut Bencher) {
+//    //    b.iter(|| group_by());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_having(b: &mut Bencher) {
+//    //    b.iter(|| having());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_and_where(b: &mut Bencher) {
+//    //    b.iter(|| and_where());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_and_where_eq(b: &mut Bencher) {
+//    //    b.iter(|| and_where_eq());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_and_where_ne(b: &mut Bencher) {
+//    //    b.iter(|| and_where_ne());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_and_where_gt(b: &mut Bencher) {
+//    //    b.iter(|| and_where_gt());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_and_where_ge(b: &mut Bencher) {
+//    //    b.iter(|| and_where_ge());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_and_where_lt(b: &mut Bencher) {
+//    //    b.iter(|| and_where_lt());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_and_where_le(b: &mut Bencher) {
+//    //    b.iter(|| and_where_le());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_and_where_like(b: &mut Bencher) {
+//    //    b.iter(|| and_where_like());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_and_where_like_right(b: &mut Bencher) {
+//    //    b.iter(|| and_where_like_right());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_and_where_like_left(b: &mut Bencher) {
+//    //    b.iter(|| and_where_like_left());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_and_where_like_any(b: &mut Bencher) {
+//    //    b.iter(|| and_where_like_any());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_and_where_not_like(b: &mut Bencher) {
+//    //    b.iter(|| and_where_not_like());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_and_where_not_like_right(b: &mut Bencher) {
+//    //    b.iter(|| and_where_not_like_right());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_and_where_not_like_left(b: &mut Bencher) {
+//    //    b.iter(|| and_where_not_like_left());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_and_where_not_like_any(b: &mut Bencher) {
+//    //    b.iter(|| and_where_not_like_any());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_and_where_is_null(b: &mut Bencher) {
+//    //    b.iter(|| and_where_is_null());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_and_where_is_not_null(b: &mut Bencher) {
+//    //    b.iter(|| and_where_is_not_null());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_or_where(b: &mut Bencher) {
+//    //    b.iter(|| or_where());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_or_where_eq(b: &mut Bencher) {
+//    //    b.iter(|| or_where_eq());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_or_where_ne(b: &mut Bencher) {
+//    //    b.iter(|| or_where_ne());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_or_where_gt(b: &mut Bencher) {
+//    //    b.iter(|| or_where_gt());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_or_where_ge(b: &mut Bencher) {
+//    //    b.iter(|| or_where_ge());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_or_where_lt(b: &mut Bencher) {
+//    //    b.iter(|| or_where_lt());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_or_where_le(b: &mut Bencher) {
+//    //    b.iter(|| or_where_le());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_or_where_like(b: &mut Bencher) {
+//    //    b.iter(|| or_where_like());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_or_where_like_right(b: &mut Bencher) {
+//    //    b.iter(|| or_where_like_right());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_or_where_like_left(b: &mut Bencher) {
+//    //    b.iter(|| or_where_like_left());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_or_where_like_any(b: &mut Bencher) {
+//    //    b.iter(|| or_where_like_any());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_or_where_not_like(b: &mut Bencher) {
+//    //    b.iter(|| or_where_not_like());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_or_where_not_like_right(b: &mut Bencher) {
+//    //    b.iter(|| or_where_not_like_right());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_or_where_not_like_left(b: &mut Bencher) {
+//    //    b.iter(|| or_where_not_like_left());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_or_where_not_like_any(b: &mut Bencher) {
+//    //    b.iter(|| or_where_not_like_any());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_or_where_is_null(b: &mut Bencher) {
+//    //    b.iter(|| or_where_is_null());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_or_where_is_not_null(b: &mut Bencher) {
+//    //    b.iter(|| or_where_is_not_null());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_union(b: &mut Bencher) {
+//    //    b.iter(|| union());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_union_all(b: &mut Bencher) {
+//    //    b.iter(|| union_all());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_order_by(b: &mut Bencher) {
+//    //    b.iter(|| order_by());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_order_asc(b: &mut Bencher) {
+//    //    b.iter(|| order_asc());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_order_desc(b: &mut Bencher) {
+//    //    b.iter(|| order_desc());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_limit(b: &mut Bencher) {
+//    //    b.iter(|| limit());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_offset(b: &mut Bencher) {
+//    //    b.iter(|| offset());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_sql(b: &mut Bencher) {
+//    //    b.iter(|| sql());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_subquery(b: &mut Bencher) {
+//    //    b.iter(|| subquery());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_subquery_as(b: &mut Bencher) {
+//    //    b.iter(|| subquery_as());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_query(b: &mut Bencher) {
+//    //    b.iter(|| query());
+//    //}
+//
+//    //#[bench]
+//    //fn bench_query_values(b: &mut Bencher) {
+//    //    b.iter(|| query_values());
+//    //}
+//
+//    #[bench]
+//    fn bench_esc(b: &mut Bencher) {
+//        b.iter(|| esc("Hello, 'World'"));
+//    }
+//
+//    #[bench]
+//    fn bench_quote(b: &mut Bencher) {
+//        b.iter(|| quote("Hello, 'World'"));
+//    }
+//
+//    #[bench]
+//    fn bench_x_select_only_values(b: &mut Bencher) {
+//        b.iter(|| SqlBuilder::select_values(&["10", &quote("100")]).sql());
+//    }
+//
+//    #[bench]
+//    fn bench_x_select_all_books(b: &mut Bencher) {
+//        b.iter(|| SqlBuilder::select_from("books").sql());
+//    }
+//
+//    #[bench]
+//    fn bench_x_show_all_prices(b: &mut Bencher) {
+//        b.iter(|| {
+//            SqlBuilder::select_from("books")
+//                .distinct()
+//                .field("price")
+//                .sql()
+//        });
+//    }
+//
+//    #[bench]
+//    fn bench_x_select_title_and_price_1(b: &mut Bencher) {
+//        b.iter(|| {
+//            SqlBuilder::select_from("books")
+//                .fields(&["title", "price"])
+//                .sql()
+//        });
+//    }
+//
+//    #[bench]
+//    fn bench_x_select_title_and_price_2(b: &mut Bencher) {
+//        b.iter(|| {
+//            SqlBuilder::select_from("books")
+//                .field("title")
+//                .field("price")
+//                .sql()
+//        });
+//    }
+//
+//    #[bench]
+//    fn bench_x_select_expensive_books_1(b: &mut Bencher) {
+//        b.iter(|| {
+//            SqlBuilder::select_from("books")
+//                .field("title")
+//                .field("price")
+//                .and_where("price > 100")
+//                .sql()
+//        });
+//    }
+//
+//    #[bench]
+//    fn bench_x_select_expensive_books_2(b: &mut Bencher) {
+//        b.iter(|| {
+//            SqlBuilder::select_from("books")
+//                .field("title")
+//                .field("price")
+//                .and_where_gt("price", 200.to_string())
+//                .sql()
+//        });
+//    }
+//}
