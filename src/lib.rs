@@ -29,13 +29,44 @@
 //! let sql = SqlBuilder::select_from("company")
 //!     .field("id")
 //!     .field("name")
-//!     .and_where("salary > 25000")
+//!     .and_where_gt("salary", 25000)
 //!     .sql()?;
 //!
 //! assert_eq!("SELECT id, name FROM company WHERE salary > 25000;", &sql);
 //! # Ok(())
 //! # }
 //! ```
+//!
+//! ## SQL support
+//!
+//! ### Statements
+//!
+//! - SELECT
+//! - INSERT
+//! - UPDATE
+//! - DELETE
+//!
+//! ### Operations
+//!
+//! - join
+//! - distinct
+//! - group by
+//! - order by
+//! - where
+//! - limit, offset
+//! - subquery
+//! - get all results
+//! - get first row
+//! - get first value, first integer value, first string value
+//!
+//! ### Functions
+//!
+//! - escape
+//! - query
+//!
+//! ## License
+//!
+//! This project is licensed under the [MIT license](LICENSE).
 
 //#![feature(test)]
 //extern crate test;

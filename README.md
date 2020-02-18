@@ -29,7 +29,7 @@ Example:
 let sql = SqlBuilder::select_from("company")
     .field("id")
     .field("name")
-    .and_where("salary > 25000")
+    .and_where_gt("salary", 25000)
     .sql()?;
 
 assert_eq!("SELECT id, name FROM company WHERE salary > 25000;", &sql);
