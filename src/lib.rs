@@ -6,7 +6,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! sql-builder = "0.8"
+//! sql-builder = "0.9"
 //! ```
 //!
 //! Next, add this to your crate:
@@ -85,6 +85,7 @@ pub struct SqlBuilder {
     fields: Vec<String>,
     sets: Vec<String>,
     values: Values,
+    returning: Option<String>,
     group_by: Vec<String>,
     having: Option<String>,
     unions: String,
@@ -137,6 +138,7 @@ impl SqlBuilder {
             fields: Vec::new(),
             sets: Vec::new(),
             values: Values::Empty,
+            returning: None,
             group_by: Vec::new(),
             having: None,
             unions: String::new(),
@@ -870,6 +872,33 @@ impl SqlBuilder {
     /// ```
     pub fn select<S: ToString>(&mut self, query: S) -> &mut Self {
         self.values = Values::Select(query.to_string());
+        self
+    }
+
+    /// Add RETURNING part.
+    ///
+    /// ```
+    /// extern crate sql_builder;
+    ///
+    /// # use std::error::Error;
+    /// use sql_builder::{SqlBuilder, quote};
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let sql = SqlBuilder::insert_into("books")
+    ///     .field("title")
+    ///     .field("price")
+    ///     .values(&["'Don Quixote', 200"])
+    ///     .returning("id")
+    ///     .sql()?;
+    ///
+    /// assert_eq!("INSERT INTO books (title, price) VALUES ('Don Quixote', 200) RETURNING id;", &sql);
+    /// // add                                                                             ^^
+    /// // here                                                                           field
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn returning<S: ToString>(&mut self, field: S) -> &mut Self {
+        self.returning = Some(field.to_string());
         self
     }
 
@@ -2469,12 +2498,20 @@ impl SqlBuilder {
                 // Make VALUES part
                 let values = values.join(", ");
 
+                // Make RETURNING part
+                let returning = if let Some(ret) = &self.returning {
+                    format!(" RETURNING {}", ret)
+                } else {
+                    "".to_string()
+                };
+
                 // Make SQL
                 format!(
-                    "INSERT INTO {table} ({fields}) VALUES {values};",
+                    "INSERT INTO {table} ({fields}) VALUES {values}{returning};",
                     table = &self.table,
                     fields = fields,
                     values = values,
+                    returning = returning,
                 )
             }
             Values::Select(query) => {
