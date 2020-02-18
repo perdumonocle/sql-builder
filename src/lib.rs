@@ -1054,7 +1054,7 @@ impl SqlBuilder {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
-    ///     .and_where_gt("price", 300.to_string())
+    ///     .and_where_gt("price", 300)
     ///     .sql()?;
     ///
     /// assert_eq!("SELECT title, price FROM books WHERE price > 300;", &sql);
@@ -1086,7 +1086,7 @@ impl SqlBuilder {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
-    ///     .and_where_ge("price", 300.to_string())
+    ///     .and_where_ge("price", 300)
     ///     .sql()?;
     ///
     /// assert_eq!("SELECT title, price FROM books WHERE price >= 300;", &sql);
@@ -1118,7 +1118,7 @@ impl SqlBuilder {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
-    ///     .and_where_lt("price", 300.to_string())
+    ///     .and_where_lt("price", 300)
     ///     .sql()?;
     ///
     /// assert_eq!("SELECT title, price FROM books WHERE price < 300;", &sql);
@@ -1150,7 +1150,7 @@ impl SqlBuilder {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
-    ///     .and_where_le("price", 300.to_string())
+    ///     .and_where_le("price", 300)
     ///     .sql()?;
     ///
     /// assert_eq!("SELECT title, price FROM books WHERE price <= 300;", &sql);
@@ -1586,8 +1586,8 @@ impl SqlBuilder {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
-    ///     .and_where_lt("price", 100.to_string())
-    ///     .or_where_gt("price", 300.to_string())
+    ///     .and_where_lt("price", 100)
+    ///     .or_where_gt("price", 300)
     ///     .sql()?;
     ///
     /// assert_eq!("SELECT title, price FROM books WHERE price < 100 OR price > 300;", &sql);
@@ -1619,8 +1619,8 @@ impl SqlBuilder {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
-    ///     .or_where_lt("price", 100.to_string())
-    ///     .or_where_ge("price", 300.to_string())
+    ///     .or_where_lt("price", 100)
+    ///     .or_where_ge("price", 300)
     ///     .sql()?;
     ///
     /// assert_eq!("SELECT title, price FROM books WHERE price < 100 OR price >= 300;", &sql);
@@ -1652,8 +1652,8 @@ impl SqlBuilder {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
-    ///     .and_where_lt("price", 100.to_string())
-    ///     .or_where_lt("price", 300.to_string())
+    ///     .and_where_lt("price", 100)
+    ///     .or_where_lt("price", 300)
     ///     .sql()?;
     ///
     /// assert_eq!("SELECT title, price FROM books WHERE price < 100 OR price < 300;", &sql);
@@ -1685,8 +1685,8 @@ impl SqlBuilder {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
-    ///     .or_where_le("price", 100.to_string())
-    ///     .or_where_le("price", 300.to_string())
+    ///     .or_where_le("price", 100)
+    ///     .or_where_le("price", 300)
     ///     .sql()?;
     ///
     /// assert_eq!("SELECT title, price FROM books WHERE price <= 100 OR price <= 300;", &sql);
@@ -2698,7 +2698,7 @@ mod tests {
         let sql = SqlBuilder::select_from("books")
             .field("title")
             .field("price")
-            .and_where_gt("price", 200.to_string())
+            .and_where_gt("price", 200)
             .sql()?;
 
         assert_eq!(&sql, "SELECT title, price FROM books WHERE price > 200;");
@@ -2706,7 +2706,7 @@ mod tests {
         let sql = SqlBuilder::select_from("books")
             .field("title")
             .field("price")
-            .and_where_ge("price", 300.to_string())
+            .and_where_ge("price", 300)
             .sql()?;
 
         assert_eq!(&sql, "SELECT title, price FROM books WHERE price >= 300;");
