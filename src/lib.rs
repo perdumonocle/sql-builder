@@ -6,7 +6,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! sql-builder = "0.9"
+//! sql-builder = "0.10"
 //! ```
 //!
 //! Next, add this to your crate:
@@ -37,36 +37,7 @@
 //! # }
 //! ```
 //!
-//! ## SQL support
-//!
-//! ### Statements
-//!
-//! - SELECT
-//! - INSERT
-//! - UPDATE
-//! - DELETE
-//!
-//! ### Operations
-//!
-//! - join
-//! - distinct
-//! - group by
-//! - order by
-//! - where
-//! - limit, offset
-//! - subquery
-//! - get all results
-//! - get first row
-//! - get first value, first integer value, first string value
-//!
-//! ### Functions
-//!
-//! - escape
-//! - query
-//!
-//! ## License
-//!
-//! This project is licensed under the [MIT license](LICENSE).
+//! See [more examples](https://docs.rs/sql-builder/0.10.0/sql_builder/struct.SqlBuilder.html)
 
 //#![feature(test)]
 //extern crate test;
@@ -900,6 +871,31 @@ impl SqlBuilder {
     pub fn returning<S: ToString>(&mut self, field: S) -> &mut Self {
         self.returning = Some(field.to_string());
         self
+    }
+
+    /// Add RETURNING id.
+    ///
+    /// ```
+    /// extern crate sql_builder;
+    ///
+    /// # use std::error::Error;
+    /// use sql_builder::{SqlBuilder, quote};
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// let sql = SqlBuilder::insert_into("books")
+    ///     .field("title")
+    ///     .field("price")
+    ///     .values(&["'Don Quixote', 200"])
+    ///     .returning_id()
+    ///     .sql()?;
+    ///
+    /// assert_eq!("INSERT INTO books (title, price) VALUES ('Don Quixote', 200) RETURNING id;", &sql);
+    /// // add here                                                              ^^^^^^^^^^^^
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn returning_id(&mut self) -> &mut Self {
+        self.returning("id")
     }
 
     /// Add GROUP BY part.
@@ -3040,7 +3036,7 @@ mod tests {
             .field("title")
             .field("price")
             .values(&["'Don Quixote', 200"])
-            .returning("id")
+            .returning_id()
             .sql()?;
 
         assert_eq!(
