@@ -3558,7 +3558,7 @@ mod tests {
 //            SqlBuilder::select_from("books")
 //                .field("title")
 //                .field("price")
-//                .and_where_gt("price", 200.to_string())
+//                .and_where_gt("price", 200)
 //                .sql()
 //        });
 //    }
