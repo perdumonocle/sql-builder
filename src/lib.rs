@@ -37,7 +37,7 @@
 //! # }
 //! ```
 //!
-//! See [more examples](https://docs.rs/sql-builder/0.10.1/sql_builder/struct.SqlBuilder.html)
+//! See [more examples](https://docs.rs/sql-builder/0.10.2/sql_builder/struct.SqlBuilder.html)
 
 //#![feature(test)]
 //extern crate test;
@@ -2615,6 +2615,36 @@ pub fn quote<S: ToString>(src: S) -> String {
     format!("'{}'", esc(src.to_string()))
 }
 
+/// Backquote string for SQL.
+///
+/// ```
+/// extern crate sql_builder;
+///
+/// use sql_builder::baquote;
+///
+/// let sql = baquote("Hello, 'World'");
+///
+/// assert_eq!(&sql, "`Hello, 'World'`");
+/// ```
+pub fn baquote<S: ToString>(src: S) -> String {
+    format!("`{}`", src.to_string())
+}
+
+/// Double quote string for SQL.
+///
+/// ```
+/// extern crate sql_builder;
+///
+/// use sql_builder::dquote;
+///
+/// let sql = dquote("Hello, 'World'");
+///
+/// assert_eq!(&sql, "\"Hello, 'World'\"");
+/// ```
+pub fn dquote<S: ToString>(src: S) -> String {
+    format!("\"{}\"", src.to_string())
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -2631,8 +2661,13 @@ mod tests {
     #[test]
     fn test_quote() -> Result<(), Box<dyn Error>> {
         let sql = quote("Hello, 'World'");
-
         assert_eq!(&sql, "'Hello, ''World'''");
+
+        let sql = baquote("Hello, 'World'");
+        assert_eq!(&sql, "`Hello, 'World'`");
+
+        let sql = dquote("Hello, 'World'");
+        assert_eq!(&sql, "\"Hello, 'World'\"");
 
         Ok(())
     }

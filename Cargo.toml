@@ -1,6 +1,6 @@
 [package]
 name = "sql-builder"
-version = "0.10.1"
+version = "0.10.2"
 description = "Simple SQL code generator."
 authors = ["perdumonocle <konstantin_1987@mail.ru>"]
 license = "MIT"
