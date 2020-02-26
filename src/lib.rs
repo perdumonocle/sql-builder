@@ -37,7 +37,7 @@
 //! # }
 //! ```
 //!
-//! See [more examples](https://docs.rs/sql-builder/0.10.2/sql_builder/struct.SqlBuilder.html)
+//! See [more examples](https://docs.rs/sql-builder/0.10.3/sql_builder/struct.SqlBuilder.html)
 
 //#![feature(test)]
 //extern crate test;
@@ -852,7 +852,7 @@ impl SqlBuilder {
     /// extern crate sql_builder;
     ///
     /// # use std::error::Error;
-    /// use sql_builder::{SqlBuilder, quote};
+    /// use sql_builder::SqlBuilder;
     ///
     /// # fn main() -> Result<(), Box<dyn Error>> {
     /// let sql = SqlBuilder::insert_into("books")
@@ -879,7 +879,7 @@ impl SqlBuilder {
     /// extern crate sql_builder;
     ///
     /// # use std::error::Error;
-    /// use sql_builder::{SqlBuilder, quote};
+    /// use sql_builder::SqlBuilder;
     ///
     /// # fn main() -> Result<(), Box<dyn Error>> {
     /// let sql = SqlBuilder::insert_into("books")

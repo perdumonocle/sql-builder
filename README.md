@@ -35,6 +35,8 @@ let sql = SqlBuilder::select_from("company")
 assert_eq!("SELECT id, name FROM company WHERE salary > 25000;", &sql);
 ```
 
+See [more examples](https://docs.rs/sql-builder/0.10.3/sql_builder/struct.SqlBuilder.html)
+
 ## SQL support
 
 ### Statements
@@ -58,7 +60,7 @@ assert_eq!("SELECT id, name FROM company WHERE salary > 25000;", &sql);
 ### Functions
 
 - escape
-- query
+- quote, double quote, back quote
 
 ## License
 
