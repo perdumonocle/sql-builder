@@ -1624,8 +1624,8 @@ impl SqlBuilder {
     ///     .sql()?;
     ///
     /// assert_eq!("SELECT title, price FROM books WHERE price < 100 OR price >= 300;", &sql);
-    /// // add                                           ^^^^^   ^^^    ^^^^^    ^^^
-    /// // here                                          field  value   field   value
+    /// // add                                                          ^^^^^    ^^^
+    /// // here                                                         field   value
     /// # Ok(())
     /// # }
     /// ```
@@ -1686,12 +1686,12 @@ impl SqlBuilder {
     ///     .field("title")
     ///     .field("price")
     ///     .or_where_le("price", 100)
-    ///     .or_where_le("price", 300)
+    ///     .or_where_ge("price", 300)
     ///     .sql()?;
     ///
-    /// assert_eq!("SELECT title, price FROM books WHERE price <= 100 OR price <= 300;", &sql);
-    /// // add                                           ^^^^^    ^^^    ^^^^^    ^^^
-    /// // here                                          field   value   field   value
+    /// assert_eq!("SELECT title, price FROM books WHERE price <= 100 OR price >= 300;", &sql);
+    /// // add                                           ^^^^^    ^^^
+    /// // here                                          field   value
     /// # Ok(())
     /// # }
     /// ```
