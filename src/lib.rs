@@ -37,7 +37,7 @@
 //! # }
 //! ```
 //!
-//! See [more examples](https://docs.rs/sql-builder/0.10.3/sql_builder/struct.SqlBuilder.html)
+//! See [more examples](https://docs.rs/sql-builder/0.10.4/sql_builder/struct.SqlBuilder.html)
 
 //#![feature(test)]
 //extern crate test;
