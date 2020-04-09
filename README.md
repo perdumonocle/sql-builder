@@ -15,17 +15,11 @@ To use `sql-builder`, first add this to your `Cargo.toml`:
 sql-builder = "0.11"
 ```
 
-Next, add this to your crate:
-
-```rust
-extern crate sql_builder;
-
-use sql_builder::SqlBuilder;
-```
-
 Example:
 
 ```rust
+use sql_builder::SqlBuilder;
+
 let sql = SqlBuilder::select_from("company")
     .field("id")
     .field("name")
@@ -47,7 +41,7 @@ let sql = SqlBuilder::select_from("company")
 assert_eq!("SELECT id, name FROM company WHERE (salary BETWEEN 10000 AND 25000) AND (staff BETWEEN 100 AND 200);", &sql);
 ```
 
-See [more examples](https://docs.rs/sql-builder/0.11.0/sql_builder/struct.SqlBuilder.html)
+See [more examples](https://docs.rs/sql-builder/0.11.1/sql_builder/struct.SqlBuilder.html)
 
 ## SQL support
 

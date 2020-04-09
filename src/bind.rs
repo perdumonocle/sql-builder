@@ -69,6 +69,10 @@ mod tests {
             "10f20o30o10",
             &String::from("?f?o?o?").binds(&[&10, &20, &30])
         );
+        assert_eq!(
+            "10f'AAA'o10o'AAA'",
+            &String::from("?f?o?o?").binds(&[&10, &"AAA"])
+        );
 
         Ok(())
     }

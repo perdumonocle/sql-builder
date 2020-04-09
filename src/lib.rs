@@ -9,21 +9,11 @@
 //! sql-builder = "0.11"
 //! ```
 //!
-//! Next, add this to your crate:
-//!
-//! ```
-//! extern crate sql_builder;
-//!
-//! use sql_builder::SqlBuilder;
-//! ```
-//!
 //! # Examples:
 //!
 //! ```
-//! extern crate sql_builder;
-//!
-//! # use std::error::Error;
 //! use sql_builder::SqlBuilder;
+//! # use std::error::Error;
 //!
 //! # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
 //! let sql = SqlBuilder::select_from("company")
@@ -38,8 +28,6 @@
 //! ```
 //!
 //! ```
-//! extern crate sql_builder;
-//!
 //! # use std::error::Error;
 //! use sql_builder::prelude::*;
 //!
@@ -55,10 +43,7 @@
 //! # }
 //! ```
 //!
-//! See [more examples](https://docs.rs/sql-builder/0.11.0/sql_builder/struct.SqlBuilder.html)
-
-//#![feature(test)]
-//extern crate test;
+//! See [more examples](https://docs.rs/sql-builder/0.11.1/sql_builder/struct.SqlBuilder.html)
 
 pub mod arg;
 pub mod bind;
@@ -146,8 +131,6 @@ impl SqlBuilder {
     /// You may specify comma separted list of tables.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -175,8 +158,6 @@ impl SqlBuilder {
     /// Create SELECT query without a table.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::{SqlBuilder, quote};
     ///
@@ -202,8 +183,6 @@ impl SqlBuilder {
     /// Create INSERT query.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::{SqlBuilder, quote};
     ///
@@ -232,8 +211,6 @@ impl SqlBuilder {
     /// Create UPDATE query.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -259,8 +236,6 @@ impl SqlBuilder {
     /// Create DELETE query.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -286,8 +261,6 @@ impl SqlBuilder {
     /// Use NATURAL JOIN
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -312,8 +285,6 @@ impl SqlBuilder {
     /// Use LEFT JOIN
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -339,8 +310,6 @@ impl SqlBuilder {
     /// Use LEFT OUTER JOIN
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -366,8 +335,6 @@ impl SqlBuilder {
     /// Use RIGHT JOIN
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -393,8 +360,6 @@ impl SqlBuilder {
     /// Use RIGHT OUTER JOIN
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -420,8 +385,6 @@ impl SqlBuilder {
     /// Use INNER JOIN
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -447,8 +410,6 @@ impl SqlBuilder {
     /// Use CROSS JOIN
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -474,8 +435,6 @@ impl SqlBuilder {
     /// Join with table.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -524,8 +483,6 @@ impl SqlBuilder {
     /// Join constraint to the last JOIN part.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -554,8 +511,6 @@ impl SqlBuilder {
     /// Set DISTINCT for fields.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -578,8 +533,6 @@ impl SqlBuilder {
     /// Add fields.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -606,8 +559,6 @@ impl SqlBuilder {
     /// Replace fields.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     /// # #[derive(Default)]
@@ -662,8 +613,6 @@ impl SqlBuilder {
     /// Add field.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -687,8 +636,6 @@ impl SqlBuilder {
     /// Replace fields with choosed one.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     /// # #[derive(Default)]
@@ -741,8 +688,6 @@ impl SqlBuilder {
     /// Add SET part (for UPDATE).
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -770,8 +715,6 @@ impl SqlBuilder {
     /// Add SET part with escaped string value (for UPDATE).
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -800,8 +743,6 @@ impl SqlBuilder {
     /// Add VALUES part (for INSERT).
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::{SqlBuilder, quote};
     ///
@@ -838,8 +779,6 @@ impl SqlBuilder {
     /// Add SELECT part (for INSERT).
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -871,8 +810,6 @@ impl SqlBuilder {
     /// Add RETURNING part.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -898,8 +835,6 @@ impl SqlBuilder {
     /// Add RETURNING id.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -923,8 +858,6 @@ impl SqlBuilder {
     /// Add GROUP BY part.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -950,8 +883,6 @@ impl SqlBuilder {
     /// Add HAVING condition.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -978,8 +909,6 @@ impl SqlBuilder {
     /// Add WHERE condition.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -1005,8 +934,6 @@ impl SqlBuilder {
     /// Add WHERE condition for equal parts.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::{SqlBuilder, quote};
     ///
@@ -1036,8 +963,6 @@ impl SqlBuilder {
     /// Add WHERE condition for non-equal parts.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::{SqlBuilder, quote};
     ///
@@ -1067,8 +992,6 @@ impl SqlBuilder {
     /// Add WHERE condition for field greater than value.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -1099,8 +1022,6 @@ impl SqlBuilder {
     /// Add WHERE condition for field not less than value.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -1131,8 +1052,6 @@ impl SqlBuilder {
     /// Add WHERE condition for field less than value.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -1163,8 +1082,6 @@ impl SqlBuilder {
     /// Add WHERE condition for field not greater than value.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -1195,8 +1112,6 @@ impl SqlBuilder {
     /// Add WHERE LIKE condition.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -1227,8 +1142,6 @@ impl SqlBuilder {
     /// Add WHERE LIKE %condition.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -1259,8 +1172,6 @@ impl SqlBuilder {
     /// Add WHERE LIKE condition%.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -1291,8 +1202,6 @@ impl SqlBuilder {
     /// Add WHERE LIKE %condition%.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -1323,8 +1232,6 @@ impl SqlBuilder {
     /// Add WHERE NOT LIKE condition.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -1355,8 +1262,6 @@ impl SqlBuilder {
     /// Add WHERE NOT LIKE %condition.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -1387,8 +1292,6 @@ impl SqlBuilder {
     /// Add WHERE NOT LIKE condition%.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -1419,8 +1322,6 @@ impl SqlBuilder {
     /// Add WHERE NOT LIKE %condition%.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -1451,8 +1352,6 @@ impl SqlBuilder {
     /// Add WHERE IS NULL condition.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -1477,8 +1376,6 @@ impl SqlBuilder {
     /// Add WHERE IS NOT NULL condition.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -1503,8 +1400,6 @@ impl SqlBuilder {
     /// Add OR condition to the last WHERE condition.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -1535,8 +1430,6 @@ impl SqlBuilder {
     /// Add OR condition of equal parts to the last WHERE condition.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::{SqlBuilder, quote};
     ///
@@ -1567,8 +1460,6 @@ impl SqlBuilder {
     /// Add OR condition of non-equal parts to the last WHERE condition.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::{SqlBuilder, quote};
     ///
@@ -1599,8 +1490,6 @@ impl SqlBuilder {
     /// Add OR condition for field greater than value to the last WHERE condition.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -1632,8 +1521,6 @@ impl SqlBuilder {
     /// Add OR condition for field not less than value to the last WHERE condition.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -1665,8 +1552,6 @@ impl SqlBuilder {
     /// Add OR condition for field less than value to the last WHERE condition.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -1698,8 +1583,6 @@ impl SqlBuilder {
     /// Add OR condition for field not greater than value to the last WHERE condition.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -1731,8 +1614,6 @@ impl SqlBuilder {
     /// Add OR LIKE condition to the last WHERE condition.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -1764,8 +1645,6 @@ impl SqlBuilder {
     /// Add OR LIKE condition to the last WHERE %condition.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -1797,8 +1676,6 @@ impl SqlBuilder {
     /// Add OR LIKE condition to the last WHERE condition%.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -1830,8 +1707,6 @@ impl SqlBuilder {
     /// Add OR LIKE condition to the last WHERE %condition%.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -1863,8 +1738,6 @@ impl SqlBuilder {
     /// Add OR NOT LIKE condition to the last WHERE condition.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -1896,8 +1769,6 @@ impl SqlBuilder {
     /// Add OR NOT LIKE condition to the last WHERE %condition.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -1929,8 +1800,6 @@ impl SqlBuilder {
     /// Add OR NOT LIKE condition to the last WHERE condition%.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -1962,8 +1831,6 @@ impl SqlBuilder {
     /// Add OR NOT LIKE condition to the last WHERE %condition%.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -1995,8 +1862,6 @@ impl SqlBuilder {
     /// Add OR IS NULL condition to the last WHERE condition.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -2022,8 +1887,6 @@ impl SqlBuilder {
     /// Add OR IS NOT NULL condition to the last WHERE condition.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -2050,8 +1913,6 @@ impl SqlBuilder {
     /// ORDER BY must be in the last subquery.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -2087,8 +1948,6 @@ impl SqlBuilder {
     /// ORDER BY must be in the last subquery.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -2119,8 +1978,6 @@ impl SqlBuilder {
     /// Add ORDER BY.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -2151,8 +2008,6 @@ impl SqlBuilder {
     /// Add ORDER BY ASC.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -2177,8 +2032,6 @@ impl SqlBuilder {
     /// Add ORDER BY DESC.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -2203,8 +2056,6 @@ impl SqlBuilder {
     /// Set LIMIT.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -2231,8 +2082,6 @@ impl SqlBuilder {
     /// Set OFFSET.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -2260,8 +2109,6 @@ impl SqlBuilder {
     /// Build complete SQL command.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -2311,8 +2158,6 @@ impl SqlBuilder {
     /// Build subquery SQL command.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -2344,8 +2189,6 @@ impl SqlBuilder {
     /// Build named subquery SQL command.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -2382,8 +2225,6 @@ impl SqlBuilder {
     /// SQL command generator for query or subquery.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
@@ -2476,8 +2317,6 @@ impl SqlBuilder {
     /// SQL command generator for query or subquery without a table.
     ///
     /// ```
-    /// extern crate sql_builder;
-    ///
     /// # use std::error::Error;
     /// use sql_builder::{SqlBuilder, quote};
     ///
@@ -2613,8 +2452,6 @@ impl SqlBuilder {
 /// Escape string for SQL.
 ///
 /// ```
-/// extern crate sql_builder;
-///
 /// use sql_builder::esc;
 ///
 /// let sql = esc("Hello, 'World'");
@@ -2628,8 +2465,6 @@ pub fn esc<S: ToString>(src: S) -> String {
 /// Quote string for SQL.
 ///
 /// ```
-/// extern crate sql_builder;
-///
 /// use sql_builder::quote;
 ///
 /// let sql = quote("Hello, 'World'");
@@ -2643,8 +2478,6 @@ pub fn quote<S: ToString>(src: S) -> String {
 /// Backquote string for SQL.
 ///
 /// ```
-/// extern crate sql_builder;
-///
 /// use sql_builder::baquote;
 ///
 /// let sql = baquote("Hello, 'World'");
@@ -2658,8 +2491,6 @@ pub fn baquote<S: ToString>(src: S) -> String {
 /// Double quote string for SQL.
 ///
 /// ```
-/// extern crate sql_builder;
-///
 /// use sql_builder::dquote;
 ///
 /// let sql = dquote("Hello, 'World'");
