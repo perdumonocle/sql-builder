@@ -47,9 +47,10 @@
 //! let sql = SqlBuilder::select_from("company")
 //!     .fields(&["id", "name"])
 //!     .and_where("salary BETWEEN ? AND ?".binds(&[&10000, &25000]))
+//!     .and_where("staff BETWEEN ? AND ?".bind(&100).bind(&200))
 //!     .sql()?;
 //!
-//! assert_eq!("SELECT id, name FROM company WHERE salary BETWEEN 10000 AND 25000;", &sql);
+//! assert_eq!("SELECT id, name FROM company WHERE (salary BETWEEN 10000 AND 25000) AND (staff BETWEEN 100 AND 200);", &sql);
 //! # Ok(())
 //! # }
 //! ```
