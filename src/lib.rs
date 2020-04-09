@@ -1810,7 +1810,7 @@ impl SqlBuilder {
     ///     .sql()?;
     ///
     /// assert_eq!("SELECT price FROM books WHERE title LIKE 'Alice''s%' OR title LIKE 'Philosopher''s%';", &sql);
-    /// // add                                    ^^^^^       ^^^^^^^^      ^^^^^       ^^^^^^^^^^^^^^  
+    /// // add                                    ^^^^^       ^^^^^^^^      ^^^^^       ^^^^^^^^^^^^^^
     /// // here                                   field         mask        field            mask
     /// # Ok(())
     /// # }
@@ -1942,7 +1942,7 @@ impl SqlBuilder {
     ///     .sql()?;
     ///
     /// assert_eq!("SELECT price FROM books WHERE title NOT LIKE 'Alice''s%' OR title NOT LIKE 'Philosopher''s%';", &sql);
-    /// // add                                    ^^^^^           ^^^^^^^^      ^^^^^           ^^^^^^^^^^^^^^  
+    /// // add                                    ^^^^^           ^^^^^^^^      ^^^^^           ^^^^^^^^^^^^^^
     /// // here                                   field             mask        field                mask
     /// # Ok(())
     /// # }
@@ -2455,7 +2455,7 @@ impl SqlBuilder {
         };
 
         // Make SQL
-        let sql = format!("SELECT{distinct} {fields} FROM {table}{joins}{group_by}{wheres}{unions}{order_by}{limit}{offset}",
+        let sql = format!("SELECT{distinct} {fields} FROM {table}{joins}{wheres}{group_by}{unions}{order_by}{limit}{offset}",
             distinct = distinct,
             fields = fields,
             table = &self.table,
@@ -3018,6 +3018,16 @@ mod tests {
             .sql()?;
 
         assert_eq!(&sql, "SELECT price, COUNT(price) AS cnt FROM books GROUP BY price HAVING price > 100 ORDER BY cnt DESC;");
+
+        let sql = SqlBuilder::select_from("books")
+            .field("price")
+            .field("COUNT(price) AS cnt")
+            .group_by("price")
+            .and_where("price > 100")
+            .order_desc("cnt")
+            .sql()?;
+
+        assert_eq!(&sql, "SELECT price, COUNT(price) AS cnt FROM books WHERE price > 100 GROUP BY price ORDER BY cnt DESC;");
 
         Ok(())
     }
