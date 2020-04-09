@@ -6,7 +6,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! sql-builder = "0.10"
+//! sql-builder = "0.11"
 //! ```
 //!
 //! Next, add this to your crate:
@@ -37,10 +37,31 @@
 //! # }
 //! ```
 //!
-//! See [more examples](https://docs.rs/sql-builder/0.10.4/sql_builder/struct.SqlBuilder.html)
+//! ```
+//! extern crate sql_builder;
+//!
+//! # use std::error::Error;
+//! use sql_builder::prelude::*;
+//!
+//! # fn main() -> Result<(), Box<dyn Error>> {
+//! let sql = SqlBuilder::select_from("company")
+//!     .fields(&["id", "name"])
+//!     .and_where("salary BETWEEN ? AND ?".binds(&[&10000, &25000]))
+//!     .sql()?;
+//!
+//! assert_eq!("SELECT id, name FROM company WHERE salary BETWEEN 10000 AND 25000;", &sql);
+//! # Ok(())
+//! # }
+//! ```
+//!
+//! See [more examples](https://docs.rs/sql-builder/0.11.0/sql_builder/struct.SqlBuilder.html)
 
 //#![feature(test)]
 //extern crate test;
+
+pub mod arg;
+pub mod bind;
+pub mod prelude;
 
 use std::error::Error;
 
