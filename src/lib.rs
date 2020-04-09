@@ -25,7 +25,7 @@
 //! # use std::error::Error;
 //! use sql_builder::SqlBuilder;
 //!
-//! # fn main() -> Result<(), Box<dyn Error>> {
+//! # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
 //! let sql = SqlBuilder::select_from("company")
 //!     .field("id")
 //!     .field("name")
@@ -43,7 +43,7 @@
 //! # use std::error::Error;
 //! use sql_builder::prelude::*;
 //!
-//! # fn main() -> Result<(), Box<dyn Error>> {
+//! # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
 //! let sql = SqlBuilder::select_from("company")
 //!     .fields(&["id", "name"])
 //!     .and_where("salary BETWEEN ? AND ?".binds(&[&10000, &25000]))
@@ -151,7 +151,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
@@ -180,7 +180,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::{SqlBuilder, quote};
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_values(&["10", &quote("100")])
     ///     .sql()?;
     ///
@@ -207,7 +207,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::{SqlBuilder, quote};
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::insert_into("books")
     ///     .field("title")
     ///     .field("price")
@@ -237,7 +237,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::update_table("books")
     ///     .set("price", "price + 10")
     ///     .sql()?;
@@ -264,7 +264,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::delete_from("books")
     ///     .and_where("price > 100")
     ///     .sql()?;
@@ -291,7 +291,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("total")
@@ -317,7 +317,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("total")
@@ -344,7 +344,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("total")
@@ -371,7 +371,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("total")
@@ -398,7 +398,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("total")
@@ -425,7 +425,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("total")
@@ -452,7 +452,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("total")
@@ -479,7 +479,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books AS b")
     ///     .field("b.title")
     ///     .field("s.total")
@@ -529,7 +529,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books AS b")
     ///     .field("b.title")
     ///     .field("s.total")
@@ -559,7 +559,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .distinct()
     ///     .field("price")
@@ -583,7 +583,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .fields(&["title", "price"])
     ///     .sql()?;
@@ -614,7 +614,7 @@ impl SqlBuilder {
     /// # struct ReqData { filter: Option<String>, price_min: Option<u64>, price_max: Option<u64>,
     /// # limit: Option<usize>, offset: Option<usize> }
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// # let req_data = ReqData::default();
     /// // Prepare query for total count
     ///
@@ -667,7 +667,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
@@ -695,7 +695,7 @@ impl SqlBuilder {
     /// # struct ReqData { filter: Option<String>, price_min: Option<u64>, price_max: Option<u64>,
     /// # limit: Option<usize>, offset: Option<usize> }
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// # let req_data = ReqData::default();
     /// // Prepare query for total count
     ///
@@ -746,7 +746,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::update_table("books")
     ///     .set("price", "price + 10")
     ///     .sql()?;
@@ -775,7 +775,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::update_table("books")
     ///     .set_str("comment", "Don't distribute!")
     ///     .and_where_le("price", "100")
@@ -805,7 +805,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::{SqlBuilder, quote};
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::insert_into("books")
     ///     .field("title")
     ///     .field("price")
@@ -843,7 +843,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let query = SqlBuilder::select_from("warehouse")
     ///     .field("title")
     ///     .field("preliminary_price * 2")
@@ -876,7 +876,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::insert_into("books")
     ///     .field("title")
     ///     .field("price")
@@ -903,7 +903,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::insert_into("books")
     ///     .field("title")
     ///     .field("price")
@@ -928,7 +928,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("price")
     ///     .field("COUNT(price) AS cnt")
@@ -955,7 +955,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("price")
     ///     .field("COUNT(price) AS cnt")
@@ -983,7 +983,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
@@ -1010,7 +1010,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::{SqlBuilder, quote};
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("price")
     ///     .and_where_eq("title", &quote("Harry Potter and the Philosopher's Stone"))
@@ -1041,7 +1041,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::{SqlBuilder, quote};
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("price")
     ///     .and_where_ne("title", &quote("Harry Potter and the Philosopher's Stone"))
@@ -1072,7 +1072,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
@@ -1104,7 +1104,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
@@ -1136,7 +1136,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
@@ -1168,7 +1168,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
@@ -1200,7 +1200,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("price")
     ///     .and_where_like("title", "%Philosopher's%")
@@ -1232,7 +1232,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("price")
     ///     .and_where_like_right("title", "Stone")
@@ -1264,7 +1264,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("price")
     ///     .and_where_like_left("title", "Harry")
@@ -1296,7 +1296,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("price")
     ///     .and_where_like_any("title", " and ")
@@ -1328,7 +1328,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .and_where_not_like("title", "%Alice's%")
@@ -1360,7 +1360,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("price")
     ///     .and_where_not_like_right("title", "Stone")
@@ -1392,7 +1392,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("price")
     ///     .and_where_not_like_left("title", "Harry")
@@ -1424,7 +1424,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("price")
     ///     .and_where_not_like_any("title", " and ")
@@ -1456,7 +1456,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .and_where_is_null("price")
@@ -1482,7 +1482,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .and_where_is_not_null("price")
@@ -1508,7 +1508,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
@@ -1540,7 +1540,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::{SqlBuilder, quote};
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("price")
     ///     .and_where_eq("title", &quote("Harry Potter and the Philosopher's Stone"))
@@ -1572,7 +1572,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::{SqlBuilder, quote};
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("price")
     ///     .or_where_ne("title", &quote("Harry Potter and the Philosopher's Stone"))
@@ -1604,7 +1604,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
@@ -1637,7 +1637,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
@@ -1670,7 +1670,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
@@ -1703,7 +1703,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
@@ -1736,7 +1736,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("price")
     ///     .or_where_like("title", "%Alice's%")
@@ -1769,7 +1769,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("price")
     ///     .or_where_like_right("title", "Alice's")
@@ -1802,7 +1802,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("price")
     ///     .or_where_like_left("title", "Alice's")
@@ -1835,7 +1835,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("price")
     ///     .or_where_like_any("title", "Alice's")
@@ -1868,7 +1868,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .and_where_not_like("title", "%Alice's%")
@@ -1901,7 +1901,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("price")
     ///     .or_where_not_like_right("title", "Alice's")
@@ -1934,7 +1934,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("price")
     ///     .or_where_not_like_left("title", "Alice's")
@@ -1967,7 +1967,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("price")
     ///     .or_where_not_like_any("title", "Alice's")
@@ -2000,7 +2000,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .and_where_eq("price", 0)
@@ -2027,7 +2027,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .or_where_is_not_null("title")
@@ -2055,7 +2055,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let append = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
@@ -2092,7 +2092,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let append = SqlBuilder::select_values(&["'The Great Gatsby'", "124"])
     ///     .query_values()?;
     ///
@@ -2124,7 +2124,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
@@ -2156,7 +2156,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
@@ -2182,7 +2182,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
@@ -2208,7 +2208,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
@@ -2236,7 +2236,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
@@ -2265,14 +2265,14 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books").sql()?;
     ///
     /// assert_eq!("SELECT * FROM books;", &sql);
     /// # Ok(())
     /// # }
     /// ```
-    pub fn sql(&self) -> Result<String, Box<dyn Error>> {
+    pub fn sql(&self) -> Result<String, Box<dyn Error + Send + Sync>> {
         match self.statement {
             Statement::SelectFrom => self.sql_select(),
             Statement::SelectValues => self.sql_select_values(),
@@ -2283,7 +2283,7 @@ impl SqlBuilder {
     }
 
     /// Build complete SQL command for SELECT statement
-    fn sql_select(&self) -> Result<String, Box<dyn Error>> {
+    fn sql_select(&self) -> Result<String, Box<dyn Error + Send + Sync>> {
         // Checks
         if self.table.is_empty() {
             return Err("No table name".into());
@@ -2296,7 +2296,7 @@ impl SqlBuilder {
     }
 
     /// Build complete SQL command for SELECT statement without a table
-    fn sql_select_values(&self) -> Result<String, Box<dyn Error>> {
+    fn sql_select_values(&self) -> Result<String, Box<dyn Error + Send + Sync>> {
         // Checks
         if self.fields.is_empty() {
             return Err("No values".into());
@@ -2316,7 +2316,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let cat = SqlBuilder::select_from("books")
     ///     .field("CASE WHEN price < 100 THEN 'cheap' ELSE 'expensive' END AS category")
     ///     .subquery()?;
@@ -2335,7 +2335,7 @@ impl SqlBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn subquery(&self) -> Result<String, Box<dyn Error>> {
+    pub fn subquery(&self) -> Result<String, Box<dyn Error + Send + Sync>> {
         let text = self.query()?;
         let text = format!("({})", &text);
         Ok(text)
@@ -2349,7 +2349,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let cat = SqlBuilder::select_from("books")
     ///     .field("CASE WHEN price < 100 THEN 'cheap' ELSE 'expensive' END")
     ///     .subquery_as("category")?;
@@ -2368,7 +2368,10 @@ impl SqlBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn subquery_as<S: ToString>(&self, name: S) -> Result<String, Box<dyn Error>> {
+    pub fn subquery_as<S: ToString>(
+        &self,
+        name: S,
+    ) -> Result<String, Box<dyn Error + Send + Sync>> {
         let mut text = "(".to_string();
         text.push_str(&self.query()?);
         text.push_str(") AS ");
@@ -2384,7 +2387,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let query = SqlBuilder::select_from("warehouse")
     ///     .field("title")
     ///     .field("preliminary_price * 2")
@@ -2402,7 +2405,7 @@ impl SqlBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn query(&self) -> Result<String, Box<dyn Error>> {
+    pub fn query(&self) -> Result<String, Box<dyn Error + Send + Sync>> {
         // Distinct results
         let distinct = if self.distinct { " DISTINCT" } else { "" };
 
@@ -2478,7 +2481,7 @@ impl SqlBuilder {
     /// # use std::error::Error;
     /// use sql_builder::{SqlBuilder, quote};
     ///
-    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let values = SqlBuilder::select_values(&["10", &quote("100")])
     ///     .query_values()?;
     ///
@@ -2486,7 +2489,7 @@ impl SqlBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn query_values(&self) -> Result<String, Box<dyn Error>> {
+    pub fn query_values(&self) -> Result<String, Box<dyn Error + Send + Sync>> {
         // Make values
         let fields = self.fields.join(", ");
 
@@ -2496,7 +2499,7 @@ impl SqlBuilder {
     }
 
     /// Build SQL command for INSERT statement
-    fn sql_insert(&self) -> Result<String, Box<dyn Error>> {
+    fn sql_insert(&self) -> Result<String, Box<dyn Error + Send + Sync>> {
         // Checks
         if self.table.is_empty() {
             return Err("No table name".into());
@@ -2547,7 +2550,7 @@ impl SqlBuilder {
     }
 
     /// Build SQL command for UPDATE statement
-    fn sql_update(&self) -> Result<String, Box<dyn Error>> {
+    fn sql_update(&self) -> Result<String, Box<dyn Error + Send + Sync>> {
         // Checks
         if self.table.is_empty() {
             return Err("No table name".into());
@@ -2573,7 +2576,7 @@ impl SqlBuilder {
     }
 
     /// Build SQL command for DELETE statement
-    fn sql_delete(&self) -> Result<String, Box<dyn Error>> {
+    fn sql_delete(&self) -> Result<String, Box<dyn Error + Send + Sync>> {
         // Checks
         if self.table.is_empty() {
             return Err("No table name".into());
@@ -2672,7 +2675,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_esc() -> Result<(), Box<dyn Error>> {
+    fn test_esc() -> Result<(), Box<dyn Error + Send + Sync>> {
         let sql = esc("Hello, 'World'");
 
         assert_eq!(&sql, "Hello, ''World''");
@@ -2681,7 +2684,7 @@ mod tests {
     }
 
     #[test]
-    fn test_quote() -> Result<(), Box<dyn Error>> {
+    fn test_quote() -> Result<(), Box<dyn Error + Send + Sync>> {
         let sql = quote("Hello, 'World'");
         assert_eq!(&sql, "'Hello, ''World'''");
 
@@ -2695,7 +2698,7 @@ mod tests {
     }
 
     #[test]
-    fn test_select_only_values() -> Result<(), Box<dyn Error>> {
+    fn test_select_only_values() -> Result<(), Box<dyn Error + Send + Sync>> {
         let values = SqlBuilder::select_values(&["10", &quote("100")]).sql()?;
 
         assert_eq!("SELECT 10, '100';", &values);
@@ -2704,7 +2707,7 @@ mod tests {
     }
 
     #[test]
-    fn test_select_all_books() -> Result<(), Box<dyn Error>> {
+    fn test_select_all_books() -> Result<(), Box<dyn Error + Send + Sync>> {
         let sql = SqlBuilder::select_from("books").sql()?;
 
         assert_eq!(&sql, "SELECT * FROM books;");
@@ -2713,7 +2716,7 @@ mod tests {
     }
 
     #[test]
-    fn test_show_all_prices() -> Result<(), Box<dyn Error>> {
+    fn test_show_all_prices() -> Result<(), Box<dyn Error + Send + Sync>> {
         let sql = SqlBuilder::select_from("books")
             .distinct()
             .field("price")
@@ -2725,7 +2728,7 @@ mod tests {
     }
 
     #[test]
-    fn test_select_title_and_price() -> Result<(), Box<dyn Error>> {
+    fn test_select_title_and_price() -> Result<(), Box<dyn Error + Send + Sync>> {
         let sql = SqlBuilder::select_from("books")
             .fields(&["title", "price"])
             .sql()?;
@@ -2743,7 +2746,7 @@ mod tests {
     }
 
     #[test]
-    fn test_select_expensive_books() -> Result<(), Box<dyn Error>> {
+    fn test_select_expensive_books() -> Result<(), Box<dyn Error + Send + Sync>> {
         let sql = SqlBuilder::select_from("books")
             .field("title")
             .field("price")
@@ -2772,7 +2775,8 @@ mod tests {
     }
 
     #[test]
-    fn test_select_price_for_harry_potter_and_phil_stone() -> Result<(), Box<dyn Error>> {
+    fn test_select_price_for_harry_potter_and_phil_stone(
+    ) -> Result<(), Box<dyn Error + Send + Sync>> {
         let sql = SqlBuilder::select_from("books")
             .field("price")
             .and_where_eq("title", quote("Harry Potter and the Philosopher's Stone"))
@@ -2787,7 +2791,8 @@ mod tests {
     }
 
     #[test]
-    fn test_select_price_not_for_harry_potter_and_phil_stone() -> Result<(), Box<dyn Error>> {
+    fn test_select_price_not_for_harry_potter_and_phil_stone(
+    ) -> Result<(), Box<dyn Error + Send + Sync>> {
         let sql = SqlBuilder::select_from("books")
             .field("price")
             .and_where_ne("title", quote("Harry Potter and the Philosopher's Stone"))
@@ -2802,7 +2807,7 @@ mod tests {
     }
 
     #[test]
-    fn test_select_expensive_harry_potter() -> Result<(), Box<dyn Error>> {
+    fn test_select_expensive_harry_potter() -> Result<(), Box<dyn Error + Send + Sync>> {
         let sql = SqlBuilder::select_from("books")
             .field("title")
             .field("price")
@@ -2819,7 +2824,7 @@ mod tests {
     }
 
     #[test]
-    fn test_select_strange_books() -> Result<(), Box<dyn Error>> {
+    fn test_select_strange_books() -> Result<(), Box<dyn Error + Send + Sync>> {
         let sql = SqlBuilder::select_from("books")
             .field("title")
             .field("price")
@@ -2842,7 +2847,7 @@ mod tests {
     }
 
     #[test]
-    fn test_order_harry_potter_by_price() -> Result<(), Box<dyn Error>> {
+    fn test_order_harry_potter_by_price() -> Result<(), Box<dyn Error + Send + Sync>> {
         let sql = SqlBuilder::select_from("books")
             .field("title")
             .field("price")
@@ -2881,7 +2886,7 @@ mod tests {
     }
 
     #[test]
-    fn test_find_cheap_or_harry_potter() -> Result<(), Box<dyn Error>> {
+    fn test_find_cheap_or_harry_potter() -> Result<(), Box<dyn Error + Send + Sync>> {
         let append = SqlBuilder::select_from("books")
             .field("title")
             .field("price")
@@ -2921,7 +2926,7 @@ mod tests {
     }
 
     #[test]
-    fn test_select_first_3_harry_potter_books() -> Result<(), Box<dyn Error>> {
+    fn test_select_first_3_harry_potter_books() -> Result<(), Box<dyn Error + Send + Sync>> {
         let sql = SqlBuilder::select_from("books")
             .field("title")
             .field("price")
@@ -2936,7 +2941,7 @@ mod tests {
     }
 
     #[test]
-    fn test_select_harry_potter_from_second_book() -> Result<(), Box<dyn Error>> {
+    fn test_select_harry_potter_from_second_book() -> Result<(), Box<dyn Error + Send + Sync>> {
         let sql = SqlBuilder::select_from("books")
             .field("title")
             .field("price")
@@ -2962,7 +2967,7 @@ mod tests {
     }
 
     #[test]
-    fn test_find_books_not_about_alice() -> Result<(), Box<dyn Error>> {
+    fn test_find_books_not_about_alice() -> Result<(), Box<dyn Error + Send + Sync>> {
         let sql = SqlBuilder::select_from("books")
             .field("title")
             .and_where_not_like_any("title", "Alice's")
@@ -2977,7 +2982,7 @@ mod tests {
     }
 
     #[test]
-    fn test_books_without_price() -> Result<(), Box<dyn Error>> {
+    fn test_books_without_price() -> Result<(), Box<dyn Error + Send + Sync>> {
         let sql = SqlBuilder::select_from("books")
             .field("title")
             .and_where_is_null("price")
@@ -2996,7 +3001,7 @@ mod tests {
     }
 
     #[test]
-    fn test_group_books_by_price() -> Result<(), Box<dyn Error>> {
+    fn test_group_books_by_price() -> Result<(), Box<dyn Error + Send + Sync>> {
         let sql = SqlBuilder::select_from("books")
             .field("price")
             .field("COUNT(price) AS cnt")
@@ -3023,7 +3028,7 @@ mod tests {
     }
 
     #[test]
-    fn test_group_books_by_price_category() -> Result<(), Box<dyn Error>> {
+    fn test_group_books_by_price_category() -> Result<(), Box<dyn Error + Send + Sync>> {
         let cat = SqlBuilder::select_from("books")
             .field("CASE WHEN price < 100 THEN 'cheap' ELSE 'expensive' END AS category")
             .subquery()?;
@@ -3058,7 +3063,7 @@ mod tests {
     }
 
     #[test]
-    fn test_grow_price() -> Result<(), Box<dyn Error>> {
+    fn test_grow_price() -> Result<(), Box<dyn Error + Send + Sync>> {
         let sql = SqlBuilder::update_table("books")
             .set("price", "price + 10")
             .sql()?;
@@ -3079,7 +3084,7 @@ mod tests {
     }
 
     #[test]
-    fn test_add_new_books() -> Result<(), Box<dyn Error>> {
+    fn test_add_new_books() -> Result<(), Box<dyn Error + Send + Sync>> {
         let sql = SqlBuilder::insert_into("books")
             .field("title")
             .field("price")
@@ -3105,7 +3110,7 @@ mod tests {
     }
 
     #[test]
-    fn test_add_books_from_warehouse() -> Result<(), Box<dyn Error>> {
+    fn test_add_books_from_warehouse() -> Result<(), Box<dyn Error + Send + Sync>> {
         let query = SqlBuilder::select_from("warehouse")
             .field("title")
             .field("preliminary_price * 2")
@@ -3128,7 +3133,7 @@ mod tests {
     }
 
     #[test]
-    fn test_sold_all_harry_potter() -> Result<(), Box<dyn Error>> {
+    fn test_sold_all_harry_potter() -> Result<(), Box<dyn Error + Send + Sync>> {
         let sql = SqlBuilder::update_table("books")
             .set("price", 0)
             .set("title", "'[SOLD!]' || title")
@@ -3141,7 +3146,7 @@ mod tests {
     }
 
     #[test]
-    fn test_mark_as_not_distr() -> Result<(), Box<dyn Error>> {
+    fn test_mark_as_not_distr() -> Result<(), Box<dyn Error + Send + Sync>> {
         let sql = SqlBuilder::update_table("books")
             .set_str("comment", "Don't distribute!")
             .and_where_le("price", "100")
@@ -3156,7 +3161,7 @@ mod tests {
     }
 
     #[test]
-    fn test_remove_all_expensive_books() -> Result<(), Box<dyn Error>> {
+    fn test_remove_all_expensive_books() -> Result<(), Box<dyn Error + Send + Sync>> {
         let sql = SqlBuilder::delete_from("books")
             .and_where("price > 100")
             .sql()?;
@@ -3167,7 +3172,7 @@ mod tests {
     }
 
     #[test]
-    fn test_count_books_in_shops() -> Result<(), Box<dyn Error>> {
+    fn test_count_books_in_shops() -> Result<(), Box<dyn Error + Send + Sync>> {
         let sql = SqlBuilder::select_from("books AS b")
             .field("b.title")
             .field("s.total")
