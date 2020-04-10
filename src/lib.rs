@@ -19,7 +19,7 @@
 //! let sql = SqlBuilder::select_from("company")
 //!     .field("id")
 //!     .field("name")
-//!     .and_where_gt("salary", 25000)
+//!     .and_where_gt("salary", 25_000)
 //!     .sql()?;
 //!
 //! assert_eq!("SELECT id, name FROM company WHERE salary > 25000;", &sql);
@@ -34,7 +34,7 @@
 //! # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
 //! let sql = SqlBuilder::select_from("company")
 //!     .fields(&["id", "name"])
-//!     .and_where("salary BETWEEN ? AND ?".binds(&[&10000, &25000]))
+//!     .and_where("salary BETWEEN ? AND ?".binds(&[&10_000, &25_000]))
 //!     .and_where("staff BETWEEN ? AND ?".bind(&100).bind(&200))
 //!     .sql()?;
 //!
@@ -43,7 +43,7 @@
 //! # }
 //! ```
 //!
-//! See [more examples](https://docs.rs/sql-builder/0.11.1/sql_builder/struct.SqlBuilder.html)
+//! See [more examples](https://docs.rs/sql-builder/0.11.2/sql_builder/struct.SqlBuilder.html)
 
 pub mod arg;
 pub mod bind;
