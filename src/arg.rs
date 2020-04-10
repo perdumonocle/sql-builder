@@ -168,22 +168,18 @@ impl SqlArg for &usize {
 
 impl SqlArg for bool {
     fn sql_arg(&self) -> String {
-        String::from(
-            match *self {
-                true => "TRUE",
-                false => "FALSE",
-            }
-        )
+        String::from(match *self {
+            true => "TRUE",
+            false => "FALSE",
+        })
     }
 }
 
 impl SqlArg for &bool {
     fn sql_arg(&self) -> String {
-        String::from(
-            match *self {
-                true => "TRUE",
-                false => "FALSE",
-            }
-        )
+        String::from(match *self {
+            true => "TRUE",
+            false => "FALSE",
+        })
     }
 }
