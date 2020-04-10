@@ -89,6 +89,8 @@ mod tests {
         assert_eq!("fo10o", &"fo?o".bind(&10_usize));
         assert_eq!("fo10o", &"fo?o".bind(&10));
         assert_eq!("fo10o", &"fo?o".bind(&10_isize));
+        assert_eq!("foTRUEo", &"fo?o".bind(&true));
+        assert_eq!("foFALSEo", &"fo?o".bind(&false));
 
         Ok(())
     }
@@ -105,8 +107,8 @@ mod tests {
             &String::from("?f?o?o?").binds(&[&10, &20, &30])
         );
         assert_eq!(
-            "10f'AAA'o10o'AAA'",
-            &String::from("?f?o?o?").binds(&[&10, &"AAA"])
+            "10f'AAA'oTRUEo10",
+            &String::from("?f?o?o?").binds(&[&10, &"AAA", &true])
         );
 
         Ok(())

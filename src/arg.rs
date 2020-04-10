@@ -165,3 +165,25 @@ impl SqlArg for &usize {
         self.to_string()
     }
 }
+
+impl SqlArg for bool {
+    fn sql_arg(&self) -> String {
+        String::from(
+            match *self {
+                true => "TRUE",
+                false => "FALSE",
+            }
+        )
+    }
+}
+
+impl SqlArg for &bool {
+    fn sql_arg(&self) -> String {
+        String::from(
+            match *self {
+                true => "TRUE",
+                false => "FALSE",
+            }
+        )
+    }
+}
