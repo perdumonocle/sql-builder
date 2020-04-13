@@ -8,7 +8,7 @@ Simple SQL code generator.
 
 ## Usage
 
-To use `sql-builder`, first add this to your `Cargo.toml`:
+To use `sql-builder`, add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
@@ -23,7 +23,7 @@ use sql_builder::SqlBuilder;
 let sql = SqlBuilder::select_from("company")
     .field("id")
     .field("name")
-    .and_where_gt("salary", 25000)
+    .and_where_gt("salary", 25_000)
     .sql()?;
 
 assert_eq!("SELECT id, name FROM company WHERE salary > 25000;", &sql);
@@ -34,7 +34,7 @@ use sql_builder::prelude::*;
 
 let sql = SqlBuilder::select_from("company")
     .fields(&["id", "name"])
-    .and_where("salary BETWEEN ? AND ?".binds(&[&10000, &25000]))
+    .and_where("salary BETWEEN ? AND ?".binds(&[&10_000, &25_000]))
     .and_where("staff BETWEEN ? AND ?".bind(&100).bind(&200))
     .sql()?;
 
