@@ -162,7 +162,6 @@ impl Bind for &str {
     fn bind_num(&self, num: u16, arg: &dyn SqlArg) -> String {
         (*self).to_string().bind_num(num, arg)
     }
-
 }
 
 impl Bind for String {
@@ -282,7 +281,10 @@ mod tests {
         assert_eq!("fo10o", &"fo?o".bind(&10_isize));
         assert_eq!("foTRUEo", &"fo?o".bind(&true));
         assert_eq!("foFALSEo", &"fo?o".bind(&false));
-        assert_eq!("10f'lol'o10o$3", &"$1f$2o$1o$3".bind_num(1, &10_u8).bind_num(2, &"lol"));
+        assert_eq!(
+            "10f'lol'o10o$3",
+            &"$1f$2o$1o$3".bind_num(1, &10_u8).bind_num(2, &"lol")
+        );
 
         Ok(())
     }
