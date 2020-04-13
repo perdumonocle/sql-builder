@@ -41,7 +41,7 @@ let sql = SqlBuilder::select_from("company")
 assert_eq!("SELECT id, name FROM company WHERE (salary BETWEEN 10000 AND 25000) AND (staff BETWEEN 100 AND 200);", &sql);
 ```
 
-See [more examples](https://docs.rs/sql-builder/0.11.3/sql_builder/struct.SqlBuilder.html)
+See [more examples](https://docs.rs/sql-builder/0.11.4/sql_builder/struct.SqlBuilder.html)
 
 ## SQL support
 
