@@ -150,7 +150,7 @@
 //! # }
 //! ```
 //!
-//! See [more examples](https://docs.rs/sql-builder/0.11.4/sql_builder/struct.SqlBuilder.html)
+//! See [more examples](https://docs.rs/sql-builder/0.11.5/sql_builder/struct.SqlBuilder.html)
 
 pub mod arg;
 pub mod bind;
