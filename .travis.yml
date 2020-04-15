@@ -6,6 +6,9 @@ rust:
 before_script:
   - rustup component add clippy
   - rustup component add rustfmt
+  - rustup default nightly
+  - rustup component add clippy
+  - rustup component add rustfmt
 
 sudo: false
 script:
