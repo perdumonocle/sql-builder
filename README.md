@@ -15,7 +15,7 @@ To use `sql-builder`, add this to your `Cargo.toml`:
 sql-builder = "0.11"
 ```
 
-Example:
+# Examples:
 
 ## SELECT
 
