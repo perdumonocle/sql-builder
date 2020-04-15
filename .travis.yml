@@ -1,12 +1,8 @@
 language: rust
 rust:
   - stable
-  - nightly
 
 before_script:
-  - rustup component add clippy
-  - rustup component add rustfmt
-  - rustup default nightly
   - rustup component add clippy
   - rustup component add rustfmt
 
