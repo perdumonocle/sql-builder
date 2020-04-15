@@ -76,6 +76,7 @@ pub trait Bind {
     fn bind_num(&self, num: u16, arg: &dyn SqlArg) -> String;
 
     /// Replace $1, $2, ... with elements of array.
+    /// Escape the $ symbol with another $ symbol.
     ///
     /// ```
     /// # use std::error::Error;
@@ -193,6 +194,7 @@ impl Bind for &str {
     }
 
     /// Replace $1, $2, ... with elements of array.
+    /// Escape the $ symbol with another $ symbol.
     ///
     /// ```
     /// # use std::error::Error;
@@ -324,6 +326,7 @@ impl Bind for String {
     }
 
     /// Replace $1, $2, ... with elements of array.
+    /// Escape the $ symbol with another $ symbol.
     ///
     /// ```
     /// # use std::error::Error;

@@ -108,11 +108,13 @@
 //!
 //! # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
 //! let sql = SqlBuilder::update_table("company")
-//!     .set("salary", "salary + ?".bind(&100))
+//!     .set("salary", "salary + $1")
+//!     .set("comment", &quote("up $1$$"))
 //!     .and_where("salary < ?".bind(&1_000))
-//!     .sql()?;
+//!     .sql()?
+//!     .bind_nums(&[&100]);
 //!
-//! assert_eq!("UPDATE company SET salary = salary + 100 WHERE salary < 1000;", &sql);
+//! assert_eq!("UPDATE company SET salary = salary + 100, comment = 'up 100$' WHERE salary < 1000;", &sql);
 //! # Ok(())
 //! # }
 //! ```
