@@ -11,6 +11,8 @@
 //!
 //! # Examples:
 //!
+//! ## SELECT
+//!
 //! ```
 //! use sql_builder::SqlBuilder;
 //! # use std::error::Error;
@@ -39,6 +41,111 @@
 //!     .sql()?;
 //!
 //! assert_eq!("SELECT id, name FROM company WHERE (salary BETWEEN 10000 AND 25000) AND (staff BETWEEN 100 AND 200);", &sql);
+//! # Ok(())
+//! # }
+//! ```
+//!
+//! ## INSERT
+//!
+//! ```
+//! use sql_builder::{SqlBuilder, quote};
+//! # use std::error::Error;
+//!
+//! # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+//! let sql = SqlBuilder::insert_into("company")
+//!     .field("name")
+//!     .field("salary")
+//!     .field("staff")
+//!     .values(&[&quote("D&G"), &10_000.to_string(), &100.to_string()])
+//!     .values(&[&quote("G&D"), &25_000.to_string(), &200.to_string()])
+//!     .sql()?;
+//!
+//! assert_eq!("INSERT INTO company (name, salary, staff) VALUES ('D&G', 10000, 100), ('G&D', 25000, 200);", &sql);
+//! # Ok(())
+//! # }
+//! ```
+//!
+//! ```
+//! use sql_builder::prelude::*;
+//! # use std::error::Error;
+//!
+//! # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+//! let sql = SqlBuilder::insert_into("company")
+//!     .field("name")
+//!     .field("salary")
+//!     .field("staff")
+//!     .values(&["$1, ?, ?"])
+//!     .values(&["$2, ?, ?"])
+//!     .sql()?
+//!     .bind_nums(&[&"D&G", &"G&D"])
+//!     .binds(&[&10_000, &100]);
+//!
+//! assert_eq!("INSERT INTO company (name, salary, staff) VALUES ('D&G', 10000, 100), ('G&D', 10000, 100);", &sql);
+//! # Ok(())
+//! # }
+//! ```
+//!
+//! ## UPDATE
+//!
+//! ```
+//! use sql_builder::SqlBuilder;
+//! # use std::error::Error;
+//!
+//! # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+//! let sql = SqlBuilder::update_table("company")
+//!     .set("salary", "salary + 100")
+//!     .and_where_lt("salary", 1_000)
+//!     .sql()?;
+//!
+//! assert_eq!("UPDATE company SET salary = salary + 100 WHERE salary < 1000;", &sql);
+//! # Ok(())
+//! # }
+//! ```
+//!
+//! ```
+//! use sql_builder::prelude::*;
+//! # use std::error::Error;
+//!
+//! # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+//! let sql = SqlBuilder::update_table("company")
+//!     .set("salary", "salary + ?".bind(&100))
+//!     .and_where("salary < ?".bind(&1_000))
+//!     .sql()?;
+//!
+//! assert_eq!("UPDATE company SET salary = salary + 100 WHERE salary < 1000;", &sql);
+//! # Ok(())
+//! # }
+//! ```
+//!
+//! ## DELETE
+//!
+//! ```
+//! use sql_builder::SqlBuilder;
+//! # use std::error::Error;
+//!
+//! # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+//! let sql = SqlBuilder::delete_from("company")
+//!     .or_where_lt("salary", 1_000)
+//!     .or_where_gt("salary", 25_000)
+//!     .sql()?;
+//!
+//! assert_eq!("DELETE FROM company WHERE salary < 1000 OR salary > 25000;", &sql);
+//! # Ok(())
+//! # }
+//! ```
+//!
+//! ```
+//! use sql_builder::prelude::*;
+//! # use std::error::Error;
+//!
+//! # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+//! let sql = SqlBuilder::delete_from("company")
+//!     .or_where("salary < ?")
+//!     .or_where("salary > ?")
+//!     .sql()?
+//!     .binds(&[&1_000, &25_000]);
+//!
+//! assert_eq!("DELETE FROM company WHERE salary < 1000 OR salary > 25000;", &sql);
 //! # Ok(())
 //! # }
 //! ```

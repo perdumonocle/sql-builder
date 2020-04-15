@@ -32,8 +32,6 @@ pub trait Bind {
     ///     .sql()?;
     ///
     /// assert_eq!("SELECT title, price FROM books WHERE price > 100 AND title LIKE 'Harry Potter%';", &sql);
-    /// // add             ^^^^^^^^^^^^
-    /// // here               fields
     /// # Ok(())
     /// # }
     /// ```
@@ -77,7 +75,40 @@ pub trait Bind {
     /// ```
     fn bind_num(&self, num: u16, arg: &dyn SqlArg) -> String;
 
-    //fn bind_nums(&self, args: &[&dyn SqlArg]) -> String;
+    /// Replace $1, $2, ... with elements of array.
+    ///
+    /// ```
+    /// # use std::error::Error;
+    /// use sql_builder::prelude::*;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .fields(&["title", "price"])
+    ///     .and_where("price > $1 AND price < $1 + $2".bind_nums(&[&100, &200]))
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title, price FROM books WHERE price > 100 AND price < 100 + 200;", &sql);
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    /// ```
+    /// # use std::error::Error;
+    /// use sql_builder::prelude::*;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .fields(&["title", "price"])
+    ///     .and_where("price > $1")
+    ///     .and_where("price < $1 + $2")
+    ///     .sql()?
+    ///     .bind_nums(&[&100, &200]);
+    ///
+    /// assert_eq!("SELECT title, price FROM books WHERE (price > 100) AND (price < 100 + 200);", &sql);
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn bind_nums(&self, args: &[&dyn SqlArg]) -> String;
 }
 
 impl Bind for &str {
@@ -114,8 +145,6 @@ impl Bind for &str {
     ///     .sql()?;
     ///
     /// assert_eq!("SELECT title, price FROM books WHERE price > 100 AND title LIKE 'Harry Potter%';", &sql);
-    /// // add             ^^^^^^^^^^^^
-    /// // here               fields
     /// # Ok(())
     /// # }
     /// ```
@@ -162,6 +191,43 @@ impl Bind for &str {
     fn bind_num(&self, num: u16, arg: &dyn SqlArg) -> String {
         (*self).to_string().bind_num(num, arg)
     }
+
+    /// Replace $1, $2, ... with elements of array.
+    ///
+    /// ```
+    /// # use std::error::Error;
+    /// use sql_builder::prelude::*;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .fields(&["title", "price"])
+    ///     .and_where("price > $1 AND price < $1 + $2".bind_nums(&[&100, &200]))
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title, price FROM books WHERE price > 100 AND price < 100 + 200;", &sql);
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    /// ```
+    /// # use std::error::Error;
+    /// use sql_builder::prelude::*;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .fields(&["title", "price"])
+    ///     .and_where("price > $1")
+    ///     .and_where("price < $1 + $2")
+    ///     .sql()?
+    ///     .bind_nums(&[&100, &200]);
+    ///
+    /// assert_eq!("SELECT title, price FROM books WHERE (price > 100) AND (price < 100 + 200);", &sql);
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn bind_nums(&self, args: &[&dyn SqlArg]) -> String {
+        (*self).to_string().bind_nums(args)
+    }
 }
 
 impl Bind for String {
@@ -198,8 +264,6 @@ impl Bind for String {
     ///     .sql()?;
     ///
     /// assert_eq!("SELECT title, price FROM books WHERE price > 100 AND title LIKE 'Harry Potter%';", &sql);
-    /// // add             ^^^^^^^^^^^^
-    /// // here               fields
     /// # Ok(())
     /// # }
     /// ```
@@ -258,6 +322,85 @@ impl Bind for String {
         let rep = format!("${}", &num);
         self.replace(&rep, &arg.sql_arg())
     }
+
+    /// Replace $1, $2, ... with elements of array.
+    ///
+    /// ```
+    /// # use std::error::Error;
+    /// use sql_builder::prelude::*;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .fields(&["title", "price"])
+    ///     .and_where("price > $1 AND price < $1 + $2".bind_nums(&[&100, &200]))
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title, price FROM books WHERE price > 100 AND price < 100 + 200;", &sql);
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    /// ```
+    /// # use std::error::Error;
+    /// use sql_builder::prelude::*;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .fields(&["title", "price"])
+    ///     .and_where("price > $1")
+    ///     .and_where("price < $1 + $2")
+    ///     .sql()?
+    ///     .bind_nums(&[&100, &200]);
+    ///
+    /// assert_eq!("SELECT title, price FROM books WHERE (price > 100) AND (price < 100 + 200);", &sql);
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn bind_nums(&self, args: &[&dyn SqlArg]) -> String {
+        let mut res = String::new();
+        let mut num = 0usize;
+        let mut wait_digit = false;
+        let len = args.len();
+        for ch in self.chars() {
+            if ch == '$' {
+                if wait_digit {
+                    if num > 0 {
+                        let idx = num - 1;
+                        if len > idx {
+                            res.push_str(&args[idx].sql_arg());
+                        }
+                        num = 0;
+                    } else {
+                        wait_digit = false;
+                        res.push(ch);
+                    }
+                } else {
+                    wait_digit = true;
+                }
+            } else if wait_digit {
+                if let Some(digit) = ch.to_digit(10) {
+                    num = num * 10 + digit as usize;
+                } else {
+                    let idx = num - 1;
+                    if len > idx {
+                        res.push_str(&args[idx].sql_arg());
+                    }
+                    res.push(ch);
+                    wait_digit = false;
+                    num = 0;
+                }
+            } else {
+                res.push(ch);
+            }
+        }
+        if wait_digit && num > 0 {
+            let idx = num - 1;
+            if len > idx {
+                res.push_str(&args[idx].sql_arg());
+            }
+        }
+        res
+    }
 }
 
 #[cfg(test)]
@@ -303,6 +446,10 @@ mod tests {
         assert_eq!(
             "10f'AAA'oTRUEo10",
             &String::from("?f?o?o?").binds(&[&10, &"AAA", &true])
+        );
+        assert_eq!(
+            "10f'AAA'o$oTRUE",
+            &String::from("$1f$02o$$o$3$4").bind_nums(&[&10, &"AAA", &true])
         );
 
         Ok(())

@@ -1,2 +1,2 @@
 pub use crate::bind::*;
-pub use crate::SqlBuilder;
+pub use crate::{quote, SqlBuilder};
