@@ -110,6 +110,8 @@ pub trait Bind {
     /// # }
     /// ```
     fn bind_nums(&self, args: &[&dyn SqlArg]) -> String;
+
+    fn bind_name(&self, name: &dyn ToString, arg: &dyn SqlArg) -> String;
 }
 
 impl Bind for &str {
@@ -229,6 +231,10 @@ impl Bind for &str {
     /// ```
     fn bind_nums(&self, args: &[&dyn SqlArg]) -> String {
         (*self).to_string().bind_nums(args)
+    }
+
+    fn bind_name(&self, name: &dyn ToString, arg: &dyn SqlArg) -> String {
+        (*self).to_string().bind_name(name, arg)
     }
 }
 
@@ -404,6 +410,11 @@ impl Bind for String {
         }
         res
     }
+
+    fn bind_name(&self, name: &dyn ToString, arg: &dyn SqlArg) -> String {
+        let rep = format!(":{}:", &name.to_string());
+        self.replace(&rep, &arg.sql_arg())
+    }
 }
 
 #[cfg(test)]
@@ -431,6 +442,7 @@ mod tests {
             "10f'lol'o10o$3",
             &"$1f$2o$1o$3".bind_num(1, &10_u8).bind_num(2, &"lol")
         );
+        assert_eq!("f'lol'oo:def:", &"f:abc:oo:def:".bind_name(&"abc", &"lol"));
 
         Ok(())
     }
