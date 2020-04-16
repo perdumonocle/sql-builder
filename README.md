@@ -127,7 +127,7 @@ let sql = SqlBuilder::delete_from("company")
 assert_eq!("DELETE FROM company WHERE salary < 1000 OR salary > 25000;", &sql);
 ```
 
-See [more examples](https://docs.rs/sql-builder/0.11.6/sql_builder/struct.SqlBuilder.html)
+See [more examples](https://docs.rs/sql-builder/0.11.7/sql_builder/struct.SqlBuilder.html)
 
 ## SQL support
 
