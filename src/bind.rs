@@ -112,8 +112,49 @@ pub trait Bind {
     /// ```
     fn bind_nums(&self, args: &[&dyn SqlArg]) -> String;
 
+    /// Replace all :name: with a value.
+    ///
+    /// ```
+    /// # use std::error::Error;
+    /// use sql_builder::prelude::*;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// let sql = SqlBuilder::insert_into("books")
+    ///     .fields(&["title", "price"])
+    ///     .values(&[":name:, :costs:"])
+    ///     .sql()?
+    ///     .bind_name(&"name", &"Harry Potter and the Philosopher's Stone")
+    ///     .bind_name(&"costs", &150);
+    ///
+    /// assert_eq!("INSERT INTO books (title, price) VALUES ('Harry Potter and the Philosopher''s Stone', 150);", &sql);
+    /// # Ok(())
+    /// # }
+    /// ```
     fn bind_name(&self, name: &dyn ToString, arg: &dyn SqlArg) -> String;
 
+    /// Replace each :name: from map.
+    /// Escape the : symbol with another : symbol.
+    ///
+    /// ```
+    /// # use std::error::Error;
+    /// use sql_builder::prelude::*;
+    /// use std::collections::HashMap;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// let mut names = HashMap::new();
+    /// names.insert("name", "Harry Potter and the Philosopher's Stone".sql_arg());
+    /// names.insert("costs", 150.sql_arg());
+    ///
+    /// let sql = SqlBuilder::insert_into("books")
+    ///     .fields(&["title", "price"])
+    ///     .values(&[":name:, :costs:"])
+    ///     .sql()?
+    ///     .bind_names(&names);
+    ///
+    /// assert_eq!("INSERT INTO books (title, price) VALUES ('Harry Potter and the Philosopher''s Stone', 150);", &sql);
+    /// # Ok(())
+    /// # }
+    /// ```
     fn bind_names<'a>(&self, names: &HashMap<&'a str, String>) -> String;
 }
 
@@ -236,10 +277,51 @@ impl Bind for &str {
         (*self).to_string().bind_nums(args)
     }
 
+    /// Replace all :name: with a value.
+    ///
+    /// ```
+    /// # use std::error::Error;
+    /// use sql_builder::prelude::*;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// let sql = SqlBuilder::insert_into("books")
+    ///     .fields(&["title", "price"])
+    ///     .values(&[":name:, :costs:"])
+    ///     .sql()?
+    ///     .bind_name(&"name", &"Harry Potter and the Philosopher's Stone")
+    ///     .bind_name(&"costs", &150);
+    ///
+    /// assert_eq!("INSERT INTO books (title, price) VALUES ('Harry Potter and the Philosopher''s Stone', 150);", &sql);
+    /// # Ok(())
+    /// # }
+    /// ```
     fn bind_name(&self, name: &dyn ToString, arg: &dyn SqlArg) -> String {
         (*self).to_string().bind_name(name, arg)
     }
 
+    /// Replace each :name: from map.
+    /// Escape the : symbol with another : symbol.
+    ///
+    /// ```
+    /// # use std::error::Error;
+    /// use sql_builder::prelude::*;
+    /// use std::collections::HashMap;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// let mut names = HashMap::new();
+    /// names.insert("name", "Harry Potter and the Philosopher's Stone".sql_arg());
+    /// names.insert("costs", 150.sql_arg());
+    ///
+    /// let sql = SqlBuilder::insert_into("books")
+    ///     .fields(&["title", "price"])
+    ///     .values(&[":name:, :costs:"])
+    ///     .sql()?
+    ///     .bind_names(&names);
+    ///
+    /// assert_eq!("INSERT INTO books (title, price) VALUES ('Harry Potter and the Philosopher''s Stone', 150);", &sql);
+    /// # Ok(())
+    /// # }
+    /// ```
     fn bind_names<'a>(&self, names: &HashMap<&'a str, String>) -> String {
         (*self).to_string().bind_names(names)
     }
@@ -418,11 +500,52 @@ impl Bind for String {
         res
     }
 
+    /// Replace all :name: with a value.
+    ///
+    /// ```
+    /// # use std::error::Error;
+    /// use sql_builder::prelude::*;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// let sql = SqlBuilder::insert_into("books")
+    ///     .fields(&["title", "price"])
+    ///     .values(&[":name:, :costs:"])
+    ///     .sql()?
+    ///     .bind_name(&"name", &"Harry Potter and the Philosopher's Stone")
+    ///     .bind_name(&"costs", &150);
+    ///
+    /// assert_eq!("INSERT INTO books (title, price) VALUES ('Harry Potter and the Philosopher''s Stone', 150);", &sql);
+    /// # Ok(())
+    /// # }
+    /// ```
     fn bind_name(&self, name: &dyn ToString, arg: &dyn SqlArg) -> String {
         let rep = format!(":{}:", &name.to_string());
         self.replace(&rep, &arg.sql_arg())
     }
 
+    /// Replace each :name: from map.
+    /// Escape the : symbol with another : symbol.
+    ///
+    /// ```
+    /// # use std::error::Error;
+    /// use sql_builder::prelude::*;
+    /// use std::collections::HashMap;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// let mut names = HashMap::new();
+    /// names.insert("name", "Harry Potter and the Philosopher's Stone".sql_arg());
+    /// names.insert("costs", 150.sql_arg());
+    ///
+    /// let sql = SqlBuilder::insert_into("books")
+    ///     .fields(&["title", "price"])
+    ///     .values(&[":name:, :costs:"])
+    ///     .sql()?
+    ///     .bind_names(&names);
+    ///
+    /// assert_eq!("INSERT INTO books (title, price) VALUES ('Harry Potter and the Philosopher''s Stone', 150);", &sql);
+    /// # Ok(())
+    /// # }
+    /// ```
     fn bind_names<'a>(&self, names: &HashMap<&'a str, String>) -> String {
         let mut res = String::new();
         let mut key = String::new();
