@@ -21,7 +21,6 @@ sql-builder = "0.11"
 
 ```rust
 use sql_builder::SqlBuilder;
-# use std::error::Error;
 
 let sql = SqlBuilder::select_from("company")
     .field("id")
@@ -132,7 +131,7 @@ let sql = SqlBuilder::delete_from("company")
 assert_eq!("DELETE FROM company WHERE (salary >= 1000) AND (salary <= 25000);", &sql);
 ```
 
-See [more examples](https://docs.rs/sql-builder/0.11.9/sql_builder/struct.SqlBuilder.html)
+See [more examples](https://docs.rs/sql-builder/0.11.10/sql_builder/struct.SqlBuilder.html)
 
 ## SQL support
 
