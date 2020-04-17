@@ -114,7 +114,7 @@ pub trait Bind {
 
     fn bind_name(&self, name: &dyn ToString, arg: &dyn SqlArg) -> String;
 
-    fn bind_names(&self, names: &HashMap<String, String>) -> String;
+    fn bind_names<'a>(&self, names: &HashMap<&'a str, String>) -> String;
 }
 
 impl Bind for &str {
@@ -240,7 +240,7 @@ impl Bind for &str {
         (*self).to_string().bind_name(name, arg)
     }
 
-    fn bind_names(&self, names: &HashMap<String, String>) -> String {
+    fn bind_names<'a>(&self, names: &HashMap<&'a str, String>) -> String {
         (*self).to_string().bind_names(names)
     }
 }
@@ -423,7 +423,7 @@ impl Bind for String {
         self.replace(&rep, &arg.sql_arg())
     }
 
-    fn bind_names(&self, names: &HashMap<String, String>) -> String {
+    fn bind_names<'a>(&self, names: &HashMap<&'a str, String>) -> String {
         let mut res = String::new();
         let mut key = String::new();
         let mut wait_colon = false;
@@ -434,7 +434,7 @@ impl Bind for String {
                         res.push(ch);
                     } else {
                         let skey = key.to_string();
-                        if let Some(value) = names.get(&skey) {
+                        if let Some(value) = names.get(&*skey) {
                             res.push_str(&value);
                         }
                         key = String::new();
@@ -528,10 +528,11 @@ mod tests {
     #[test]
     fn test_bind_names() -> Result<(), Box<dyn Error + Send + Sync>> {
         let mut names = HashMap::new();
-        names.insert("aaa".to_string(), 10.sql_arg());
-        names.insert("bbb".to_string(), 20.sql_arg());
-        names.insert("ccc".to_string(), 30.sql_arg());
-        names.insert("ddd".to_string(), 40.sql_arg());
+        names.insert("aaa", 10.sql_arg());
+        names.insert("bbb", 20.sql_arg());
+        names.insert("ccc", "tt".sql_arg());
+        names.insert("ddd", 40.sql_arg());
+
         let sql = SqlBuilder::insert_into("books")
             .fields(&["title", "price"])
             .values(&["'a_book', :aaa:"])
@@ -541,7 +542,7 @@ mod tests {
             .bind_names(&names);
 
         assert_eq!(
-            "INSERT INTO books (title, price) VALUES ('a_book', 10), ('c_book', 30), ('e_book', );",
+            "INSERT INTO books (title, price) VALUES ('a_book', 10), ('c_book', 'tt'), ('e_book', );",
             &sql
         );
 
