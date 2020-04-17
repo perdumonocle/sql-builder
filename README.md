@@ -117,17 +117,22 @@ assert_eq!("DELETE FROM company WHERE salary < 1000 OR salary > 25000;", &sql);
 
 ```rust
 use sql_builder::prelude::*;
+use std::collections::HashMap;
+
+let mut names = HashMap::new();
+names.insert("min", 1_000_i32.sql_arg());
+names.insert("max", 25_000_i32.sql_arg());
 
 let sql = SqlBuilder::delete_from("company")
-    .or_where("salary < ?")
-    .or_where("salary > ?")
+    .and_where("salary >= :min:")
+    .and_where("salary <= :max:")
     .sql()?
-    .binds(&[&1_000, &25_000]);
+    .bind_names(&names);
 
-assert_eq!("DELETE FROM company WHERE salary < 1000 OR salary > 25000;", &sql);
+assert_eq!("DELETE FROM company WHERE (salary >= 1000) AND (salary <= 25000);", &sql);
 ```
 
-See [more examples](https://docs.rs/sql-builder/0.11.8/sql_builder/struct.SqlBuilder.html)
+See [more examples](https://docs.rs/sql-builder/0.11.9/sql_builder/struct.SqlBuilder.html)
 
 ## SQL support
 

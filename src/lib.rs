@@ -138,21 +138,26 @@
 //!
 //! ```
 //! use sql_builder::prelude::*;
+//! use std::collections::HashMap;
 //! # use std::error::Error;
 //!
 //! # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
-//! let sql = SqlBuilder::delete_from("company")
-//!     .or_where("salary < ?")
-//!     .or_where("salary > ?")
-//!     .sql()?
-//!     .binds(&[&1_000, &25_000]);
+//! let mut names = HashMap::new();
+//! names.insert("min", 1_000_i32.sql_arg());
+//! names.insert("max", 25_000_i32.sql_arg());
 //!
-//! assert_eq!("DELETE FROM company WHERE salary < 1000 OR salary > 25000;", &sql);
+//! let sql = SqlBuilder::delete_from("company")
+//!     .and_where("salary >= :min:")
+//!     .and_where("salary <= :max:")
+//!     .sql()?
+//!     .bind_names(&names);
+//!
+//! assert_eq!("DELETE FROM company WHERE (salary >= 1000) AND (salary <= 25000);", &sql);
 //! # Ok(())
 //! # }
 //! ```
 //!
-//! See [more examples](https://docs.rs/sql-builder/0.11.8/sql_builder/struct.SqlBuilder.html)
+//! See [more examples](https://docs.rs/sql-builder/0.11.9/sql_builder/struct.SqlBuilder.html)
 
 pub mod arg;
 pub mod bind;
