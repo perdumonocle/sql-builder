@@ -1,4 +1,5 @@
 use crate::quote;
+use std::borrow::{Cow, ToOwned};
 
 pub trait SqlArg {
     fn sql_arg(&self) -> String;
@@ -13,6 +14,12 @@ impl SqlArg for str {
 impl SqlArg for &str {
     fn sql_arg(&self) -> String {
         quote(self)
+    }
+}
+
+impl SqlArg for Cow<'_, str> {
+    fn sql_arg(&self) -> String {
+        quote(self[..].to_owned())
     }
 }
 
@@ -161,6 +168,30 @@ impl SqlArg for usize {
 }
 
 impl SqlArg for &usize {
+    fn sql_arg(&self) -> String {
+        self.to_string()
+    }
+}
+
+impl SqlArg for f32 {
+    fn sql_arg(&self) -> String {
+        self.to_string()
+    }
+}
+
+impl SqlArg for &f32 {
+    fn sql_arg(&self) -> String {
+        self.to_string()
+    }
+}
+
+impl SqlArg for f64 {
+    fn sql_arg(&self) -> String {
+        self.to_string()
+    }
+}
+
+impl SqlArg for &f64 {
     fn sql_arg(&self) -> String {
         self.to_string()
     }

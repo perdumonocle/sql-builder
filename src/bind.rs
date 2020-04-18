@@ -629,6 +629,10 @@ mod tests {
             "10f'AAA'o$oTRUE",
             &String::from("$1f$02o$$o$3$4").bind_nums(&[&10, &"AAA", &true])
         );
+        assert_eq!(
+            "1f1.5o0.0000001o1",
+            &"?f?o?o?".binds(&[&1.0, &1.5, &0.0000001])
+        );
 
         Ok(())
     }
