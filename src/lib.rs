@@ -6,7 +6,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! sql-builder = "0.11"
+//! sql-builder = "0.12"
 //! ```
 //!
 //! # Examples:
