@@ -12,7 +12,7 @@ To use `sql-builder`, add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-sql-builder = "0.12"
+sql-builder = "0.13"
 ```
 
 # Examples:
@@ -131,7 +131,7 @@ let sql = SqlBuilder::delete_from("company")
 assert_eq!("DELETE FROM company WHERE (salary >= 1000) AND (salary <= 25000);", &sql);
 ```
 
-See [more examples](https://docs.rs/sql-builder/0.12.2/sql_builder/struct.SqlBuilder.html)
+See [more examples](https://docs.rs/sql-builder/0.13.0/sql_builder/struct.SqlBuilder.html)
 
 ## SQL support
 

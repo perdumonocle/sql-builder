@@ -675,4 +675,15 @@ mod tests {
 
         Ok(())
     }
+
+    #[test]
+    fn test_null() -> Result<(), Box<dyn Error + Send + Sync>> {
+        let foo: Option<&str> = None;
+        assert_eq!("foNULLo", &"fo?o".bind(&foo));
+
+        let foo = Some("foo");
+        assert_eq!("fo'foo'o", &"fo?o".bind(&foo));
+
+        Ok(())
+    }
 }

@@ -208,3 +208,21 @@ impl SqlArg for &bool {
         String::from(if **self { "TRUE" } else { "FALSE" })
     }
 }
+
+impl<T: SqlArg> SqlArg for Option<T> {
+    fn sql_arg(&self) -> String {
+        match &*self {
+            Some(value) => value.sql_arg(),
+            None => String::from("NULL"),
+        }
+    }
+}
+
+impl<T: SqlArg> SqlArg for &Option<T> {
+    fn sql_arg(&self) -> String {
+        match &**self {
+            Some(value) => value.sql_arg(),
+            None => String::from("NULL"),
+        }
+    }
+}
