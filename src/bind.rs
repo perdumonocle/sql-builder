@@ -155,7 +155,7 @@ pub trait Bind {
     /// # Ok(())
     /// # }
     /// ```
-    fn bind_names<'a>(&self, names: &dyn BindNames) -> String;
+    fn bind_names(&self, names: &dyn BindNames) -> String;
 }
 
 impl Bind for &str {
