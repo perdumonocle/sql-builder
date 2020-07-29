@@ -141,9 +141,9 @@ pub trait Bind {
     /// use std::collections::HashMap;
     ///
     /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
-    /// let mut names = HashMap::new();
-    /// names.insert("name", "Harry Potter and the Philosopher's Stone".sql_arg());
-    /// names.insert("costs", 150.sql_arg());
+    /// let mut names: HashMap<&str, &dyn SqlArg> = HashMap::new();
+    /// names.insert("name", &"Harry Potter and the Philosopher's Stone");
+    /// names.insert("costs", &150);
     ///
     /// let sql = SqlBuilder::insert_into("books")
     ///     .fields(&["title", "price"])
@@ -155,7 +155,7 @@ pub trait Bind {
     /// # Ok(())
     /// # }
     /// ```
-    fn bind_names<'a>(&self, names: &HashMap<&'a str, String>) -> String;
+    fn bind_names<'a>(&self, names: &dyn BindNames) -> String;
 }
 
 impl Bind for &str {
@@ -308,9 +308,9 @@ impl Bind for &str {
     /// use std::collections::HashMap;
     ///
     /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
-    /// let mut names = HashMap::new();
-    /// names.insert("name", "Harry Potter and the Philosopher's Stone".sql_arg());
-    /// names.insert("costs", 150.sql_arg());
+    /// let mut names: HashMap<&str, &dyn SqlArg> = HashMap::new();
+    /// names.insert("name", &"Harry Potter and the Philosopher's Stone");
+    /// names.insert("costs", &150);
     ///
     /// let sql = SqlBuilder::insert_into("books")
     ///     .fields(&["title", "price"])
@@ -322,7 +322,7 @@ impl Bind for &str {
     /// # Ok(())
     /// # }
     /// ```
-    fn bind_names<'a>(&self, names: &HashMap<&'a str, String>) -> String {
+    fn bind_names<'a>(&self, names: &dyn BindNames) -> String {
         (*self).to_string().bind_names(names)
     }
 }
@@ -532,9 +532,9 @@ impl Bind for String {
     /// use std::collections::HashMap;
     ///
     /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
-    /// let mut names = HashMap::new();
-    /// names.insert("name", "Harry Potter and the Philosopher's Stone".sql_arg());
-    /// names.insert("costs", 150.sql_arg());
+    /// let mut names: HashMap<&str, &dyn SqlArg> = HashMap::new();
+    /// names.insert("name", &"Harry Potter and the Philosopher's Stone");
+    /// names.insert("costs", &150);
     ///
     /// let sql = SqlBuilder::insert_into("books")
     ///     .fields(&["title", "price"])
@@ -546,10 +546,11 @@ impl Bind for String {
     /// # Ok(())
     /// # }
     /// ```
-    fn bind_names<'a>(&self, names: &HashMap<&'a str, String>) -> String {
+    fn bind_names<'a>(&self, names: &dyn BindNames) -> String {
         let mut res = String::new();
         let mut key = String::new();
         let mut wait_colon = false;
+        let names = names.names_map();
         for ch in self.chars() {
             if ch == ':' {
                 if wait_colon {
@@ -558,7 +559,9 @@ impl Bind for String {
                     } else {
                         let skey = key.to_string();
                         if let Some(value) = names.get(&*skey) {
-                            res.push_str(&value);
+                            res.push_str(&value.sql_arg());
+                        } else {
+                            res.push_str("NULL");
                         }
                         key = String::new();
                     }
@@ -577,6 +580,42 @@ impl Bind for String {
             res.push_str(&key);
         }
         res
+    }
+}
+
+pub trait BindNames<'a> {
+    fn names_map(&self) -> HashMap<&'a str, &dyn SqlArg>;
+}
+
+impl<'a> BindNames<'a> for HashMap<&'a str, &dyn SqlArg> {
+    fn names_map(&self) -> HashMap<&'a str, &dyn SqlArg> {
+        self.to_owned()
+    }
+}
+
+impl<'a> BindNames<'a> for &HashMap<&'a str, &dyn SqlArg> {
+    fn names_map(&self) -> HashMap<&'a str, &dyn SqlArg> {
+        self.to_owned().to_owned()
+    }
+}
+
+impl<'a> BindNames<'a> for Vec<(&'a str, &dyn SqlArg)> {
+    fn names_map(&self) -> HashMap<&'a str, &dyn SqlArg> {
+        let mut map = HashMap::new();
+        for (k, v) in self.iter() {
+            map.insert(*k, *v);
+        }
+        map
+    }
+}
+
+impl<'a> BindNames<'a> for &[(&'a str, &dyn SqlArg)] {
+    fn names_map(&self) -> HashMap<&'a str, &dyn SqlArg> {
+        let mut map = HashMap::new();
+        for (k, v) in self.iter() {
+            map.insert(*k, *v);
+        }
+        map
     }
 }
 
@@ -654,11 +693,11 @@ mod tests {
 
     #[test]
     fn test_bind_names() -> Result<(), Box<dyn Error + Send + Sync>> {
-        let mut names = HashMap::new();
-        names.insert("aaa", 10.sql_arg());
-        names.insert("bbb", 20.sql_arg());
-        names.insert("ccc", "tt".sql_arg());
-        names.insert("ddd", 40.sql_arg());
+        let mut names: HashMap<&str, &dyn SqlArg> = HashMap::new();
+        names.insert("aaa", &10);
+        names.insert("bbb", &20);
+        names.insert("ccc", &"tt");
+        names.insert("ddd", &40);
 
         let sql = SqlBuilder::insert_into("books")
             .fields(&["title", "price"])
@@ -669,7 +708,23 @@ mod tests {
             .bind_names(&names);
 
         assert_eq!(
-            "INSERT INTO books (title, price) VALUES ('a_book', 10), ('c_book', 'tt'), ('e_book', );",
+            "INSERT INTO books (title, price) VALUES ('a_book', 10), ('c_book', 'tt'), ('e_book', NULL);",
+            &sql
+        );
+
+        let names: Vec<(&str, &dyn SqlArg)> =
+            vec![("aaa", &10), ("bbb", &20), ("ccc", &"tt"), ("ddd", &40)];
+
+        let sql = SqlBuilder::insert_into("books")
+            .fields(&["title", "price"])
+            .values(&["'a_book', :aaa:"])
+            .values(&["'c_book', :ccc:"])
+            .values(&["'e_book', :eee:"])
+            .sql()?
+            .bind_names(&names);
+
+        assert_eq!(
+            "INSERT INTO books (title, price) VALUES ('a_book', 10), ('c_book', 'tt'), ('e_book', NULL);",
             &sql
         );
 
