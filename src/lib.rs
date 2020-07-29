@@ -1511,6 +1511,156 @@ impl SqlBuilder {
         self.and_where(&cond)
     }
 
+    /// Add WHERE field IN (list).
+    ///
+    /// ```
+    /// # use std::error::Error;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("title")
+    ///     .field("price")
+    ///     .and_where_in("title", &[quote("G"), quote("L"), quote("t")])
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title, price FROM books WHERE title IN ('G', 'L', 't');", &sql);
+    /// // add                                           ^^^^^     ^^^^^^^^^^^^^
+    /// // here                                          field         list
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn and_where_in<S, T>(&mut self, field: S, list: &[T]) -> &mut Self
+    where
+        S: ToString,
+        T: ToString,
+    {
+        let list: Vec<String> = list
+            .iter()
+            .map(|v| (*v).to_string())
+            .collect::<Vec<String>>();
+        let list = list.join(", ");
+
+        let mut cond = field.to_string();
+        cond.push_str(" IN (");
+        cond.push_str(&list);
+        cond.push_str(")");
+        self.and_where(&cond)
+    }
+
+    /// Add WHERE field NOT IN (list).
+    ///
+    /// ```
+    /// # use std::error::Error;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("title")
+    ///     .field("price")
+    ///     .and_where_not_in("title", &[quote("G"), quote("L"), quote("t")])
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title, price FROM books WHERE title NOT IN ('G', 'L', 't');", &sql);
+    /// // add                                           ^^^^^         ^^^^^^^^^^^^^
+    /// // here                                          field             list
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn and_where_not_in<S, T>(&mut self, field: S, list: &[T]) -> &mut Self
+    where
+        S: ToString,
+        T: ToString,
+    {
+        let list: Vec<String> = list
+            .iter()
+            .map(|v| (*v).to_string())
+            .collect::<Vec<String>>();
+        let list = list.join(", ");
+
+        let mut cond = field.to_string();
+        cond.push_str(" NOT IN (");
+        cond.push_str(&list);
+        cond.push_str(")");
+        self.and_where(&cond)
+    }
+
+    /// Add WHERE field IN (query).
+    ///
+    /// ```
+    /// # use std::error::Error;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// let query = SqlBuilder::select_from("shop")
+    ///     .field("title")
+    ///     .and_where("sold")
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title FROM shop WHERE sold", &query);
+    ///
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("title")
+    ///     .field("price")
+    ///     .and_where_in_query("title", &query)
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title, price FROM books WHERE title IN (SELECT title FROM shop WHERE sold);", &sql);
+    /// // add                                           ^^^^^     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    /// // here                                          field                   query
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn and_where_in_query<S, T>(&mut self, field: S, query: T) -> &mut Self
+    where
+        S: ToString,
+        T: ToString,
+    {
+        let mut cond = field.to_string();
+        cond.push_str(" IN (");
+        cond.push_str(&query.to_string());
+        cond.push_str(")");
+        self.and_where(&cond)
+    }
+
+    /// Add WHERE field NOT IN (query).
+    ///
+    /// ```
+    /// # use std::error::Error;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// let query = SqlBuilder::select_from("shop")
+    ///     .field("title")
+    ///     .and_where("sold")
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title FROM shop WHERE sold", &query);
+    ///
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("title")
+    ///     .field("price")
+    ///     .and_where_not_in_query("title", &query)
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title, price FROM books WHERE title NOT IN (SELECT title FROM shop WHERE sold);", &sql);
+    /// // add                                           ^^^^^         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    /// // here                                          field                       query
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn and_where_not_in_query<S, T>(&mut self, field: S, query: T) -> &mut Self
+    where
+        S: ToString,
+        T: ToString,
+    {
+        let mut cond = field.to_string();
+        cond.push_str(" NOT IN (");
+        cond.push_str(&query.to_string());
+        cond.push_str(")");
+        self.and_where(&cond)
+    }
+
     /// Add OR condition to the last WHERE condition.
     ///
     /// ```
@@ -2020,6 +2170,160 @@ impl SqlBuilder {
     pub fn or_where_is_not_null<S: ToString>(&mut self, field: S) -> &mut Self {
         let mut cond = field.to_string();
         cond.push_str(" IS NOT NULL");
+        self.or_where(&cond)
+    }
+
+    /// Add OR field IN (list) to the last WHERE condition.
+    ///
+    /// ```
+    /// # use std::error::Error;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("title")
+    ///     .field("price")
+    ///     .or_where_lt("price", 100)
+    ///     .or_where_in("title", &[quote("G"), quote("L"), quote("t")])
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title, price FROM books WHERE price < 100 OR title IN ('G', 'L', 't');", &sql);
+    /// // add                                                          ^^^^^     ^^^^^^^^^^^^^
+    /// // here                                                         field         list
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn or_where_in<S, T>(&mut self, field: S, list: &[T]) -> &mut Self
+    where
+        S: ToString,
+        T: ToString,
+    {
+        let list: Vec<String> = list
+            .iter()
+            .map(|v| (*v).to_string())
+            .collect::<Vec<String>>();
+        let list = list.join(", ");
+
+        let mut cond = field.to_string();
+        cond.push_str(" IN (");
+        cond.push_str(&list);
+        cond.push_str(")");
+        self.or_where(&cond)
+    }
+
+    /// Add OR field NOT IN (list) to the last WHERE condition.
+    ///
+    /// ```
+    /// # use std::error::Error;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("title")
+    ///     .field("price")
+    ///     .or_where_lt("price", 100)
+    ///     .and_where_not_in("title", &[quote("G"), quote("L"), quote("t")])
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title, price FROM books WHERE price < 100 OR title NOT IN ('G', 'L', 't');", &sql);
+    /// // add                                                          ^^^^^         ^^^^^^^^^^^^^
+    /// // here                                                         field             list
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn or_where_not_in<S, T>(&mut self, field: S, list: &[T]) -> &mut Self
+    where
+        S: ToString,
+        T: ToString,
+    {
+        let list: Vec<String> = list
+            .iter()
+            .map(|v| (*v).to_string())
+            .collect::<Vec<String>>();
+        let list = list.join(", ");
+
+        let mut cond = field.to_string();
+        cond.push_str(" NOT IN (");
+        cond.push_str(&list);
+        cond.push_str(")");
+        self.or_where(&cond)
+    }
+
+    /// Add OR field IN (query) to the last WHERE condition.
+    ///
+    /// ```
+    /// # use std::error::Error;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// let query = SqlBuilder::select_from("shop")
+    ///     .field("title")
+    ///     .and_where("sold")
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title FROM shop WHERE sold", &query);
+    ///
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("title")
+    ///     .field("price")
+    ///     .or_where_lt("price", 100)
+    ///     .or_where_in_query("title", &query)
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title, price FROM books WHERE price < 100 OR title IN (SELECT title FROM shop WHERE sold);", &sql);
+    /// // add                                                          ^^^^^     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    /// // here                                                         field                   query
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn or_where_in_query<S, T>(&mut self, field: S, query: T) -> &mut Self
+    where
+        S: ToString,
+        T: ToString,
+    {
+        let mut cond = field.to_string();
+        cond.push_str(" IN (");
+        cond.push_str(&query.to_string());
+        cond.push_str(")");
+        self.or_where(&cond)
+    }
+
+    /// Add OR field NOT IN (query) to the last WHERE condition.
+    ///
+    /// ```
+    /// # use std::error::Error;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// let query = SqlBuilder::select_from("shop")
+    ///     .field("title")
+    ///     .and_where("sold")
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title FROM shop WHERE sold", &query);
+    ///
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("title")
+    ///     .field("price")
+    ///     .or_where_lt("price", 100)
+    ///     .or_where_not_in_query("title", &query)
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title, price FROM books WHERE price < 100 OR title NOT IN (SELECT title FROM shop WHERE sold);", &sql);
+    /// // add                                                          ^^^^^         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    /// // here                                                         field                       query
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn or_where_not_in_query<S, T>(&mut self, field: S, query: T) -> &mut Self
+    where
+        S: ToString,
+        T: ToString,
+    {
+        let mut cond = field.to_string();
+        cond.push_str(" NOT IN (");
+        cond.push_str(&query.to_string());
+        cond.push_str(")");
         self.or_where(&cond)
     }
 
