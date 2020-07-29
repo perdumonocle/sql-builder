@@ -1515,7 +1515,7 @@ impl SqlBuilder {
     ///
     /// ```
     /// # use std::error::Error;
-    /// use sql_builder::SqlBuilder;
+    /// use sql_builder::{SqlBuilder, quote};
     ///
     /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
@@ -1552,7 +1552,7 @@ impl SqlBuilder {
     ///
     /// ```
     /// # use std::error::Error;
-    /// use sql_builder::SqlBuilder;
+    /// use sql_builder::{SqlBuilder, quote};
     ///
     /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
@@ -1589,13 +1589,13 @@ impl SqlBuilder {
     ///
     /// ```
     /// # use std::error::Error;
-    /// use sql_builder::SqlBuilder;
+    /// use sql_builder::{SqlBuilder, quote};
     ///
     /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let query = SqlBuilder::select_from("shop")
     ///     .field("title")
     ///     .and_where("sold")
-    ///     .sql()?;
+    ///     .query()?;
     ///
     /// assert_eq!("SELECT title FROM shop WHERE sold", &query);
     ///
@@ -1627,13 +1627,13 @@ impl SqlBuilder {
     ///
     /// ```
     /// # use std::error::Error;
-    /// use sql_builder::SqlBuilder;
+    /// use sql_builder::{SqlBuilder, quote};
     ///
     /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let query = SqlBuilder::select_from("shop")
     ///     .field("title")
     ///     .and_where("sold")
-    ///     .sql()?;
+    ///     .query()?;
     ///
     /// assert_eq!("SELECT title FROM shop WHERE sold", &query);
     ///
@@ -2177,7 +2177,7 @@ impl SqlBuilder {
     ///
     /// ```
     /// # use std::error::Error;
-    /// use sql_builder::SqlBuilder;
+    /// use sql_builder::{SqlBuilder, quote};
     ///
     /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
@@ -2215,14 +2215,14 @@ impl SqlBuilder {
     ///
     /// ```
     /// # use std::error::Error;
-    /// use sql_builder::SqlBuilder;
+    /// use sql_builder::{SqlBuilder, quote};
     ///
     /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
     ///     .or_where_lt("price", 100)
-    ///     .and_where_not_in("title", &[quote("G"), quote("L"), quote("t")])
+    ///     .or_where_not_in("title", &[quote("G"), quote("L"), quote("t")])
     ///     .sql()?;
     ///
     /// assert_eq!("SELECT title, price FROM books WHERE price < 100 OR title NOT IN ('G', 'L', 't');", &sql);
@@ -2259,7 +2259,7 @@ impl SqlBuilder {
     /// let query = SqlBuilder::select_from("shop")
     ///     .field("title")
     ///     .and_where("sold")
-    ///     .sql()?;
+    ///     .query()?;
     ///
     /// assert_eq!("SELECT title FROM shop WHERE sold", &query);
     ///
@@ -2298,7 +2298,7 @@ impl SqlBuilder {
     /// let query = SqlBuilder::select_from("shop")
     ///     .field("title")
     ///     .and_where("sold")
-    ///     .sql()?;
+    ///     .query()?;
     ///
     /// assert_eq!("SELECT title FROM shop WHERE sold", &query);
     ///
