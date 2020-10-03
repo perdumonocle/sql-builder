@@ -1,4 +1,5 @@
 use crate::arg::SqlArg;
+use anyhow::Result;
 use std::collections::HashMap;
 
 pub trait Bind {
@@ -626,7 +627,7 @@ mod tests {
     use std::error::Error;
 
     #[test]
-    fn test_bind() -> Result<(), Box<dyn Error + Send + Sync>> {
+    fn test_bind() -> Result<()> {
         let foo = "f?o?o";
 
         assert_eq!("'lol'foo?", &"?foo?".bind(&"lol"));
@@ -650,7 +651,7 @@ mod tests {
     }
 
     #[test]
-    fn test_binds() -> Result<(), Box<dyn Error + Send + Sync>> {
+    fn test_binds() -> Result<()> {
         assert_eq!("10f20o30o10", &"?f?o?o?".binds(&[&10, &20, &30]));
         assert_eq!(
             "'abc'f'def'o'ghi'o'abc'",
@@ -677,7 +678,7 @@ mod tests {
     }
 
     #[test]
-    fn test_bind_doc() -> Result<(), Box<dyn Error + Send + Sync>> {
+    fn test_bind_doc() -> Result<()> {
         let sql = SqlBuilder::select_from("books")
             .fields(&["title", "price"])
             .and_where("price > ? AND title LIKE ?".binds(&[&100, &"Harry Potter%"]))
@@ -692,7 +693,7 @@ mod tests {
     }
 
     #[test]
-    fn test_bind_names() -> Result<(), Box<dyn Error + Send + Sync>> {
+    fn test_bind_names() -> Result<()> {
         let mut names: HashMap<&str, &dyn SqlArg> = HashMap::new();
         names.insert("aaa", &10);
         names.insert("bbb", &20);
@@ -732,7 +733,7 @@ mod tests {
     }
 
     #[test]
-    fn test_null() -> Result<(), Box<dyn Error + Send + Sync>> {
+    fn test_null() -> Result<()> {
         let foo: Option<&str> = None;
         assert_eq!("foNULLo", &"fo?o".bind(&foo));
 

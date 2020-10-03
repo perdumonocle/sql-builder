@@ -6,7 +6,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! sql-builder = "1.1"
+//! sql-builder = "2.0"
 //! ```
 //!
 //! # Examples:
@@ -157,13 +157,15 @@
 //! # }
 //! ```
 //!
-//! See [more examples](https://docs.rs/sql-builder/1.1.1/sql_builder/struct.SqlBuilder.html)
+//! See [more examples](https://docs.rs/sql-builder/2.0.0/sql_builder/struct.SqlBuilder.html)
 
 pub mod arg;
 pub mod bind;
+pub mod error;
 pub mod prelude;
 
-use std::error::Error;
+pub use crate::error::SqlBuilderError;
+use anyhow::Result;
 
 /// Main SQL builder
 #[derive(Clone)]
@@ -267,6 +269,32 @@ impl SqlBuilder {
             table: table.to_string(),
             ..Self::default()
         }
+    }
+
+    /// SELECT from additional table.
+    /// Adds table name to comma separted list of tables.
+    ///
+    /// ```
+    /// # use std::error::Error;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .and_table("newspapers")
+    ///     .field("title")
+    ///     .field("price")
+    ///     .and_where("price > 100")
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title, price FROM books, newspapers WHERE price > 100;", &sql);
+    /// // add                                      ^^^^^^^^^^
+    /// // here                                       table
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn and_table<S: ToString>(&mut self, table: S) -> &mut Self {
+        self.table = format!("{}, {}", self.table, table.to_string());
+        self
     }
 
     /// Create SELECT query without a table.
@@ -2537,7 +2565,7 @@ impl SqlBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn sql(&self) -> Result<String, Box<dyn Error + Send + Sync>> {
+    pub fn sql(&self) -> Result<String> {
         match self.statement {
             Statement::SelectFrom => self.sql_select(),
             Statement::SelectValues => self.sql_select_values(),
@@ -2548,10 +2576,10 @@ impl SqlBuilder {
     }
 
     /// Build complete SQL command for SELECT statement
-    fn sql_select(&self) -> Result<String, Box<dyn Error + Send + Sync>> {
+    fn sql_select(&self) -> Result<String> {
         // Checks
         if self.table.is_empty() {
-            return Err("No table name".into());
+            return Err(SqlBuilderError::NoTableName.into());
         }
 
         // Build query
@@ -2561,10 +2589,10 @@ impl SqlBuilder {
     }
 
     /// Build complete SQL command for SELECT statement without a table
-    fn sql_select_values(&self) -> Result<String, Box<dyn Error + Send + Sync>> {
+    fn sql_select_values(&self) -> Result<String> {
         // Checks
         if self.fields.is_empty() {
-            return Err("No values".into());
+            return Err(SqlBuilderError::NoValues.into());
         }
 
         // Build query
@@ -2598,7 +2626,7 @@ impl SqlBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn subquery(&self) -> Result<String, Box<dyn Error + Send + Sync>> {
+    pub fn subquery(&self) -> Result<String> {
         let text = self.query()?;
         let text = format!("({})", &text);
         Ok(text)
@@ -2629,10 +2657,7 @@ impl SqlBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn subquery_as<S: ToString>(
-        &self,
-        name: S,
-    ) -> Result<String, Box<dyn Error + Send + Sync>> {
+    pub fn subquery_as<S: ToString>(&self, name: S) -> Result<String> {
         let mut text = "(".to_string();
         text.push_str(&self.query()?);
         text.push_str(") AS ");
@@ -2664,7 +2689,7 @@ impl SqlBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn query(&self) -> Result<String, Box<dyn Error + Send + Sync>> {
+    pub fn query(&self) -> Result<String> {
         // Distinct results
         let distinct = if self.distinct { " DISTINCT" } else { "" };
 
@@ -2746,20 +2771,20 @@ impl SqlBuilder {
     /// # Ok(())
     /// # }
     /// ```
-    pub fn query_values(&self) -> Result<String, Box<dyn Error + Send + Sync>> {
+    pub fn query_values(&self) -> Result<String> {
         // Make values
         let fields = self.fields.join(", ");
 
         // Make SQL
-        let sql = format!("SELECT {fields}", fields = fields,);
+        let sql = format!("SELECT {fields}", fields = fields);
         Ok(sql)
     }
 
     /// Build SQL command for INSERT statement
-    fn sql_insert(&self) -> Result<String, Box<dyn Error + Send + Sync>> {
+    fn sql_insert(&self) -> Result<String> {
         // Checks
         if self.table.is_empty() {
-            return Err("No table name".into());
+            return Err(SqlBuilderError::NoTableName.into());
         }
 
         // Make SET part
@@ -2767,10 +2792,10 @@ impl SqlBuilder {
 
         // Add values or query
         let sql = match &self.values {
-            Values::Empty => return Err("No values".into()),
+            Values::Empty => return Err(SqlBuilderError::NoValues.into()),
             Values::List(values) => {
                 if values.is_empty() {
-                    return Err("No values".into());
+                    return Err(SqlBuilderError::NoValues.into());
                 }
 
                 // Make VALUES part
@@ -2807,13 +2832,13 @@ impl SqlBuilder {
     }
 
     /// Build SQL command for UPDATE statement
-    fn sql_update(&self) -> Result<String, Box<dyn Error + Send + Sync>> {
+    fn sql_update(&self) -> Result<String> {
         // Checks
         if self.table.is_empty() {
-            return Err("No table name".into());
+            return Err(SqlBuilderError::NoTableName.into());
         }
         if self.sets.is_empty() {
-            return Err("No set fields".into());
+            return Err(SqlBuilderError::NoSetFields.into());
         }
 
         // Make SET part
@@ -2833,10 +2858,10 @@ impl SqlBuilder {
     }
 
     /// Build SQL command for DELETE statement
-    fn sql_delete(&self) -> Result<String, Box<dyn Error + Send + Sync>> {
+    fn sql_delete(&self) -> Result<String> {
         // Checks
         if self.table.is_empty() {
-            return Err("No table name".into());
+            return Err(SqlBuilderError::NoTableName.into());
         }
 
         // Make WHERE part
@@ -2924,7 +2949,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_esc() -> Result<(), Box<dyn Error + Send + Sync>> {
+    fn test_esc() -> Result<()> {
         let sql = esc("Hello, 'World'");
 
         assert_eq!(&sql, "Hello, ''World''");
@@ -2933,7 +2958,7 @@ mod tests {
     }
 
     #[test]
-    fn test_quote() -> Result<(), Box<dyn Error + Send + Sync>> {
+    fn test_quote() -> Result<()> {
         let sql = quote("Hello, 'World'");
         assert_eq!(&sql, "'Hello, ''World'''");
 
@@ -2947,7 +2972,7 @@ mod tests {
     }
 
     #[test]
-    fn test_select_only_values() -> Result<(), Box<dyn Error + Send + Sync>> {
+    fn test_select_only_values() -> Result<()> {
         let values = SqlBuilder::select_values(&["10", &quote("100")]).sql()?;
 
         assert_eq!("SELECT 10, '100';", &values);
@@ -2956,7 +2981,7 @@ mod tests {
     }
 
     #[test]
-    fn test_select_all_books() -> Result<(), Box<dyn Error + Send + Sync>> {
+    fn test_select_all_books() -> Result<()> {
         let sql = SqlBuilder::select_from("books").sql()?;
 
         assert_eq!(&sql, "SELECT * FROM books;");
@@ -2965,7 +2990,7 @@ mod tests {
     }
 
     #[test]
-    fn test_show_all_prices() -> Result<(), Box<dyn Error + Send + Sync>> {
+    fn test_show_all_prices() -> Result<()> {
         let sql = SqlBuilder::select_from("books")
             .distinct()
             .field("price")
@@ -2977,7 +3002,7 @@ mod tests {
     }
 
     #[test]
-    fn test_select_title_and_price() -> Result<(), Box<dyn Error + Send + Sync>> {
+    fn test_select_title_and_price() -> Result<()> {
         let sql = SqlBuilder::select_from("books")
             .fields(&["title", "price"])
             .sql()?;
@@ -2995,7 +3020,7 @@ mod tests {
     }
 
     #[test]
-    fn test_select_expensive_books() -> Result<(), Box<dyn Error + Send + Sync>> {
+    fn test_select_expensive_books() -> Result<()> {
         let sql = SqlBuilder::select_from("books")
             .field("title")
             .field("price")
@@ -3024,8 +3049,7 @@ mod tests {
     }
 
     #[test]
-    fn test_select_price_for_harry_potter_and_phil_stone(
-    ) -> Result<(), Box<dyn Error + Send + Sync>> {
+    fn test_select_price_for_harry_potter_and_phil_stone() -> Result<()> {
         let sql = SqlBuilder::select_from("books")
             .field("price")
             .and_where_eq("title", quote("Harry Potter and the Philosopher's Stone"))
@@ -3040,8 +3064,7 @@ mod tests {
     }
 
     #[test]
-    fn test_select_price_not_for_harry_potter_and_phil_stone(
-    ) -> Result<(), Box<dyn Error + Send + Sync>> {
+    fn test_select_price_not_for_harry_potter_and_phil_stone() -> Result<()> {
         let sql = SqlBuilder::select_from("books")
             .field("price")
             .and_where_ne("title", quote("Harry Potter and the Philosopher's Stone"))
@@ -3056,7 +3079,7 @@ mod tests {
     }
 
     #[test]
-    fn test_select_expensive_harry_potter() -> Result<(), Box<dyn Error + Send + Sync>> {
+    fn test_select_expensive_harry_potter() -> Result<()> {
         let sql = SqlBuilder::select_from("books")
             .field("title")
             .field("price")
@@ -3073,7 +3096,7 @@ mod tests {
     }
 
     #[test]
-    fn test_select_strange_books() -> Result<(), Box<dyn Error + Send + Sync>> {
+    fn test_select_strange_books() -> Result<()> {
         let sql = SqlBuilder::select_from("books")
             .field("title")
             .field("price")
@@ -3096,7 +3119,7 @@ mod tests {
     }
 
     #[test]
-    fn test_order_harry_potter_by_price() -> Result<(), Box<dyn Error + Send + Sync>> {
+    fn test_order_harry_potter_by_price() -> Result<()> {
         let sql = SqlBuilder::select_from("books")
             .field("title")
             .field("price")
@@ -3135,7 +3158,7 @@ mod tests {
     }
 
     #[test]
-    fn test_find_cheap_or_harry_potter() -> Result<(), Box<dyn Error + Send + Sync>> {
+    fn test_find_cheap_or_harry_potter() -> Result<()> {
         let append = SqlBuilder::select_from("books")
             .field("title")
             .field("price")
@@ -3175,7 +3198,7 @@ mod tests {
     }
 
     #[test]
-    fn test_select_first_3_harry_potter_books() -> Result<(), Box<dyn Error + Send + Sync>> {
+    fn test_select_first_3_harry_potter_books() -> Result<()> {
         let sql = SqlBuilder::select_from("books")
             .field("title")
             .field("price")
@@ -3190,7 +3213,7 @@ mod tests {
     }
 
     #[test]
-    fn test_select_harry_potter_from_second_book() -> Result<(), Box<dyn Error + Send + Sync>> {
+    fn test_select_harry_potter_from_second_book() -> Result<()> {
         let sql = SqlBuilder::select_from("books")
             .field("title")
             .field("price")
@@ -3216,7 +3239,7 @@ mod tests {
     }
 
     #[test]
-    fn test_find_books_not_about_alice() -> Result<(), Box<dyn Error + Send + Sync>> {
+    fn test_find_books_not_about_alice() -> Result<()> {
         let sql = SqlBuilder::select_from("books")
             .field("title")
             .and_where_not_like_any("title", "Alice's")
@@ -3231,7 +3254,7 @@ mod tests {
     }
 
     #[test]
-    fn test_books_without_price() -> Result<(), Box<dyn Error + Send + Sync>> {
+    fn test_books_without_price() -> Result<()> {
         let sql = SqlBuilder::select_from("books")
             .field("title")
             .and_where_is_null("price")
@@ -3250,7 +3273,7 @@ mod tests {
     }
 
     #[test]
-    fn test_group_books_by_price() -> Result<(), Box<dyn Error + Send + Sync>> {
+    fn test_group_books_by_price() -> Result<()> {
         let sql = SqlBuilder::select_from("books")
             .field("price")
             .field("COUNT(price) AS cnt")
@@ -3287,7 +3310,7 @@ mod tests {
     }
 
     #[test]
-    fn test_group_books_by_price_category() -> Result<(), Box<dyn Error + Send + Sync>> {
+    fn test_group_books_by_price_category() -> Result<()> {
         let cat = SqlBuilder::select_from("books")
             .field("CASE WHEN price < 100 THEN 'cheap' ELSE 'expensive' END AS category")
             .subquery()?;
@@ -3322,7 +3345,7 @@ mod tests {
     }
 
     #[test]
-    fn test_grow_price() -> Result<(), Box<dyn Error + Send + Sync>> {
+    fn test_grow_price() -> Result<()> {
         let sql = SqlBuilder::update_table("books")
             .set("price", "price + 10")
             .sql()?;
@@ -3343,7 +3366,7 @@ mod tests {
     }
 
     #[test]
-    fn test_add_new_books() -> Result<(), Box<dyn Error + Send + Sync>> {
+    fn test_add_new_books() -> Result<()> {
         let sql = SqlBuilder::insert_into("books")
             .field("title")
             .field("price")
@@ -3369,7 +3392,7 @@ mod tests {
     }
 
     #[test]
-    fn test_add_books_from_warehouse() -> Result<(), Box<dyn Error + Send + Sync>> {
+    fn test_add_books_from_warehouse() -> Result<()> {
         let query = SqlBuilder::select_from("warehouse")
             .field("title")
             .field("preliminary_price * 2")
@@ -3392,7 +3415,7 @@ mod tests {
     }
 
     #[test]
-    fn test_sold_all_harry_potter() -> Result<(), Box<dyn Error + Send + Sync>> {
+    fn test_sold_all_harry_potter() -> Result<()> {
         let sql = SqlBuilder::update_table("books")
             .set("price", 0)
             .set("title", "'[SOLD!]' || title")
@@ -3405,7 +3428,7 @@ mod tests {
     }
 
     #[test]
-    fn test_mark_as_not_distr() -> Result<(), Box<dyn Error + Send + Sync>> {
+    fn test_mark_as_not_distr() -> Result<()> {
         let sql = SqlBuilder::update_table("books")
             .set_str("comment", "Don't distribute!")
             .and_where_le("price", "100")
@@ -3420,7 +3443,7 @@ mod tests {
     }
 
     #[test]
-    fn test_remove_all_expensive_books() -> Result<(), Box<dyn Error + Send + Sync>> {
+    fn test_remove_all_expensive_books() -> Result<()> {
         let sql = SqlBuilder::delete_from("books")
             .and_where("price > 100")
             .sql()?;
@@ -3431,7 +3454,7 @@ mod tests {
     }
 
     #[test]
-    fn test_count_books_in_shops() -> Result<(), Box<dyn Error + Send + Sync>> {
+    fn test_count_books_in_shops() -> Result<()> {
         let sql = SqlBuilder::select_from("books AS b")
             .field("b.title")
             .field("s.total")
