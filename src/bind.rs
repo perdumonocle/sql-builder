@@ -647,7 +647,7 @@ impl<'a> BindNames<'a> for &[(&'a str, &dyn SqlArg)] {
 mod tests {
     use super::*;
     use crate::prelude::*;
-    use std::error::Error;
+    use anyhow::Result;
 
     #[test]
     fn test_bind() -> Result<()> {
