@@ -1,5 +1,4 @@
 use crate::arg::SqlArg;
-use anyhow::Result;
 use std::collections::HashMap;
 
 pub trait Bind {
@@ -7,9 +6,10 @@ pub trait Bind {
     ///
     /// ```
     /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::prelude::*;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .fields(&["title", "price"])
     ///     .and_where("price BETWEEN ? AND ?".bind(&100).bind(&200))
@@ -25,9 +25,10 @@ pub trait Bind {
     ///
     /// ```
     /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::prelude::*;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .fields(&["title", "price"])
     ///     .and_where("price > ? AND title LIKE ?".binds(&[&100, &"Harry Potter%"]))
@@ -43,9 +44,10 @@ pub trait Bind {
     ///
     /// ```
     /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::prelude::*;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .fields(&["title", "price"])
     ///     .and_where("price > $1 AND price < $1 + $2"
@@ -60,9 +62,10 @@ pub trait Bind {
     ///
     /// ```
     /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::prelude::*;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .fields(&["title", "price"])
     ///     .and_where("price > $1")
@@ -82,9 +85,10 @@ pub trait Bind {
     ///
     /// ```
     /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::prelude::*;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .fields(&["title", "price"])
     ///     .and_where("price > $1 AND price < $1 + $2".bind_nums(&[&100, &200]))
@@ -97,9 +101,10 @@ pub trait Bind {
     ///
     /// ```
     /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::prelude::*;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .fields(&["title", "price"])
     ///     .and_where("price > $1")
@@ -117,9 +122,10 @@ pub trait Bind {
     ///
     /// ```
     /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::prelude::*;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::insert_into("books")
     ///     .fields(&["title", "price"])
     ///     .values(&[":name:, :costs:"])
@@ -138,10 +144,11 @@ pub trait Bind {
     ///
     /// ```
     /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::prelude::*;
     /// use std::collections::HashMap;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let mut names: HashMap<&str, &dyn SqlArg> = HashMap::new();
     /// names.insert("name", &"Harry Potter and the Philosopher's Stone");
     /// names.insert("costs", &150);
@@ -164,9 +171,10 @@ impl Bind for &str {
     ///
     /// ```
     /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::prelude::*;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .fields(&["title", "price"])
     ///     .and_where("price BETWEEN ? AND ?".bind(&100).bind(&200))
@@ -184,9 +192,10 @@ impl Bind for &str {
     ///
     /// ```
     /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::prelude::*;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .fields(&["title", "price"])
     ///     .and_where("price > ? AND title LIKE ?".binds(&[&100, &"Harry Potter%"]))
@@ -204,9 +213,10 @@ impl Bind for &str {
     ///
     /// ```
     /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::prelude::*;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .fields(&["title", "price"])
     ///     .and_where("price > $1 AND price < $1 + $2"
@@ -221,9 +231,10 @@ impl Bind for &str {
     ///
     /// ```
     /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::prelude::*;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .fields(&["title", "price"])
     ///     .and_where("price > $1")
@@ -245,9 +256,10 @@ impl Bind for &str {
     ///
     /// ```
     /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::prelude::*;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .fields(&["title", "price"])
     ///     .and_where("price > $1 AND price < $1 + $2".bind_nums(&[&100, &200]))
@@ -260,9 +272,10 @@ impl Bind for &str {
     ///
     /// ```
     /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::prelude::*;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .fields(&["title", "price"])
     ///     .and_where("price > $1")
@@ -282,9 +295,10 @@ impl Bind for &str {
     ///
     /// ```
     /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::prelude::*;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::insert_into("books")
     ///     .fields(&["title", "price"])
     ///     .values(&[":name:, :costs:"])
@@ -305,10 +319,11 @@ impl Bind for &str {
     ///
     /// ```
     /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::prelude::*;
     /// use std::collections::HashMap;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let mut names: HashMap<&str, &dyn SqlArg> = HashMap::new();
     /// names.insert("name", &"Harry Potter and the Philosopher's Stone");
     /// names.insert("costs", &150);
@@ -333,9 +348,10 @@ impl Bind for String {
     ///
     /// ```
     /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::prelude::*;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .fields(&["title", "price"])
     ///     .and_where("price BETWEEN ? AND ?".bind(&100).bind(&200))
@@ -353,9 +369,10 @@ impl Bind for String {
     ///
     /// ```
     /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::prelude::*;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .fields(&["title", "price"])
     ///     .and_where("price > ? AND title LIKE ?".binds(&[&100, &"Harry Potter%"]))
@@ -384,9 +401,10 @@ impl Bind for String {
     ///
     /// ```
     /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::prelude::*;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .fields(&["title", "price"])
     ///     .and_where("price > $1 AND price < $1 + $2"
@@ -401,9 +419,10 @@ impl Bind for String {
     ///
     /// ```
     /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::prelude::*;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .fields(&["title", "price"])
     ///     .and_where("price > $1")
@@ -426,9 +445,10 @@ impl Bind for String {
     ///
     /// ```
     /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::prelude::*;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .fields(&["title", "price"])
     ///     .and_where("price > $1 AND price < $1 + $2".bind_nums(&[&100, &200]))
@@ -441,9 +461,10 @@ impl Bind for String {
     ///
     /// ```
     /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::prelude::*;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .fields(&["title", "price"])
     ///     .and_where("price > $1")
@@ -505,9 +526,10 @@ impl Bind for String {
     ///
     /// ```
     /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::prelude::*;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::insert_into("books")
     ///     .fields(&["title", "price"])
     ///     .values(&[":name:, :costs:"])
@@ -529,10 +551,11 @@ impl Bind for String {
     ///
     /// ```
     /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::prelude::*;
     /// use std::collections::HashMap;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let mut names: HashMap<&str, &dyn SqlArg> = HashMap::new();
     /// names.insert("name", &"Harry Potter and the Philosopher's Stone");
     /// names.insert("costs", &150);

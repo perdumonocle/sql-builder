@@ -1572,7 +1572,7 @@ impl SqlBuilder {
         let mut cond = field.to_string();
         cond.push_str(" IN (");
         cond.push_str(&list);
-        cond.push_str(")");
+        cond.push(')');
         self.and_where(&cond)
     }
 
@@ -1609,7 +1609,7 @@ impl SqlBuilder {
         let mut cond = field.to_string();
         cond.push_str(" NOT IN (");
         cond.push_str(&list);
-        cond.push_str(")");
+        cond.push(')');
         self.and_where(&cond)
     }
 
@@ -1647,7 +1647,7 @@ impl SqlBuilder {
         let mut cond = field.to_string();
         cond.push_str(" IN (");
         cond.push_str(&query.to_string());
-        cond.push_str(")");
+        cond.push(')');
         self.and_where(&cond)
     }
 
@@ -1685,7 +1685,7 @@ impl SqlBuilder {
         let mut cond = field.to_string();
         cond.push_str(" NOT IN (");
         cond.push_str(&query.to_string());
-        cond.push_str(")");
+        cond.push(')');
         self.and_where(&cond)
     }
 
@@ -2235,7 +2235,7 @@ impl SqlBuilder {
         let mut cond = field.to_string();
         cond.push_str(" IN (");
         cond.push_str(&list);
-        cond.push_str(")");
+        cond.push(')');
         self.or_where(&cond)
     }
 
@@ -2273,7 +2273,7 @@ impl SqlBuilder {
         let mut cond = field.to_string();
         cond.push_str(" NOT IN (");
         cond.push_str(&list);
-        cond.push_str(")");
+        cond.push(')');
         self.or_where(&cond)
     }
 
@@ -2312,7 +2312,7 @@ impl SqlBuilder {
         let mut cond = field.to_string();
         cond.push_str(" IN (");
         cond.push_str(&query.to_string());
-        cond.push_str(")");
+        cond.push(')');
         self.or_where(&cond)
     }
 
@@ -2351,7 +2351,7 @@ impl SqlBuilder {
         let mut cond = field.to_string();
         cond.push_str(" NOT IN (");
         cond.push_str(&query.to_string());
-        cond.push_str(")");
+        cond.push(')');
         self.or_where(&cond)
     }
 
