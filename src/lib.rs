@@ -6,7 +6,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! sql-builder = "2.0"
+//! sql-builder = "2.1"
 //! ```
 //!
 //! # Examples:
@@ -157,7 +157,7 @@
 //! # }
 //! ```
 //!
-//! See [more examples](https://docs.rs/sql-builder/2.0.0/sql_builder/struct.SqlBuilder.html)
+//! See [more examples](https://docs.rs/sql-builder/2.1.0/sql_builder/struct.SqlBuilder.html)
 
 pub mod arg;
 pub mod bind;
@@ -1576,6 +1576,43 @@ impl SqlBuilder {
         self.and_where(&cond)
     }
 
+    /// Add WHERE field IN (string list).
+    ///
+    /// ```
+    /// # use std::error::Error;
+    /// use sql_builder::{SqlBuilder, quote};
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("title")
+    ///     .field("price")
+    ///     .and_where_in_quoted("title", &["G", "L", "t"])
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title, price FROM books WHERE title IN ('G', 'L', 't');", &sql);
+    /// // add                                           ^^^^^     ^^^^^^^^^^^^^
+    /// // here                                          field         list
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn and_where_in_quoted<S, T>(&mut self, field: S, list: &[T]) -> &mut Self
+    where
+        S: ToString,
+        T: ToString,
+    {
+        let list: Vec<String> = list
+            .iter()
+            .map(|v| quote((*v).to_string()))
+            .collect::<Vec<String>>();
+        let list = list.join(", ");
+
+        let mut cond = field.to_string();
+        cond.push_str(" IN (");
+        cond.push_str(&list);
+        cond.push(')');
+        self.and_where(&cond)
+    }
+
     /// Add WHERE field NOT IN (list).
     ///
     /// ```
@@ -1603,6 +1640,43 @@ impl SqlBuilder {
         let list: Vec<String> = list
             .iter()
             .map(|v| (*v).to_string())
+            .collect::<Vec<String>>();
+        let list = list.join(", ");
+
+        let mut cond = field.to_string();
+        cond.push_str(" NOT IN (");
+        cond.push_str(&list);
+        cond.push(')');
+        self.and_where(&cond)
+    }
+
+    /// Add WHERE field NOT IN (string list).
+    ///
+    /// ```
+    /// # use std::error::Error;
+    /// use sql_builder::{SqlBuilder, quote};
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("title")
+    ///     .field("price")
+    ///     .and_where_not_in_quoted("title", &["G", "L", "t"])
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title, price FROM books WHERE title NOT IN ('G', 'L', 't');", &sql);
+    /// // add                                           ^^^^^         ^^^^^^^^^^^^^
+    /// // here                                          field             list
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn and_where_not_in_quoted<S, T>(&mut self, field: S, list: &[T]) -> &mut Self
+    where
+        S: ToString,
+        T: ToString,
+    {
+        let list: Vec<String> = list
+            .iter()
+            .map(|v| quote((*v).to_string()))
             .collect::<Vec<String>>();
         let list = list.join(", ");
 
@@ -2239,6 +2313,44 @@ impl SqlBuilder {
         self.or_where(&cond)
     }
 
+    /// Add OR field IN (string list) to the last WHERE condition.
+    ///
+    /// ```
+    /// # use std::error::Error;
+    /// use sql_builder::{SqlBuilder, quote};
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("title")
+    ///     .field("price")
+    ///     .or_where_lt("price", 100)
+    ///     .or_where_in_quoted("title", &["G", "L", "t"])
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title, price FROM books WHERE price < 100 OR title IN ('G', 'L', 't');", &sql);
+    /// // add                                                          ^^^^^     ^^^^^^^^^^^^^
+    /// // here                                                         field         list
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn or_where_in_quoted<S, T>(&mut self, field: S, list: &[T]) -> &mut Self
+    where
+        S: ToString,
+        T: ToString,
+    {
+        let list: Vec<String> = list
+            .iter()
+            .map(|v| quote((*v).to_string()))
+            .collect::<Vec<String>>();
+        let list = list.join(", ");
+
+        let mut cond = field.to_string();
+        cond.push_str(" IN (");
+        cond.push_str(&list);
+        cond.push(')');
+        self.or_where(&cond)
+    }
+
     /// Add OR field NOT IN (list) to the last WHERE condition.
     ///
     /// ```
@@ -2267,6 +2379,44 @@ impl SqlBuilder {
         let list: Vec<String> = list
             .iter()
             .map(|v| (*v).to_string())
+            .collect::<Vec<String>>();
+        let list = list.join(", ");
+
+        let mut cond = field.to_string();
+        cond.push_str(" NOT IN (");
+        cond.push_str(&list);
+        cond.push(')');
+        self.or_where(&cond)
+    }
+
+    /// Add OR field NOT IN (string list) to the last WHERE condition.
+    ///
+    /// ```
+    /// # use std::error::Error;
+    /// use sql_builder::{SqlBuilder, quote};
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("title")
+    ///     .field("price")
+    ///     .or_where_lt("price", 100)
+    ///     .or_where_not_in_quoted("title", &["G", "L", "t"])
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title, price FROM books WHERE price < 100 OR title NOT IN ('G', 'L', 't');", &sql);
+    /// // add                                                          ^^^^^         ^^^^^^^^^^^^^
+    /// // here                                                         field             list
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn or_where_not_in_quoted<S, T>(&mut self, field: S, list: &[T]) -> &mut Self
+    where
+        S: ToString,
+        T: ToString,
+    {
+        let list: Vec<String> = list
+            .iter()
+            .map(|v| quote((*v).to_string()))
             .collect::<Vec<String>>();
         let list = list.join(", ");
 
