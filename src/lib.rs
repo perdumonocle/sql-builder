@@ -3053,12 +3053,20 @@ impl SqlBuilder {
         // Make WHERE part
         let wheres = SqlBuilder::make_wheres(&self.wheres);
 
+        // Make RETURNING part
+        let returning = if let Some(ret) = &self.returning {
+            format!(" RETURNING {}", ret)
+        } else {
+            "".to_string()
+        };
+
         // Make SQL
         let sql = format!(
-            "UPDATE {table} SET {sets}{wheres};",
+            "UPDATE {table} SET {sets}{wheres}{returning};",
             table = &self.table,
             sets = sets,
             wheres = wheres,
+            returning = returning,
         );
         Ok(sql)
     }
@@ -3561,11 +3569,12 @@ mod tests {
         let sql = SqlBuilder::update_table("books")
             .set("price", "price * 0.1")
             .and_where_like_left("title", "Harry Potter")
+            .returning_id()
             .sql()?;
 
         assert_eq!(
             &sql,
-            "UPDATE books SET price = price * 0.1 WHERE title LIKE 'Harry Potter%';"
+            "UPDATE books SET price = price * 0.1 WHERE title LIKE 'Harry Potter%' RETURNING id;"
         );
 
         Ok(())
@@ -3638,10 +3647,11 @@ mod tests {
         let sql = SqlBuilder::update_table("books")
             .set_str("comment", "Don't distribute!")
             .and_where_le("price", "100")
+            .returning("id, comment")
             .sql()?;
 
         assert_eq!(
-            "UPDATE books SET comment = 'Don''t distribute!' WHERE price <= 100;",
+            "UPDATE books SET comment = 'Don''t distribute!' WHERE price <= 100 RETURNING id, comment;",
             &sql
         );
 
