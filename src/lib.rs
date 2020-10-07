@@ -6,7 +6,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! sql-builder = "2.1"
+//! sql-builder = "2.2"
 //! ```
 //!
 //! # Examples:
@@ -157,7 +157,7 @@
 //! # }
 //! ```
 //!
-//! See [more examples](https://docs.rs/sql-builder/2.1.0/sql_builder/struct.SqlBuilder.html)
+//! See [more examples](https://docs.rs/sql-builder/2.2.0/sql_builder/struct.SqlBuilder.html)
 
 pub mod arg;
 pub mod bind;
@@ -824,6 +824,62 @@ impl SqlBuilder {
     /// ```
     pub fn set_field<S: ToString>(&mut self, field: S) -> &mut Self {
         self.fields = vec![field.to_string()];
+        self
+    }
+
+    /// Add COUNT(field).
+    ///
+    /// ```
+    /// # use std::error::Error;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("title")
+    ///     .count("price")
+    ///     .group_by("title")
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title, COUNT(price) FROM books GROUP BY title;", &sql);
+    /// // add                          ^^^^^
+    /// // here                         field
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn count<S: ToString>(&mut self, field: S) -> &mut Self {
+        self.fields.push(format!("COUNT({})", field.to_string()));
+        self
+    }
+
+    /// Add COUNT(field) AS name.
+    ///
+    /// ```
+    /// # use std::error::Error;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("title")
+    ///     .count_as("price", "cnt")
+    ///     .group_by("title")
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title, COUNT(price) AS cnt FROM books GROUP BY title;", &sql);
+    /// // add                          ^^^^^
+    /// // here                         field
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn count_as<S, T>(&mut self, field: S, name: T) -> &mut Self
+    where
+        S: ToString,
+        T: ToString,
+    {
+        self.fields.push(format!(
+            "COUNT({}) AS {}",
+            field.to_string(),
+            name.to_string()
+        ));
         self
     }
 
