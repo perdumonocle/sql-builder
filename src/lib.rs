@@ -6,7 +6,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! sql-builder = "2.2"
+//! sql-builder = "2.3"
 //! ```
 //!
 //! # Examples:
@@ -157,7 +157,7 @@
 //! # }
 //! ```
 //!
-//! See [more examples](https://docs.rs/sql-builder/2.2.0/sql_builder/struct.SqlBuilder.html)
+//! See [more examples](https://docs.rs/sql-builder/2.3.0/sql_builder/struct.SqlBuilder.html)
 
 pub mod arg;
 pub mod bind;

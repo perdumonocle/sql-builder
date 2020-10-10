@@ -1,8 +1,8 @@
 [package]
 name = "sql-builder"
-version = "2.2.0"
+version = "2.3.0"
 description = "Simple SQL code generator."
-authors = ["perdumonocle <konstantin_1987@mail.ru>", "dvic <info@dvic.io>"]
+authors = ["perdumonocle <konstantin_1987@mail.ru>", "dvic <info@dvic.io>", "ezracelli"]
 license = "MIT"
 edition = "2018"
 keywords = ["sql", "db", "database", "simple", "codegen"]
