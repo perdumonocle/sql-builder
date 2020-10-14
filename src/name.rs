@@ -166,6 +166,26 @@ macro_rules! dname {
 }
 
 /// Create safe name of identifier
+///
+/// # Examples
+/// ```
+/// #[macro_use] extern crate sql_builder;
+/// # use anyhow::Result;
+/// use sql_builder::{SqlBuilder, SqlName};
+///
+/// # fn main() -> Result<()> {
+/// let sql = SqlBuilder::select_from(baname!("public", "BOOKS"; "b"))
+///     .field(baname!("b", "title"))
+///     .field(baname!("s", "total"))
+///     .left()
+///     .join(baname!("shops"; "s"))
+///     .on_eq(baname!("b", "id"), baname!("s", "book"))
+///     .sql()?;
+///
+/// assert_eq!("SELECT `b`.`title`, `s`.`total` FROM `public`.`BOOKS` AS b LEFT JOIN `shops` AS s ON `b`.`id` = `s`.`book`;", &sql);
+/// # Ok(())
+/// # }
+/// ```
 #[derive(Clone)]
 pub struct SqlName {
     parts: Vec<String>,
@@ -187,7 +207,7 @@ impl SqlName {
         self
     }
 
-    /// Add an alias for identifier
+    /// Set an alias for identifier
     pub fn alias<S: ToString>(&mut self, alias: S) -> &mut Self {
         self.alias = Some(alias.to_string());
         self

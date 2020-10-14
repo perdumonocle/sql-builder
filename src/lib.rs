@@ -653,6 +653,36 @@ impl SqlBuilder {
         self
     }
 
+    /// Join constraint to the last JOIN part.
+    ///
+    /// ```
+    /// # use anyhow::Result;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<()> {
+    /// let sql = SqlBuilder::select_from("books AS b")
+    ///     .field("b.title")
+    ///     .field("s.total")
+    ///     .join("shops AS s")
+    ///     .on_eq("b.id", "s.book")
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT b.title, s.total FROM books AS b JOIN shops AS s ON b.id = s.book;", &sql);
+    /// // add                                                                 ^^^^^^^^^^^^^
+    /// // here                                                                 constraint
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn on_eq<S: ToString, T: ToString>(&mut self, c1: S, c2: T) -> &mut Self {
+        if let Some(last) = self.joins.last_mut() {
+            last.push_str(" ON ");
+            last.push_str(&c1.to_string());
+            last.push_str(" = ");
+            last.push_str(&c2.to_string());
+        }
+        self
+    }
+
     /// Set DISTINCT for fields.
     ///
     /// ```
@@ -3693,6 +3723,19 @@ mod tests {
             .left_outer()
             .join("shops AS s")
             .on("b.id = s.book")
+            .sql()?;
+
+        assert_eq!(
+            &sql,
+            "SELECT b.title, s.total FROM books AS b LEFT OUTER JOIN shops AS s ON b.id = s.book;"
+        );
+
+        let sql = SqlBuilder::select_from("books AS b")
+            .field("b.title")
+            .field("s.total")
+            .left_outer()
+            .join("shops AS s")
+            .on_eq("b.id", "s.book")
             .sql()?;
 
         assert_eq!(
