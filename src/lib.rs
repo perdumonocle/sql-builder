@@ -6,7 +6,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! sql-builder = "2.3"
+//! sql-builder = "3.0"
 //! ```
 //!
 //! # Examples:
@@ -15,9 +15,9 @@
 //!
 //! ```
 //! use sql_builder::SqlBuilder;
-//! # use std::error::Error;
+//! # use anyhow::Result;
 //!
-//! # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+//! # fn main() -> Result<()> {
 //! let sql = SqlBuilder::select_from("company")
 //!     .field("id")
 //!     .field("name")
@@ -30,10 +30,10 @@
 //! ```
 //!
 //! ```
-//! # use std::error::Error;
+//! # use anyhow::Result;
 //! use sql_builder::prelude::*;
 //!
-//! # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+//! # fn main() -> Result<()> {
 //! let sql = SqlBuilder::select_from("company")
 //!     .fields(&["id", "name"])
 //!     .and_where("salary BETWEEN ? AND ?".binds(&[&10_000, &25_000]))
@@ -49,9 +49,9 @@
 //!
 //! ```
 //! use sql_builder::{SqlBuilder, quote};
-//! # use std::error::Error;
+//! # use anyhow::Result;
 //!
-//! # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+//! # fn main() -> Result<()> {
 //! let sql = SqlBuilder::insert_into("company")
 //!     .field("name")
 //!     .field("salary")
@@ -67,9 +67,9 @@
 //!
 //! ```
 //! use sql_builder::prelude::*;
-//! # use std::error::Error;
+//! # use anyhow::Result;
 //!
-//! # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+//! # fn main() -> Result<()> {
 //! let sql = SqlBuilder::insert_into("company")
 //!     .field("name")
 //!     .field("salary")
@@ -89,9 +89,9 @@
 //!
 //! ```
 //! use sql_builder::SqlBuilder;
-//! # use std::error::Error;
+//! # use anyhow::Result;
 //!
-//! # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+//! # fn main() -> Result<()> {
 //! let sql = SqlBuilder::update_table("company")
 //!     .set("salary", "salary + 100")
 //!     .and_where_lt("salary", 1_000)
@@ -104,9 +104,9 @@
 //!
 //! ```
 //! use sql_builder::prelude::*;
-//! # use std::error::Error;
+//! # use anyhow::Result;
 //!
-//! # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+//! # fn main() -> Result<()> {
 //! let sql = SqlBuilder::update_table("company")
 //!     .set("salary", "salary + $1")
 //!     .set("comment", &quote("up $1$$"))
@@ -123,9 +123,9 @@
 //!
 //! ```
 //! use sql_builder::SqlBuilder;
-//! # use std::error::Error;
+//! # use anyhow::Result;
 //!
-//! # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+//! # fn main() -> Result<()> {
 //! let sql = SqlBuilder::delete_from("company")
 //!     .or_where_lt("salary", 1_000)
 //!     .or_where_gt("salary", 25_000)
@@ -139,9 +139,9 @@
 //! ```
 //! use sql_builder::prelude::*;
 //! use std::collections::HashMap;
-//! # use std::error::Error;
+//! # use anyhow::Result;
 //!
-//! # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+//! # fn main() -> Result<()> {
 //! let mut names: HashMap<&str, &dyn SqlArg> = HashMap::new();
 //! names.insert("min", &1_000);
 //! names.insert("max", &25_000);
@@ -157,14 +157,16 @@
 //! # }
 //! ```
 //!
-//! See [more examples](https://docs.rs/sql-builder/2.3.0/sql_builder/struct.SqlBuilder.html)
+//! See [more examples](https://docs.rs/sql-builder/3.0.0/sql_builder/struct.SqlBuilder.html)
 
 pub mod arg;
 pub mod bind;
 pub mod error;
+pub mod name;
 pub mod prelude;
 
 pub use crate::error::SqlBuilderError;
+pub use crate::name::SqlName;
 use anyhow::Result;
 
 /// Main SQL builder
@@ -247,10 +249,10 @@ impl SqlBuilder {
     /// You may specify comma separted list of tables.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
@@ -275,10 +277,10 @@ impl SqlBuilder {
     /// Adds table name to comma separted list of tables.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .and_table("newspapers")
     ///     .field("title")
@@ -300,10 +302,10 @@ impl SqlBuilder {
     /// Create SELECT query without a table.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::{SqlBuilder, quote};
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_values(&["10", &quote("100")])
     ///     .sql()?;
     ///
@@ -325,10 +327,10 @@ impl SqlBuilder {
     /// Create INSERT query.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::{SqlBuilder, quote};
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::insert_into("books")
     ///     .field("title")
     ///     .field("price")
@@ -353,10 +355,10 @@ impl SqlBuilder {
     /// Create UPDATE query.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::update_table("books")
     ///     .set("price", "price + 10")
     ///     .sql()?;
@@ -378,10 +380,10 @@ impl SqlBuilder {
     /// Create DELETE query.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::delete_from("books")
     ///     .and_where("price > 100")
     ///     .sql()?;
@@ -403,10 +405,10 @@ impl SqlBuilder {
     /// Use NATURAL JOIN
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("total")
@@ -427,10 +429,10 @@ impl SqlBuilder {
     /// Use LEFT JOIN
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("total")
@@ -452,10 +454,10 @@ impl SqlBuilder {
     /// Use LEFT OUTER JOIN
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("total")
@@ -477,10 +479,10 @@ impl SqlBuilder {
     /// Use RIGHT JOIN
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("total")
@@ -502,10 +504,10 @@ impl SqlBuilder {
     /// Use RIGHT OUTER JOIN
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("total")
@@ -527,10 +529,10 @@ impl SqlBuilder {
     /// Use INNER JOIN
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("total")
@@ -552,10 +554,10 @@ impl SqlBuilder {
     /// Use CROSS JOIN
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("total")
@@ -577,15 +579,16 @@ impl SqlBuilder {
     /// Join with table.
     ///
     /// ```
-    /// # use std::error::Error;
-    /// use sql_builder::SqlBuilder;
+    /// #[macro_use] extern crate sql_builder;
+    /// # use anyhow::Result;
+    /// use sql_builder::{SqlBuilder, SqlName};
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
-    /// let sql = SqlBuilder::select_from("books AS b")
+    /// # fn main() -> Result<()> {
+    /// let sql = SqlBuilder::select_from(name!("books"; "b"))
     ///     .field("b.title")
     ///     .field("s.total")
     ///     .left()
-    ///     .join("shops AS s")
+    ///     .join(name!("shops"; "s"))
     ///     .on("b.id = s.book")
     ///     .sql()?;
     ///
@@ -625,10 +628,10 @@ impl SqlBuilder {
     /// Join constraint to the last JOIN part.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books AS b")
     ///     .field("b.title")
     ///     .field("s.total")
@@ -653,10 +656,10 @@ impl SqlBuilder {
     /// Set DISTINCT for fields.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .distinct()
     ///     .field("price")
@@ -675,10 +678,10 @@ impl SqlBuilder {
     /// Add fields.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .fields(&["title", "price"])
     ///     .sql()?;
@@ -701,13 +704,13 @@ impl SqlBuilder {
     /// Replace fields.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     /// # #[derive(Default)]
     /// # struct ReqData { filter: Option<String>, price_min: Option<u64>, price_max: Option<u64>,
     /// # limit: Option<usize>, offset: Option<usize> }
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// # let req_data = ReqData::default();
     /// // Prepare query for total count
     ///
@@ -755,10 +758,10 @@ impl SqlBuilder {
     /// Add field.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
@@ -778,13 +781,13 @@ impl SqlBuilder {
     /// Replace fields with choosed one.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     /// # #[derive(Default)]
     /// # struct ReqData { filter: Option<String>, price_min: Option<u64>, price_max: Option<u64>,
     /// # limit: Option<usize>, offset: Option<usize> }
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// # let req_data = ReqData::default();
     /// // Prepare query for total count
     ///
@@ -830,10 +833,10 @@ impl SqlBuilder {
     /// Add COUNT(field).
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .count("price")
@@ -854,10 +857,10 @@ impl SqlBuilder {
     /// Add COUNT(field) AS name.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .count_as("price", "cnt")
@@ -886,10 +889,10 @@ impl SqlBuilder {
     /// Add SET part (for UPDATE).
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::update_table("books")
     ///     .set("price", "price + 10")
     ///     .sql()?;
@@ -913,10 +916,10 @@ impl SqlBuilder {
     /// Add SET part with escaped string value (for UPDATE).
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::update_table("books")
     ///     .set_str("comment", "Don't distribute!")
     ///     .and_where_le("price", "100")
@@ -941,10 +944,10 @@ impl SqlBuilder {
     /// Add VALUES part (for INSERT).
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::{SqlBuilder, quote};
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::insert_into("books")
     ///     .field("title")
     ///     .field("price")
@@ -977,10 +980,10 @@ impl SqlBuilder {
     /// Add SELECT part (for INSERT).
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let query = SqlBuilder::select_from("warehouse")
     ///     .field("title")
     ///     .field("preliminary_price * 2")
@@ -1008,10 +1011,10 @@ impl SqlBuilder {
     /// Add RETURNING part.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::insert_into("books")
     ///     .field("title")
     ///     .field("price")
@@ -1033,10 +1036,10 @@ impl SqlBuilder {
     /// Add RETURNING id.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::insert_into("books")
     ///     .field("title")
     ///     .field("price")
@@ -1056,10 +1059,10 @@ impl SqlBuilder {
     /// Add GROUP BY part.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("price")
     ///     .field("COUNT(price) AS cnt")
@@ -1081,10 +1084,10 @@ impl SqlBuilder {
     /// Add HAVING condition.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("price")
     ///     .field("COUNT(price) AS cnt")
@@ -1107,10 +1110,10 @@ impl SqlBuilder {
     /// Add WHERE condition.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
@@ -1132,10 +1135,10 @@ impl SqlBuilder {
     /// Add WHERE condition for equal parts.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::{SqlBuilder, quote};
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("price")
     ///     .and_where_eq("title", &quote("Harry Potter and the Philosopher's Stone"))
@@ -1161,10 +1164,10 @@ impl SqlBuilder {
     /// Add WHERE condition for non-equal parts.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::{SqlBuilder, quote};
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("price")
     ///     .and_where_ne("title", &quote("Harry Potter and the Philosopher's Stone"))
@@ -1190,10 +1193,10 @@ impl SqlBuilder {
     /// Add WHERE condition for field greater than value.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
@@ -1220,10 +1223,10 @@ impl SqlBuilder {
     /// Add WHERE condition for field not less than value.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
@@ -1250,10 +1253,10 @@ impl SqlBuilder {
     /// Add WHERE condition for field less than value.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
@@ -1280,10 +1283,10 @@ impl SqlBuilder {
     /// Add WHERE condition for field not greater than value.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
@@ -1310,10 +1313,10 @@ impl SqlBuilder {
     /// Add WHERE LIKE condition.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("price")
     ///     .and_where_like("title", "%Philosopher's%")
@@ -1340,10 +1343,10 @@ impl SqlBuilder {
     /// Add WHERE LIKE %condition.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("price")
     ///     .and_where_like_right("title", "Stone")
@@ -1370,10 +1373,10 @@ impl SqlBuilder {
     /// Add WHERE LIKE condition%.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("price")
     ///     .and_where_like_left("title", "Harry")
@@ -1400,10 +1403,10 @@ impl SqlBuilder {
     /// Add WHERE LIKE %condition%.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("price")
     ///     .and_where_like_any("title", " and ")
@@ -1430,10 +1433,10 @@ impl SqlBuilder {
     /// Add WHERE NOT LIKE condition.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .and_where_not_like("title", "%Alice's%")
@@ -1460,10 +1463,10 @@ impl SqlBuilder {
     /// Add WHERE NOT LIKE %condition.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("price")
     ///     .and_where_not_like_right("title", "Stone")
@@ -1490,10 +1493,10 @@ impl SqlBuilder {
     /// Add WHERE NOT LIKE condition%.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("price")
     ///     .and_where_not_like_left("title", "Harry")
@@ -1520,10 +1523,10 @@ impl SqlBuilder {
     /// Add WHERE NOT LIKE %condition%.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("price")
     ///     .and_where_not_like_any("title", " and ")
@@ -1550,10 +1553,10 @@ impl SqlBuilder {
     /// Add WHERE IS NULL condition.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .and_where_is_null("price")
@@ -1574,10 +1577,10 @@ impl SqlBuilder {
     /// Add WHERE IS NOT NULL condition.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .and_where_is_not_null("price")
@@ -1598,10 +1601,10 @@ impl SqlBuilder {
     /// Add WHERE field IN (list).
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::{SqlBuilder, quote};
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
@@ -1635,10 +1638,10 @@ impl SqlBuilder {
     /// Add WHERE field IN (string list).
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::{SqlBuilder, quote};
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
@@ -1672,10 +1675,10 @@ impl SqlBuilder {
     /// Add WHERE field NOT IN (list).
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::{SqlBuilder, quote};
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
@@ -1709,10 +1712,10 @@ impl SqlBuilder {
     /// Add WHERE field NOT IN (string list).
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::{SqlBuilder, quote};
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
@@ -1746,10 +1749,10 @@ impl SqlBuilder {
     /// Add WHERE field IN (query).
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::{SqlBuilder, quote};
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let query = SqlBuilder::select_from("shop")
     ///     .field("title")
     ///     .and_where("sold")
@@ -1784,10 +1787,10 @@ impl SqlBuilder {
     /// Add WHERE field NOT IN (query).
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::{SqlBuilder, quote};
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let query = SqlBuilder::select_from("shop")
     ///     .field("title")
     ///     .and_where("sold")
@@ -1822,10 +1825,10 @@ impl SqlBuilder {
     /// Add OR condition to the last WHERE condition.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
@@ -1852,10 +1855,10 @@ impl SqlBuilder {
     /// Add OR condition of equal parts to the last WHERE condition.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::{SqlBuilder, quote};
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("price")
     ///     .and_where_eq("title", &quote("Harry Potter and the Philosopher's Stone"))
@@ -1882,10 +1885,10 @@ impl SqlBuilder {
     /// Add OR condition of non-equal parts to the last WHERE condition.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::{SqlBuilder, quote};
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("price")
     ///     .or_where_ne("title", &quote("Harry Potter and the Philosopher's Stone"))
@@ -1912,10 +1915,10 @@ impl SqlBuilder {
     /// Add OR condition for field greater than value to the last WHERE condition.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
@@ -1943,10 +1946,10 @@ impl SqlBuilder {
     /// Add OR condition for field not less than value to the last WHERE condition.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
@@ -1974,10 +1977,10 @@ impl SqlBuilder {
     /// Add OR condition for field less than value to the last WHERE condition.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
@@ -2005,10 +2008,10 @@ impl SqlBuilder {
     /// Add OR condition for field not greater than value to the last WHERE condition.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
@@ -2036,10 +2039,10 @@ impl SqlBuilder {
     /// Add OR LIKE condition to the last WHERE condition.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("price")
     ///     .or_where_like("title", "%Alice's%")
@@ -2067,10 +2070,10 @@ impl SqlBuilder {
     /// Add OR LIKE condition to the last WHERE %condition.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("price")
     ///     .or_where_like_right("title", "Alice's")
@@ -2098,10 +2101,10 @@ impl SqlBuilder {
     /// Add OR LIKE condition to the last WHERE condition%.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("price")
     ///     .or_where_like_left("title", "Alice's")
@@ -2129,10 +2132,10 @@ impl SqlBuilder {
     /// Add OR LIKE condition to the last WHERE %condition%.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("price")
     ///     .or_where_like_any("title", "Alice's")
@@ -2160,10 +2163,10 @@ impl SqlBuilder {
     /// Add OR NOT LIKE condition to the last WHERE condition.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .and_where_not_like("title", "%Alice's%")
@@ -2191,10 +2194,10 @@ impl SqlBuilder {
     /// Add OR NOT LIKE condition to the last WHERE %condition.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("price")
     ///     .or_where_not_like_right("title", "Alice's")
@@ -2222,10 +2225,10 @@ impl SqlBuilder {
     /// Add OR NOT LIKE condition to the last WHERE condition%.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("price")
     ///     .or_where_not_like_left("title", "Alice's")
@@ -2253,10 +2256,10 @@ impl SqlBuilder {
     /// Add OR NOT LIKE condition to the last WHERE %condition%.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("price")
     ///     .or_where_not_like_any("title", "Alice's")
@@ -2284,10 +2287,10 @@ impl SqlBuilder {
     /// Add OR IS NULL condition to the last WHERE condition.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .and_where_eq("price", 0)
@@ -2309,10 +2312,10 @@ impl SqlBuilder {
     /// Add OR IS NOT NULL condition to the last WHERE condition.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .or_where_is_not_null("title")
@@ -2334,10 +2337,10 @@ impl SqlBuilder {
     /// Add OR field IN (list) to the last WHERE condition.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::{SqlBuilder, quote};
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
@@ -2372,10 +2375,10 @@ impl SqlBuilder {
     /// Add OR field IN (string list) to the last WHERE condition.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::{SqlBuilder, quote};
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
@@ -2410,10 +2413,10 @@ impl SqlBuilder {
     /// Add OR field NOT IN (list) to the last WHERE condition.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::{SqlBuilder, quote};
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
@@ -2448,10 +2451,10 @@ impl SqlBuilder {
     /// Add OR field NOT IN (string list) to the last WHERE condition.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::{SqlBuilder, quote};
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
@@ -2486,10 +2489,10 @@ impl SqlBuilder {
     /// Add OR field IN (query) to the last WHERE condition.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let query = SqlBuilder::select_from("shop")
     ///     .field("title")
     ///     .and_where("sold")
@@ -2525,10 +2528,10 @@ impl SqlBuilder {
     /// Add OR field NOT IN (query) to the last WHERE condition.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let query = SqlBuilder::select_from("shop")
     ///     .field("title")
     ///     .and_where("sold")
@@ -2565,10 +2568,10 @@ impl SqlBuilder {
     /// ORDER BY must be in the last subquery.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let append = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
@@ -2600,10 +2603,10 @@ impl SqlBuilder {
     /// ORDER BY must be in the last subquery.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let append = SqlBuilder::select_values(&["'The Great Gatsby'", "124"])
     ///     .query_values()?;
     ///
@@ -2630,10 +2633,10 @@ impl SqlBuilder {
     /// Add ORDER BY.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
@@ -2660,10 +2663,10 @@ impl SqlBuilder {
     /// Add ORDER BY ASC.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
@@ -2684,10 +2687,10 @@ impl SqlBuilder {
     /// Add ORDER BY DESC.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
@@ -2708,10 +2711,10 @@ impl SqlBuilder {
     /// Set LIMIT.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
@@ -2734,10 +2737,10 @@ impl SqlBuilder {
     /// Set OFFSET.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books")
     ///     .field("title")
     ///     .field("price")
@@ -2761,10 +2764,10 @@ impl SqlBuilder {
     /// Build complete SQL command.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let sql = SqlBuilder::select_from("books").sql()?;
     ///
     /// assert_eq!("SELECT * FROM books;", &sql);
@@ -2810,10 +2813,10 @@ impl SqlBuilder {
     /// Build subquery SQL command.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let cat = SqlBuilder::select_from("books")
     ///     .field("CASE WHEN price < 100 THEN 'cheap' ELSE 'expensive' END AS category")
     ///     .subquery()?;
@@ -2841,10 +2844,10 @@ impl SqlBuilder {
     /// Build named subquery SQL command.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let cat = SqlBuilder::select_from("books")
     ///     .field("CASE WHEN price < 100 THEN 'cheap' ELSE 'expensive' END")
     ///     .subquery_as("category")?;
@@ -2874,10 +2877,10 @@ impl SqlBuilder {
     /// SQL command generator for query or subquery.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::SqlBuilder;
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let query = SqlBuilder::select_from("warehouse")
     ///     .field("title")
     ///     .field("preliminary_price * 2")
@@ -2966,10 +2969,10 @@ impl SqlBuilder {
     /// SQL command generator for query or subquery without a table.
     ///
     /// ```
-    /// # use std::error::Error;
+    /// # use anyhow::Result;
     /// use sql_builder::{SqlBuilder, quote};
     ///
-    /// # fn main() -> Result<(), Box<dyn Error + Send + Sync>> {
+    /// # fn main() -> Result<()> {
     /// let values = SqlBuilder::select_values(&["10", &quote("100")])
     ///     .query_values()?;
     ///
@@ -3142,7 +3145,20 @@ pub fn quote<S: ToString>(src: S) -> String {
 /// assert_eq!(&sql, "`Hello, 'World'`");
 /// ```
 pub fn baquote<S: ToString>(src: S) -> String {
-    format!("`{}`", src.to_string())
+    format!("`{}`", src.to_string().replace("`", "\\`"))
+}
+
+/// Quote string with [brackets].
+///
+/// ```
+/// use sql_builder::brquote;
+///
+/// let sql = brquote("Hello, [awesome] World");
+///
+/// assert_eq!(&sql, "[Hello, [awesome]] World]");
+/// ```
+pub fn brquote<S: ToString>(src: S) -> String {
+    format!("[{}]", src.to_string().replace("]", "]]"))
 }
 
 /// Double quote string for SQL.
