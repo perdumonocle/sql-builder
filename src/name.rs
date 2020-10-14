@@ -11,7 +11,7 @@ macro_rules! name {
         {
             SqlName::new( $n )
             $(
-                .add($x);
+                .add( $x )
             )*
             .safe()
         }

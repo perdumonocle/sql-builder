@@ -131,7 +131,7 @@ let sql = SqlBuilder::delete_from("company")
 assert_eq!("DELETE FROM company WHERE (salary >= 1000) AND (salary <= 25000);", &sql);
 ```
 
-See [more examples](https://docs.rs/sql-builder/3.0.0/sql_builder/struct.SqlBuilder.html)
+See [more examples](https://docs.rs/sql-builder/3.0.1/sql_builder/struct.SqlBuilder.html)
 
 ## SQL support
 
@@ -156,8 +156,12 @@ See [more examples](https://docs.rs/sql-builder/3.0.0/sql_builder/struct.SqlBuil
 ### Functions
 
 - escape
-- quote, double quote, back quote
+- quote, double quote, back quote, brackets quote
 - bind, binds, bind\_num, bind\_nums, bind\_name, bind\_names
+
+### Macroes
+
+- name, qname, baname, brname, dname
 
 ## License
 
