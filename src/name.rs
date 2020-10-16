@@ -174,6 +174,25 @@ macro_rules! dname {
 /// use sql_builder::{SqlBuilder, SqlName};
 ///
 /// # fn main() -> Result<()> {
+/// let sql = SqlBuilder::select_from(SqlName::new("public").add("BOOKS").alias("b").baquoted())
+///     .field(SqlName::new("b").add("title").baquoted())
+///     .field(SqlName::new("s").add("total").baquoted())
+///     .left()
+///     .join(SqlName::new("shops").alias("s").baquoted())
+///     .on_eq(SqlName::new("b").add("id").baquoted(), SqlName::new("s").add("book").baquoted())
+///     .sql()?;
+///
+/// assert_eq!("SELECT `b`.`title`, `s`.`total` FROM `public`.`BOOKS` AS b LEFT JOIN `shops` AS s ON `b`.`id` = `s`.`book`;", &sql);
+/// # Ok(())
+/// # }
+/// ```
+///
+/// ```
+/// #[macro_use] extern crate sql_builder;
+/// # use anyhow::Result;
+/// use sql_builder::{SqlBuilder, SqlName};
+///
+/// # fn main() -> Result<()> {
 /// let sql = SqlBuilder::select_from(baname!("public", "BOOKS"; "b"))
 ///     .field(baname!("b", "title"))
 ///     .field(baname!("s", "total"))
