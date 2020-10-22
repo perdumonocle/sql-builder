@@ -157,7 +157,7 @@
 //! # }
 //! ```
 //!
-//! See [more examples](https://docs.rs/sql-builder/3.1.3/sql_builder/struct.SqlBuilder.html)
+//! See [more examples](https://docs.rs/sql-builder/3.1.1/sql_builder/struct.SqlBuilder.html)
 
 pub mod arg;
 pub mod bind;
@@ -668,8 +668,8 @@ impl SqlBuilder {
     ///     .sql()?;
     ///
     /// assert_eq!("SELECT b.title, s.total FROM books AS b JOIN shops AS s ON b.id = s.book;", &sql);
-    /// // add                                                                 ^^^^^^^^^^^^^
-    /// // here                                                                 constraint
+    /// // add                                                                 ^^^^   ^^^^^^
+    /// // here                                                                 c1      c2
     /// # Ok(())
     /// # }
     /// ```
