@@ -6,7 +6,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! sql-builder = "3.0"
+//! sql-builder = "3.1"
 //! ```
 //!
 //! # Examples:
@@ -157,7 +157,7 @@
 //! # }
 //! ```
 //!
-//! See [more examples](https://docs.rs/sql-builder/3.0.3/sql_builder/struct.SqlBuilder.html)
+//! See [more examples](https://docs.rs/sql-builder/3.1.3/sql_builder/struct.SqlBuilder.html)
 
 pub mod arg;
 pub mod bind;
@@ -1852,6 +1852,72 @@ impl SqlBuilder {
         self.and_where(&cond)
     }
 
+    /// Add WHERE field BETWEEN values.
+    ///
+    /// ```
+    /// # use anyhow::Result;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<()> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("title")
+    ///     .field("price")
+    ///     .and_where_between("price", 10_000, 20_000)
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title, price FROM books WHERE price BETWEEN 10000 AND 20000;", &sql);
+    /// // add                                           ^^^^^         ^^^^^     ^^^^^
+    /// // here                                          field          min       max
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn and_where_between<S, T, U>(&mut self, field: S, min: T, max: U) -> &mut Self
+    where
+        S: ToString,
+        T: ToString,
+        U: ToString,
+    {
+        let mut cond = field.to_string();
+        cond.push_str(" BETWEEN ");
+        cond.push_str(&min.to_string());
+        cond.push_str(" AND ");
+        cond.push_str(&max.to_string());
+        self.and_where(&cond)
+    }
+
+    /// Add WHERE field NOT BETWEEN values.
+    ///
+    /// ```
+    /// # use anyhow::Result;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<()> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("title")
+    ///     .field("price")
+    ///     .and_where_not_between("price", 10_000, 20_000)
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title, price FROM books WHERE price NOT BETWEEN 10000 AND 20000;", &sql);
+    /// // add                                           ^^^^^             ^^^^^     ^^^^^
+    /// // here                                          field              min       max
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn and_where_not_between<S, T, U>(&mut self, field: S, min: T, max: U) -> &mut Self
+    where
+        S: ToString,
+        T: ToString,
+        U: ToString,
+    {
+        let mut cond = field.to_string();
+        cond.push_str(" NOT BETWEEN ");
+        cond.push_str(&min.to_string());
+        cond.push_str(" AND ");
+        cond.push_str(&max.to_string());
+        self.and_where(&cond)
+    }
+
     /// Add OR condition to the last WHERE condition.
     ///
     /// ```
@@ -2591,6 +2657,74 @@ impl SqlBuilder {
         cond.push_str(" NOT IN (");
         cond.push_str(&query.to_string());
         cond.push(')');
+        self.or_where(&cond)
+    }
+
+    /// Add OR field BETWEEN values to the last WHERE condition.
+    ///
+    /// ```
+    /// # use anyhow::Result;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<()> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("title")
+    ///     .field("price")
+    ///     .or_where_between("price", 100, 200)
+    ///     .or_where_between("price", 10_000, 20_000)
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title, price FROM books WHERE price BETWEEN 100 AND 200 OR price BETWEEN 10000 AND 20000;", &sql);
+    /// // add                                           ^^^^^         ^^^     ^^^    ^^^^^         ^^^^^     ^^^^^
+    /// // here                                          field         min     max    field          min       max
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn or_where_between<S, T, U>(&mut self, field: S, min: T, max: U) -> &mut Self
+    where
+        S: ToString,
+        T: ToString,
+        U: ToString,
+    {
+        let mut cond = field.to_string();
+        cond.push_str(" BETWEEN ");
+        cond.push_str(&min.to_string());
+        cond.push_str(" AND ");
+        cond.push_str(&max.to_string());
+        self.or_where(&cond)
+    }
+
+    /// Add OR field NOT BETWEEN values to the last WHERE condition.
+    ///
+    /// ```
+    /// # use anyhow::Result;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<()> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("title")
+    ///     .field("price")
+    ///     .or_where_not_between("price", 100, 200)
+    ///     .or_where_not_between("price", 10_000, 20_000)
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title, price FROM books WHERE price NOT BETWEEN 100 AND 200 OR price NOT BETWEEN 10000 AND 20000;", &sql);
+    /// // add                                           ^^^^^             ^^^     ^^^    ^^^^^             ^^^^^     ^^^^^
+    /// // here                                          field             min     max    field              min       max
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn or_where_not_between<S, T, U>(&mut self, field: S, min: T, max: U) -> &mut Self
+    where
+        S: ToString,
+        T: ToString,
+        U: ToString,
+    {
+        let mut cond = field.to_string();
+        cond.push_str(" NOT BETWEEN ");
+        cond.push_str(&min.to_string());
+        cond.push_str(" AND ");
+        cond.push_str(&max.to_string());
         self.or_where(&cond)
     }
 
