@@ -966,7 +966,7 @@ impl SqlBuilder {
         S: ToString,
         T: ToString,
     {
-        let expr = format!("{} = '{}'", &field.to_string(), &esc(&value.to_string()));
+        let expr = format!("{} = '{}'", &field.to_string(), &esc(value));
         self.sets.push(expr);
         self
     }
@@ -1365,7 +1365,7 @@ impl SqlBuilder {
     {
         let mut cond = field.to_string();
         cond.push_str(" LIKE '");
-        cond.push_str(&esc(&mask.to_string()));
+        cond.push_str(&esc(mask));
         cond.push('\'');
         self.and_where(&cond)
     }
@@ -1394,8 +1394,9 @@ impl SqlBuilder {
         T: ToString,
     {
         let mut cond = field.to_string();
+        if cond.is_empty() || mask.to_string().is_empty() { return self; }
         cond.push_str(" LIKE '%");
-        cond.push_str(&esc(&mask.to_string()));
+        cond.push_str(&esc(mask));
         cond.push('\'');
         self.and_where(&cond)
     }
@@ -1424,8 +1425,9 @@ impl SqlBuilder {
         T: ToString,
     {
         let mut cond = field.to_string();
+        if cond.is_empty() || mask.to_string().is_empty() { return self; }
         cond.push_str(" LIKE '");
-        cond.push_str(&esc(&mask.to_string()));
+        cond.push_str(&esc(mask));
         cond.push_str("%'");
         self.and_where(&cond)
     }
@@ -1454,8 +1456,9 @@ impl SqlBuilder {
         T: ToString,
     {
         let mut cond = field.to_string();
+        if cond.is_empty() || mask.to_string().is_empty() { return self; }
         cond.push_str(" LIKE '%");
-        cond.push_str(&esc(&mask.to_string()));
+        cond.push_str(&esc(mask));
         cond.push_str("%'");
         self.and_where(&cond)
     }
@@ -1485,7 +1488,7 @@ impl SqlBuilder {
     {
         let mut cond = field.to_string();
         cond.push_str(" NOT LIKE '");
-        cond.push_str(&esc(&mask.to_string()));
+        cond.push_str(&esc(mask));
         cond.push('\'');
         self.and_where(&cond)
     }
@@ -1514,8 +1517,9 @@ impl SqlBuilder {
         T: ToString,
     {
         let mut cond = field.to_string();
+        if cond.is_empty() || mask.to_string().is_empty() { return self; }
         cond.push_str(" NOT LIKE '%");
-        cond.push_str(&esc(&mask.to_string()));
+        cond.push_str(&esc(mask));
         cond.push('\'');
         self.and_where(&cond)
     }
@@ -1544,8 +1548,9 @@ impl SqlBuilder {
         T: ToString,
     {
         let mut cond = field.to_string();
+        if cond.is_empty() || mask.to_string().is_empty() { return self; }
         cond.push_str(" NOT LIKE '");
-        cond.push_str(&esc(&mask.to_string()));
+        cond.push_str(&esc(mask));
         cond.push_str("%'");
         self.and_where(&cond)
     }
@@ -1574,8 +1579,9 @@ impl SqlBuilder {
         T: ToString,
     {
         let mut cond = field.to_string();
+        if cond.is_empty() || mask.to_string().is_empty() { return self; }
         cond.push_str(" NOT LIKE '%");
-        cond.push_str(&esc(&mask.to_string()));
+        cond.push_str(&esc(mask));
         cond.push_str("%'");
         self.and_where(&cond)
     }
@@ -2158,7 +2164,7 @@ impl SqlBuilder {
     {
         let mut cond = field.to_string();
         cond.push_str(" LIKE '");
-        cond.push_str(&esc(&mask.to_string()));
+        cond.push_str(&esc(mask));
         cond.push('\'');
         self.or_where(&cond)
     }
@@ -2188,8 +2194,9 @@ impl SqlBuilder {
         T: ToString,
     {
         let mut cond = field.to_string();
+        if cond.is_empty() || mask.to_string().is_empty() { return self; }
         cond.push_str(" LIKE '%");
-        cond.push_str(&esc(&mask.to_string()));
+        cond.push_str(&esc(mask));
         cond.push('\'');
         self.or_where(&cond)
     }
@@ -2219,8 +2226,9 @@ impl SqlBuilder {
         T: ToString,
     {
         let mut cond = field.to_string();
+        if cond.is_empty() || mask.to_string().is_empty() { return self; }
         cond.push_str(" LIKE '");
-        cond.push_str(&esc(&mask.to_string()));
+        cond.push_str(&esc(mask));
         cond.push_str("%'");
         self.or_where(&cond)
     }
@@ -2250,8 +2258,9 @@ impl SqlBuilder {
         T: ToString,
     {
         let mut cond = field.to_string();
+        if cond.is_empty() || mask.to_string().is_empty() { return self; }
         cond.push_str(" LIKE '%");
-        cond.push_str(&esc(&mask.to_string()));
+        cond.push_str(&esc(mask));
         cond.push_str("%'");
         self.or_where(&cond)
     }
@@ -2282,7 +2291,7 @@ impl SqlBuilder {
     {
         let mut cond = field.to_string();
         cond.push_str(" NOT LIKE '");
-        cond.push_str(&esc(&mask.to_string()));
+        cond.push_str(&esc(mask));
         cond.push('\'');
         self.or_where(&cond)
     }
@@ -2312,8 +2321,9 @@ impl SqlBuilder {
         T: ToString,
     {
         let mut cond = field.to_string();
+        if cond.is_empty() || mask.to_string().is_empty() { return self; }
         cond.push_str(" NOT LIKE '%");
-        cond.push_str(&esc(&mask.to_string()));
+        cond.push_str(&esc(mask));
         cond.push('\'');
         self.or_where(&cond)
     }
@@ -2343,8 +2353,9 @@ impl SqlBuilder {
         T: ToString,
     {
         let mut cond = field.to_string();
+        if cond.is_empty() || mask.to_string().is_empty() { return self; }
         cond.push_str(" NOT LIKE '");
-        cond.push_str(&esc(&mask.to_string()));
+        cond.push_str(&esc(mask));
         cond.push_str("%'");
         self.or_where(&cond)
     }
@@ -2374,8 +2385,9 @@ impl SqlBuilder {
         T: ToString,
     {
         let mut cond = field.to_string();
+        if cond.is_empty() || mask.to_string().is_empty() { return self; }
         cond.push_str(" NOT LIKE '%");
-        cond.push_str(&esc(&mask.to_string()));
+        cond.push_str(&esc(mask));
         cond.push_str("%'");
         self.or_where(&cond)
     }
@@ -3877,6 +3889,26 @@ mod tests {
             "SELECT b.title, s.total FROM books AS b LEFT OUTER JOIN shops AS s ON b.id = s.book;"
         );
 
+        Ok(())
+    }
+
+    #[test]
+    fn test_empty_like() -> Result<(), Box<dyn Error + Send + Sync>> {
+        let sql = SqlBuilder::select_from("books")
+            .and_where_like_any("", "")
+            .and_where_like_left("", "")
+            .and_where_like_right("", "")
+            .and_where_not_like_any("", "")
+            .and_where_not_like_left("", "")
+            .and_where_not_like_right("", "")
+            .or_where_like_any("", "")
+            .or_where_like_left("", "")
+            .or_where_like_right("", "")
+            .or_where_not_like_any("", "")
+            .or_where_not_like_left("", "")
+            .or_where_not_like_right("", "")
+            .sql()?;
+        assert_eq!(&sql, "SELECT * FROM books;");
         Ok(())
     }
 }
