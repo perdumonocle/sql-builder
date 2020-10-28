@@ -1,5 +1,26 @@
 use crate::{baquote, brquote, dquote, quote};
 
+/// Make safe name of identifier if it contains unsafe characters.
+///
+/// # Examples
+/// ```
+/// #[macro_use] extern crate sql_builder;
+/// # use anyhow::Result;
+/// use sql_builder::{SqlBuilder, SqlName};
+///
+/// # fn main() -> Result<()> {
+/// let sql = SqlBuilder::select_from(name!("public", "BOOKS"; "b"))
+///     .field(name!("b", "title"))
+///     .field(name!("s", "total"))
+///     .left()
+///     .join(name!("shops"; "s"))
+///     .on_eq(name!("b", "id"), name!("s", "book"))
+///     .sql()?;
+///
+/// assert_eq!("SELECT b.title, s.total FROM `public`.`BOOKS` AS b LEFT JOIN shops AS s ON b.id = s.book;", &sql);
+/// # Ok(())
+/// # }
+/// ```
 #[macro_export]
 macro_rules! name {
     ( $n:expr ) => {
@@ -33,6 +54,28 @@ macro_rules! name {
     };
 }
 
+/// Make quoted name of identifier.
+///
+/// # Examples
+///
+/// ```
+/// #[macro_use] extern crate sql_builder;
+/// # use anyhow::Result;
+/// use sql_builder::{SqlBuilder, SqlName};
+///
+/// # fn main() -> Result<()> {
+/// let sql = SqlBuilder::select_from(qname!("public", "BOOKS"; "b"))
+///     .field(qname!("b", "title"))
+///     .field(qname!("s", "total"))
+///     .left()
+///     .join(qname!("shops"; "s"))
+///     .on_eq(qname!("b", "id"), qname!("s", "book"))
+///     .sql()?;
+///
+/// assert_eq!("SELECT 'b'.'title', 's'.'total' FROM 'public'.'BOOKS' AS b LEFT JOIN 'shops' AS s ON 'b'.'id' = 's'.'book';", &sql);
+/// # Ok(())
+/// # }
+/// ```
 #[macro_export]
 macro_rules! qname {
     ( $n:expr ) => {
@@ -66,6 +109,28 @@ macro_rules! qname {
     };
 }
 
+/// Make backquoted name of identifier.
+///
+/// # Examples
+///
+/// ```
+/// #[macro_use] extern crate sql_builder;
+/// # use anyhow::Result;
+/// use sql_builder::{SqlBuilder, SqlName};
+///
+/// # fn main() -> Result<()> {
+/// let sql = SqlBuilder::select_from(baname!("public", "BOOKS"; "b"))
+///     .field(baname!("b", "title"))
+///     .field(baname!("s", "total"))
+///     .left()
+///     .join(baname!("shops"; "s"))
+///     .on_eq(baname!("b", "id"), baname!("s", "book"))
+///     .sql()?;
+///
+/// assert_eq!("SELECT `b`.`title`, `s`.`total` FROM `public`.`BOOKS` AS b LEFT JOIN `shops` AS s ON `b`.`id` = `s`.`book`;", &sql);
+/// # Ok(())
+/// # }
+/// ```
 #[macro_export]
 macro_rules! baname {
     ( $n:expr ) => {
@@ -99,6 +164,28 @@ macro_rules! baname {
     };
 }
 
+/// Make brackets quoted name of identifier.
+///
+/// # Examples
+///
+/// ```
+/// #[macro_use] extern crate sql_builder;
+/// # use anyhow::Result;
+/// use sql_builder::{SqlBuilder, SqlName};
+///
+/// # fn main() -> Result<()> {
+/// let sql = SqlBuilder::select_from(brname!("public", "BOOKS"; "b"))
+///     .field(brname!("b", "title"))
+///     .field(brname!("s", "total"))
+///     .left()
+///     .join(brname!("shops"; "s"))
+///     .on_eq(brname!("b", "id"), brname!("s", "book"))
+///     .sql()?;
+///
+/// assert_eq!("SELECT [b].[title], [s].[total] FROM [public].[BOOKS] AS b LEFT JOIN [shops] AS s ON [b].[id] = [s].[book];", &sql);
+/// # Ok(())
+/// # }
+/// ```
 #[macro_export]
 macro_rules! brname {
     ( $n:expr ) => {
@@ -132,6 +219,28 @@ macro_rules! brname {
     };
 }
 
+/// Make double quoted name of identifier.
+///
+/// # Examples
+///
+/// ```
+/// #[macro_use] extern crate sql_builder;
+/// # use anyhow::Result;
+/// use sql_builder::{SqlBuilder, SqlName};
+///
+/// # fn main() -> Result<()> {
+/// let sql = SqlBuilder::select_from(dname!("public", "BOOKS"; "b"))
+///     .field(dname!("b", "title"))
+///     .field(dname!("s", "total"))
+///     .left()
+///     .join(dname!("shops"; "s"))
+///     .on_eq(dname!("b", "id"), dname!("s", "book"))
+///     .sql()?;
+///
+/// assert_eq!("SELECT \"b\".\"title\", \"s\".\"total\" FROM \"public\".\"BOOKS\" AS b LEFT JOIN \"shops\" AS s ON \"b\".\"id\" = \"s\".\"book\";", &sql);
+/// # Ok(())
+/// # }
+/// ```
 #[macro_export]
 macro_rules! dname {
     ( $n:expr ) => {
@@ -314,7 +423,7 @@ impl SqlName {
     /// Check if name is safe for injection
     fn is_safe(name: &str) -> bool {
         name.chars()
-            .all(|c| matches!(c, 'A'..='Z' | 'a'..='z' | '0'..='9' | '_'))
+            .all(|c| matches!(c, 'a'..='z' | '0'..='9' | '_'))
     }
 
     /// Check if all parts is safe for injection
