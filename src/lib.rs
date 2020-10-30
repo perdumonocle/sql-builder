@@ -164,9 +164,12 @@ pub mod bind;
 pub mod error;
 pub mod name;
 pub mod prelude;
+#[path = "where-builder.rs"]
+pub mod where_builder;
 
 pub use crate::error::SqlBuilderError;
 pub use crate::name::SqlName;
+//pub use crate::where::WhereBuilder;
 use anyhow::Result;
 
 /// Main SQL builder
