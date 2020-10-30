@@ -189,6 +189,7 @@ pub struct SqlBuilder {
     order_by: Vec<String>,
     limit: Option<String>,
     offset: Option<String>,
+    error: Option<SqlBuilderError>,
 }
 
 /// SQL query statement
@@ -242,6 +243,7 @@ impl SqlBuilder {
             order_by: Vec::new(),
             limit: None,
             offset: None,
+            error: None::<SqlBuilderError>,
         }
     }
 
@@ -1158,7 +1160,14 @@ impl SqlBuilder {
     /// # }
     /// ```
     pub fn and_where<S: ToString>(&mut self, cond: S) -> &mut Self {
-        self.wheres.push(cond.to_string());
+        // Checks
+        let cond = cond.to_string();
+        if cond.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereCond);
+        }
+
+        // Change
+        self.wheres.push(cond);
         self
     }
 
@@ -1185,9 +1194,20 @@ impl SqlBuilder {
         S: ToString,
         T: ToString,
     {
-        let mut cond = field.to_string();
+        // Checks
+        let field = field.to_string();
+        if field.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereField);
+        }
+        let value = value.to_string();
+        if value.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereValue(field));
+        }
+
+        // Change
+        let mut cond = field;
         cond.push_str(" = ");
-        cond.push_str(&value.to_string());
+        cond.push_str(&value);
         self.and_where(&cond)
     }
 
@@ -1214,9 +1234,20 @@ impl SqlBuilder {
         S: ToString,
         T: ToString,
     {
-        let mut cond = field.to_string();
+        // Checks
+        let field = field.to_string();
+        if field.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereField);
+        }
+        let value = value.to_string();
+        if value.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereValue(field));
+        }
+
+        // Change
+        let mut cond = field;
         cond.push_str(" <> ");
-        cond.push_str(&value.to_string());
+        cond.push_str(&value);
         self.and_where(&cond)
     }
 
@@ -1244,9 +1275,20 @@ impl SqlBuilder {
         S: ToString,
         T: ToString,
     {
-        let mut cond = field.to_string();
+        // Checks
+        let field = field.to_string();
+        if field.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereField);
+        }
+        let value = value.to_string();
+        if value.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereValue(field));
+        }
+
+        // Change
+        let mut cond = field;
         cond.push_str(" > ");
-        cond.push_str(&value.to_string());
+        cond.push_str(&value);
         self.and_where(&cond)
     }
 
@@ -1274,9 +1316,20 @@ impl SqlBuilder {
         S: ToString,
         T: ToString,
     {
-        let mut cond = field.to_string();
+        // Checks
+        let field = field.to_string();
+        if field.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereField);
+        }
+        let value = value.to_string();
+        if value.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereValue(field));
+        }
+
+        // Change
+        let mut cond = field;
         cond.push_str(" >= ");
-        cond.push_str(&value.to_string());
+        cond.push_str(&value);
         self.and_where(&cond)
     }
 
@@ -1304,9 +1357,20 @@ impl SqlBuilder {
         S: ToString,
         T: ToString,
     {
-        let mut cond = field.to_string();
+        // Checks
+        let field = field.to_string();
+        if field.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereField);
+        }
+        let value = value.to_string();
+        if value.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereValue(field));
+        }
+
+        // Change
+        let mut cond = field;
         cond.push_str(" < ");
-        cond.push_str(&value.to_string());
+        cond.push_str(&value);
         self.and_where(&cond)
     }
 
@@ -1334,9 +1398,20 @@ impl SqlBuilder {
         S: ToString,
         T: ToString,
     {
-        let mut cond = field.to_string();
+        // Checks
+        let field = field.to_string();
+        if field.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereField);
+        }
+        let value = value.to_string();
+        if value.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereValue(field));
+        }
+
+        // Change
+        let mut cond = field;
         cond.push_str(" <= ");
-        cond.push_str(&value.to_string());
+        cond.push_str(&value);
         self.and_where(&cond)
     }
 
@@ -1363,7 +1438,14 @@ impl SqlBuilder {
         S: ToString,
         T: ToString,
     {
-        let mut cond = field.to_string();
+        // Checks
+        let field = field.to_string();
+        if field.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereField);
+        }
+
+        // Change
+        let mut cond = field;
         cond.push_str(" LIKE '");
         cond.push_str(&esc(&mask.to_string()));
         cond.push('\'');
@@ -1393,7 +1475,14 @@ impl SqlBuilder {
         S: ToString,
         T: ToString,
     {
-        let mut cond = field.to_string();
+        // Checks
+        let field = field.to_string();
+        if field.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereField);
+        }
+
+        // Change
+        let mut cond = field;
         cond.push_str(" LIKE '%");
         cond.push_str(&esc(&mask.to_string()));
         cond.push('\'');
@@ -1423,7 +1512,14 @@ impl SqlBuilder {
         S: ToString,
         T: ToString,
     {
-        let mut cond = field.to_string();
+        // Checks
+        let field = field.to_string();
+        if field.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereField);
+        }
+
+        // Change
+        let mut cond = field;
         cond.push_str(" LIKE '");
         cond.push_str(&esc(&mask.to_string()));
         cond.push_str("%'");
@@ -1453,7 +1549,14 @@ impl SqlBuilder {
         S: ToString,
         T: ToString,
     {
-        let mut cond = field.to_string();
+        // Checks
+        let field = field.to_string();
+        if field.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereField);
+        }
+
+        // Change
+        let mut cond = field;
         cond.push_str(" LIKE '%");
         cond.push_str(&esc(&mask.to_string()));
         cond.push_str("%'");
@@ -1483,9 +1586,20 @@ impl SqlBuilder {
         S: ToString,
         T: ToString,
     {
-        let mut cond = field.to_string();
+        // Checks
+        let field = field.to_string();
+        if field.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereField);
+        }
+        let mask = mask.to_string();
+        if mask.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereValue(field));
+        }
+
+        // Change
+        let mut cond = field;
         cond.push_str(" NOT LIKE '");
-        cond.push_str(&esc(&mask.to_string()));
+        cond.push_str(&esc(&mask));
         cond.push('\'');
         self.and_where(&cond)
     }
@@ -1513,9 +1627,20 @@ impl SqlBuilder {
         S: ToString,
         T: ToString,
     {
-        let mut cond = field.to_string();
+        // Checks
+        let field = field.to_string();
+        if field.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereField);
+        }
+        let mask = mask.to_string();
+        if mask.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereValue(field));
+        }
+
+        // Change
+        let mut cond = field;
         cond.push_str(" NOT LIKE '%");
-        cond.push_str(&esc(&mask.to_string()));
+        cond.push_str(&esc(&mask));
         cond.push('\'');
         self.and_where(&cond)
     }
@@ -1543,9 +1668,20 @@ impl SqlBuilder {
         S: ToString,
         T: ToString,
     {
-        let mut cond = field.to_string();
+        // Checks
+        let field = field.to_string();
+        if field.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereField);
+        }
+        let mask = mask.to_string();
+        if mask.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereValue(field));
+        }
+
+        // Change
+        let mut cond = field;
         cond.push_str(" NOT LIKE '");
-        cond.push_str(&esc(&mask.to_string()));
+        cond.push_str(&esc(&mask));
         cond.push_str("%'");
         self.and_where(&cond)
     }
@@ -1573,9 +1709,20 @@ impl SqlBuilder {
         S: ToString,
         T: ToString,
     {
-        let mut cond = field.to_string();
+        // Checks
+        let field = field.to_string();
+        if field.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereField);
+        }
+        let mask = mask.to_string();
+        if mask.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereValue(field));
+        }
+
+        // Change
+        let mut cond = field;
         cond.push_str(" NOT LIKE '%");
-        cond.push_str(&esc(&mask.to_string()));
+        cond.push_str(&esc(&mask));
         cond.push_str("%'");
         self.and_where(&cond)
     }
@@ -1599,7 +1746,14 @@ impl SqlBuilder {
     /// # }
     /// ```
     pub fn and_where_is_null<S: ToString>(&mut self, field: S) -> &mut Self {
-        let mut cond = field.to_string();
+        // Checks
+        let field = field.to_string();
+        if field.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereField);
+        }
+
+        // Change
+        let mut cond = field;
         cond.push_str(" IS NULL");
         self.and_where(&cond)
     }
@@ -1623,7 +1777,14 @@ impl SqlBuilder {
     /// # }
     /// ```
     pub fn and_where_is_not_null<S: ToString>(&mut self, field: S) -> &mut Self {
-        let mut cond = field.to_string();
+        // Checks
+        let field = field.to_string();
+        if field.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereField);
+        }
+
+        // Change
+        let mut cond = field;
         cond.push_str(" IS NOT NULL");
         self.and_where(&cond)
     }
@@ -1652,13 +1813,23 @@ impl SqlBuilder {
         S: ToString,
         T: ToString,
     {
+        // Checks
+        let field = field.to_string();
+        if field.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereField);
+        }
+        if list.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereList(field));
+        }
+
+        // Change
         let list: Vec<String> = list
             .iter()
             .map(|v| (*v).to_string())
             .collect::<Vec<String>>();
         let list = list.join(", ");
 
-        let mut cond = field.to_string();
+        let mut cond = field;
         cond.push_str(" IN (");
         cond.push_str(&list);
         cond.push(')');
@@ -1689,13 +1860,23 @@ impl SqlBuilder {
         S: ToString,
         T: ToString,
     {
+        // Checks
+        let field = field.to_string();
+        if field.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereField);
+        }
+        if list.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereList(field));
+        }
+
+        // Change
         let list: Vec<String> = list
             .iter()
             .map(|v| quote((*v).to_string()))
             .collect::<Vec<String>>();
         let list = list.join(", ");
 
-        let mut cond = field.to_string();
+        let mut cond = field;
         cond.push_str(" IN (");
         cond.push_str(&list);
         cond.push(')');
@@ -1726,13 +1907,23 @@ impl SqlBuilder {
         S: ToString,
         T: ToString,
     {
+        // Checks
+        let field = field.to_string();
+        if field.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereField);
+        }
+        if list.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereList(field));
+        }
+
+        // Change
         let list: Vec<String> = list
             .iter()
             .map(|v| (*v).to_string())
             .collect::<Vec<String>>();
         let list = list.join(", ");
 
-        let mut cond = field.to_string();
+        let mut cond = field;
         cond.push_str(" NOT IN (");
         cond.push_str(&list);
         cond.push(')');
@@ -1763,13 +1954,23 @@ impl SqlBuilder {
         S: ToString,
         T: ToString,
     {
+        // Checks
+        let field = field.to_string();
+        if field.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereField);
+        }
+        if list.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereList(field));
+        }
+
+        // Change
         let list: Vec<String> = list
             .iter()
             .map(|v| quote((*v).to_string()))
             .collect::<Vec<String>>();
         let list = list.join(", ");
 
-        let mut cond = field.to_string();
+        let mut cond = field;
         cond.push_str(" NOT IN (");
         cond.push_str(&list);
         cond.push(')');
@@ -1807,9 +2008,20 @@ impl SqlBuilder {
         S: ToString,
         T: ToString,
     {
-        let mut cond = field.to_string();
+        // Checks
+        let field = field.to_string();
+        if field.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereField);
+        }
+        let query = query.to_string();
+        if query.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereQuery(field));
+        }
+
+        // Change
+        let mut cond = field;
         cond.push_str(" IN (");
-        cond.push_str(&query.to_string());
+        cond.push_str(&query);
         cond.push(')');
         self.and_where(&cond)
     }
@@ -1845,9 +2057,20 @@ impl SqlBuilder {
         S: ToString,
         T: ToString,
     {
-        let mut cond = field.to_string();
+        // Checks
+        let field = field.to_string();
+        if field.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereField);
+        }
+        let query = query.to_string();
+        if query.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereQuery(field));
+        }
+
+        // Change
+        let mut cond = field;
         cond.push_str(" NOT IN (");
-        cond.push_str(&query.to_string());
+        cond.push_str(&query);
         cond.push(')');
         self.and_where(&cond)
     }
@@ -1877,11 +2100,26 @@ impl SqlBuilder {
         T: ToString,
         U: ToString,
     {
-        let mut cond = field.to_string();
+        // Checks
+        let field = field.to_string();
+        if field.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereField);
+        }
+        let min = min.to_string();
+        if min.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereValue(field));
+        }
+        let max = max.to_string();
+        if max.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereValue(field));
+        }
+
+        // Change
+        let mut cond = field;
         cond.push_str(" BETWEEN ");
-        cond.push_str(&min.to_string());
+        cond.push_str(&min);
         cond.push_str(" AND ");
-        cond.push_str(&max.to_string());
+        cond.push_str(&max);
         self.and_where(&cond)
     }
 
@@ -1910,11 +2148,26 @@ impl SqlBuilder {
         T: ToString,
         U: ToString,
     {
-        let mut cond = field.to_string();
+        // Checks
+        let field = field.to_string();
+        if field.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereField);
+        }
+        let min = min.to_string();
+        if min.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereValue(field));
+        }
+        let max = max.to_string();
+        if max.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereValue(field));
+        }
+
+        // Change
+        let mut cond = field;
         cond.push_str(" NOT BETWEEN ");
-        cond.push_str(&min.to_string());
+        cond.push_str(&min);
         cond.push_str(" AND ");
-        cond.push_str(&max.to_string());
+        cond.push_str(&max);
         self.and_where(&cond)
     }
 
@@ -2925,6 +3178,18 @@ impl SqlBuilder {
         self
     }
 
+    /// Set error during build.
+    fn set_error(&mut self, err: &SqlBuilderError) -> &mut Self {
+        self.error = Some(err.clone());
+        self
+    }
+
+    /// Clean error code.
+    pub fn drop_error(&mut self) -> &mut Self {
+        self.error = None;
+        self
+    }
+
     /// Build complete SQL command.
     ///
     /// ```
@@ -2939,6 +3204,9 @@ impl SqlBuilder {
     /// # }
     /// ```
     pub fn sql(&self) -> Result<String> {
+        if let Some(err) = &self.error {
+            return Err(err.clone().into());
+        }
         match self.statement {
             Statement::SelectFrom => self.sql_select(),
             Statement::SelectValues => self.sql_select_values(),
@@ -3063,6 +3331,10 @@ impl SqlBuilder {
     /// # }
     /// ```
     pub fn query(&self) -> Result<String> {
+        if let Some(err) = &self.error {
+            return Err(err.clone().into());
+        }
+
         // Distinct results
         let distinct = if self.distinct { " DISTINCT" } else { "" };
 
@@ -3145,6 +3417,11 @@ impl SqlBuilder {
     /// # }
     /// ```
     pub fn query_values(&self) -> Result<String> {
+        // Checks
+        if let Some(err) = &self.error {
+            return Err(err.clone().into());
+        }
+
         // Make values
         let fields = self.fields.join(", ");
 
@@ -3156,6 +3433,9 @@ impl SqlBuilder {
     /// Build SQL command for INSERT statement
     fn sql_insert(&self) -> Result<String> {
         // Checks
+        if let Some(err) = &self.error {
+            return Err(err.clone().into());
+        }
         if self.table.is_empty() {
             return Err(SqlBuilderError::NoTableName.into());
         }
@@ -3207,6 +3487,9 @@ impl SqlBuilder {
     /// Build SQL command for UPDATE statement
     fn sql_update(&self) -> Result<String> {
         // Checks
+        if let Some(err) = &self.error {
+            return Err(err.clone().into());
+        }
         if self.table.is_empty() {
             return Err(SqlBuilderError::NoTableName.into());
         }
@@ -3241,6 +3524,9 @@ impl SqlBuilder {
     /// Build SQL command for DELETE statement
     fn sql_delete(&self) -> Result<String> {
         // Checks
+        if let Some(err) = &self.error {
+            return Err(err.clone().into());
+        }
         if self.table.is_empty() {
             return Err(SqlBuilderError::NoTableName.into());
         }
@@ -3876,6 +4162,44 @@ mod tests {
             &sql,
             "SELECT b.title, s.total FROM books AS b LEFT OUTER JOIN shops AS s ON b.id = s.book;"
         );
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_drop_error() -> Result<()> {
+        let sql = SqlBuilder::select_from("books")
+            .and_where("")
+            .drop_error()
+            .sql()?;
+
+        assert_eq!(&sql, "SELECT * FROM books;");
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_empty_where() -> Result<()> {
+        let res = SqlBuilder::select_from("books").and_where("").sql();
+        if let Err(err) = res {
+            assert_eq!(&err.to_string(), "WHERE condition is empty");
+        } else {
+            panic!("Error checking does not works");
+        }
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_empty_where_eq() -> Result<()> {
+        let res = SqlBuilder::select_from("books")
+            .and_where_eq("", "aaa")
+            .sql();
+        if let Err(err) = res {
+            assert_eq!(&err.to_string(), "WHERE field not defined");
+        } else {
+            panic!("Error checking does not works");
+        }
 
         Ok(())
     }
