@@ -7,7 +7,7 @@ use sql_builder::prelude::*;
 #[bench]
 fn join_select_string(bencher: &mut test::Bencher) {
     bencher.iter(|| {
-        "SELECT books.title, shops.total FROM books JOIN shops ON books.id = shops.book;"
+        "SELECT books.title, shops.total FROM books INNER JOIN shops ON books.id = shops.book;"
             .to_string();
     });
 }
