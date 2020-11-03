@@ -7,9 +7,9 @@ use sql_builder::prelude::*;
 #[bench]
 fn insert_string_format(bencher: &mut test::Bencher) {
     bencher.iter(|| {
-			for i in 1..100 {
+            for i in 1..100 {
                 format!("INSERT INTO books (title, price) VALUES ('In Search of Lost Time', {}), ('Don Quixote', 200);", test::black_box(i));
-			}
+            }
     });
 }
 
