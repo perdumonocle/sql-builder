@@ -1,3 +1,6 @@
+use crate::error::SqlBuilderError;
+use std::fmt;
+
 #[macro_export]
 macro_rules! and {
     ( $f:expr, $( $l:expr ),* ) => {
@@ -37,6 +40,53 @@ macro_rules! not {
     }};
 }
 
+/// Build WHERE for SQL.
+#[derive(Clone, Default)]
+struct Where {
+    text: String,
+    prefix: Option<String>,
+    error: Option<SqlBuilderError>,
+}
+
+impl fmt::Display for Where {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.text)
+    }
+}
+
+impl Where {
+    fn new<S>(smth: S) -> Self
+    where
+        S: ToString,
+    {
+        Self {
+            text: smth.to_string(),
+            ..Self::default()
+        }
+    }
+
+    fn eq<S>(&mut self, smth: S) -> &mut Self
+    where
+        S: ToString,
+    {
+        if let Some(prefix) = &self.prefix {
+            self.text.push(' ');
+            self.text.push_str(&prefix);
+            self.prefix = None;
+        }
+        self.text.push_str(" = ");
+        self.text.push_str(&smth.to_string());
+        self
+    }
+
+    fn build(&self) -> Result<String, SqlBuilderError> {
+        match &self.error {
+            Some(err) => Err(err.clone()),
+            None => Ok(self.text.to_string()),
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -64,8 +114,22 @@ mod tests {
         let sql = and!("10", or!("20", not!("30"), "40"));
         assert_eq!("(10) AND (20 OR NOT 30 OR 40)", &sql);
     }
-}
 
-// /// Build WHERE for SQL.
-// struct WhereBulder {
-// }
+    #[test]
+    fn test_new_where() {
+        let text = Where::new("abc").to_string();
+        assert_eq!("abc", &text);
+    }
+
+    #[test]
+    fn test_where_eq() {
+        let text = Where::new("abc").eq(10).to_string();
+        assert_eq!("abc = 10", &text);
+    }
+
+    #[test]
+    fn test_where_build() {
+        let res = Where::new("abc").eq(10).build();
+        assert_eq!(Ok("abc = 10".to_string()), res);
+    }
+}
