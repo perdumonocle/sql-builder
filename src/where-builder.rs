@@ -42,7 +42,7 @@ macro_rules! not {
 
 /// Build WHERE for SQL.
 #[derive(Clone, Default)]
-struct Where {
+pub struct Where {
     text: String,
     prefix: Option<String>,
     error: Option<SqlBuilderError>,
@@ -55,31 +55,120 @@ impl fmt::Display for Where {
 }
 
 impl Where {
-    fn new<S>(smth: S) -> Self
+    pub fn new<S>(smth: S) -> Self
     where
         S: ToString,
     {
+        // Checks
+        let text = smth.to_string();
+        if text.is_empty() {
+            return Self {
+                error: Some(SqlBuilderError::NoWhereField),
+                ..Self::default()
+            };
+        }
+
+        // Create
         Self {
-            text: smth.to_string(),
+            text,
             ..Self::default()
         }
     }
 
-    fn eq<S>(&mut self, smth: S) -> &mut Self
+    pub fn empty() -> Self {
+        Self::default()
+    }
+
+    pub fn in_brackets(&mut self) -> &mut Self {
+        // Checks
+        if self.text.is_empty() {
+            self.error = Some(SqlBuilderError::NoWhereField);
+            return self;
+        }
+
+        // Change
+        self.text.insert(0, '(');
+        self.text.push(')');
+        self
+    }
+
+    pub fn not(&mut self) -> &mut Self {
+        // Checks
+        if self.text.is_empty() {
+            self.error = Some(SqlBuilderError::NoWhereField);
+            return self;
+        }
+
+        // Change
+        self.text.insert_str(0, "NOT ");
+        self
+    }
+
+    pub fn and<S>(&mut self, smth: S) -> &mut Self
     where
         S: ToString,
     {
+        // Checks
+        if self.text.is_empty() {
+            self.error = Some(SqlBuilderError::NoWhereField);
+            return self;
+        }
+        let smth = smth.to_string();
+        if smth.is_empty() {
+            self.error = Some(SqlBuilderError::NoWhereValue(self.text.clone()));
+            return self;
+        }
+
+        // Change
+        self.text.push_str(" AND ");
+        self.text.push_str(&smth);
+        self
+    }
+
+    pub fn or<S>(&mut self, smth: S) -> &mut Self
+    where
+        S: ToString,
+    {
+        // Checks
+        if self.text.is_empty() {
+            self.error = Some(SqlBuilderError::NoWhereField);
+            return self;
+        }
+        let smth = smth.to_string();
+        if smth.is_empty() {
+            self.error = Some(SqlBuilderError::NoWhereValue(self.text.clone()));
+            return self;
+        }
+
+        // Change
+        self.text.push_str(" OR ");
+        self.text.push_str(&smth);
+        self
+    }
+
+    pub fn eq<S>(&mut self, smth: S) -> &mut Self
+    where
+        S: ToString,
+    {
+        // Checks
+        let smth = smth.to_string();
+        if smth.is_empty() {
+            self.error = Some(SqlBuilderError::NoWhereValue(self.text.clone()));
+            return self;
+        }
+
+        // Change
         if let Some(prefix) = &self.prefix {
             self.text.push(' ');
             self.text.push_str(&prefix);
             self.prefix = None;
         }
         self.text.push_str(" = ");
-        self.text.push_str(&smth.to_string());
+        self.text.push_str(&smth);
         self
     }
 
-    fn build(&self) -> Result<String, SqlBuilderError> {
+    pub fn build(&self) -> Result<String, SqlBuilderError> {
         match &self.error {
             Some(err) => Err(err.clone()),
             None => Ok(self.text.to_string()),
@@ -128,8 +217,32 @@ mod tests {
     }
 
     #[test]
+    fn test_where_brackets() {
+        let text = Where::new("abc").eq(10).in_brackets().to_string();
+        assert_eq!("(abc = 10)", &text);
+    }
+
+    #[test]
     fn test_where_build() {
         let res = Where::new("abc").eq(10).build();
         assert_eq!(Ok("abc = 10".to_string()), res);
+    }
+
+    #[test]
+    fn test_where_not() {
+        let text = Where::new("abc").eq(10).in_brackets().not().to_string();
+        assert_eq!("NOT (abc = 10)", &text);
+    }
+
+    #[test]
+    fn test_where_and() {
+        let text = Where::new("abc").eq(10).and(20).to_string();
+        assert_eq!("abc = 10 AND 20", &text);
+    }
+
+    #[test]
+    fn test_where_or() {
+        let text = Where::new("abc").eq(10).or(20).to_string();
+        assert_eq!("abc = 10 OR 20", &text);
     }
 }
