@@ -40,6 +40,30 @@ macro_rules! not {
     }};
 }
 
+#[macro_export]
+macro_rules! brackets {
+    ( $el:expr ) => {
+        {
+            let mut x = String::from("(");
+            x.push_str( & $el .to_string() );
+            x.push(')');
+            x
+        }
+    };
+    ( $first:expr, $( $el:expr ),* ) => {
+        {
+            let mut x = String::from("(");
+            x.push_str( & $first .to_string() );
+            $(
+                x.push_str(", ");
+                x.push_str( & $el .to_string() );
+            )*
+            x.push(')');
+            x
+        }
+    };
+}
+
 /// Build WHERE for SQL.
 #[derive(Clone, Default)]
 pub struct Where {
@@ -196,6 +220,15 @@ mod tests {
     fn test_macro_not() {
         let sql = not!("10");
         assert_eq!("NOT 10", sql);
+    }
+
+    #[test]
+    fn test_macro_brackets() {
+        let sql = brackets!("10", "20", "30");
+        assert_eq!("(10, 20, 30)", sql);
+
+        let sql = brackets!("10");
+        assert_eq!("(10)", sql);
     }
 
     #[test]
