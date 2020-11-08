@@ -70,6 +70,7 @@ pub struct Where {
     text: String,
     prefix: Option<String>,
     error: Option<SqlBuilderError>,
+    was_and: bool,
 }
 
 impl fmt::Display for Where {
@@ -144,8 +145,14 @@ impl Where {
         }
 
         // Change
-        self.text.push_str(" AND ");
+        if !self.was_and {
+            self.text.insert(0, '(');
+            self.text.push(')');
+            self.was_and = true;
+        }
+        self.text.push_str(" AND (");
         self.text.push_str(&smth);
+        self.text.push(')');
         self
     }
 
@@ -188,6 +195,28 @@ impl Where {
             self.prefix = None;
         }
         self.text.push_str(" = ");
+        self.text.push_str(&smth);
+        self
+    }
+
+    pub fn ne<S>(&mut self, smth: S) -> &mut Self
+    where
+        S: ToString,
+    {
+        // Checks
+        let smth = smth.to_string();
+        if smth.is_empty() {
+            self.error = Some(SqlBuilderError::NoWhereValue(self.text.clone()));
+            return self;
+        }
+
+        // Change
+        if let Some(prefix) = &self.prefix {
+            self.text.push(' ');
+            self.text.push_str(&prefix);
+            self.prefix = None;
+        }
+        self.text.push_str(" <> ");
         self.text.push_str(&smth);
         self
     }
@@ -244,12 +273,6 @@ mod tests {
     }
 
     #[test]
-    fn test_where_eq() {
-        let text = Where::new("abc").eq(10).to_string();
-        assert_eq!("abc = 10", &text);
-    }
-
-    #[test]
     fn test_where_brackets() {
         let text = Where::new("abc").eq(10).in_brackets().to_string();
         assert_eq!("(abc = 10)", &text);
@@ -270,12 +293,24 @@ mod tests {
     #[test]
     fn test_where_and() {
         let text = Where::new("abc").eq(10).and(20).to_string();
-        assert_eq!("abc = 10 AND 20", &text);
+        assert_eq!("(abc = 10) AND (20)", &text);
     }
 
     #[test]
     fn test_where_or() {
         let text = Where::new("abc").eq(10).or(20).to_string();
         assert_eq!("abc = 10 OR 20", &text);
+    }
+
+    #[test]
+    fn test_where_eq() {
+        let text = Where::new("abc").eq(10).to_string();
+        assert_eq!("abc = 10", &text);
+    }
+
+    #[test]
+    fn test_where_ne() {
+        let text = Where::new("abc").ne(10).to_string();
+        assert_eq!("abc <> 10", &text);
     }
 }
