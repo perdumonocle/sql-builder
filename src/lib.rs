@@ -2174,6 +2174,88 @@ impl SqlBuilder {
         self.and_where(&cond)
     }
 
+    /// Add WHERE field REGEXP values.
+    ///
+    /// ```
+    /// # use anyhow::Result;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<()> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("title")
+    ///     .field("price")
+    ///     .and_where_regexp("title", ".* (Philosopher|Sorcerer)'s Stone")
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title, price FROM books WHERE title REGEXP '.* (Philosopher|Sorcerer)''s Stone';", &sql);
+    /// // add                                           ^^^^^         ^^^^^^
+    /// // here                                          field         regexp
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn and_where_regexp<S, T>(&mut self, field: S, regexp: T) -> &mut Self
+    where
+        S: ToString,
+        T: ToString,
+    {
+        // Checks
+        let field = field.to_string();
+        if field.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereField);
+        }
+        let regexp = regexp.to_string();
+        if regexp.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereValue(field));
+        }
+
+        // Change
+        let mut cond = field;
+        cond.push_str(" REGEXP ");
+        cond.push_str(&quote(regexp));
+        self.and_where(&cond)
+    }
+
+    /// Add WHERE field NOT REGEXP values.
+    ///
+    /// ```
+    /// # use anyhow::Result;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<()> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("title")
+    ///     .field("price")
+    ///     .and_where_not_regexp("title", ".* and the [a-zA-Z]+ of [a-zA-Z]+")
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title, price FROM books WHERE title NOT REGEXP '.* and the [a-zA-Z]+ of [a-zA-Z]+';", &sql);
+    /// // add                                           ^^^^^             ^^^^^^
+    /// // here                                          field             regexp
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn and_where_not_regexp<S, T>(&mut self, field: S, regexp: T) -> &mut Self
+    where
+        S: ToString,
+        T: ToString,
+    {
+        // Checks
+        let field = field.to_string();
+        if field.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereField);
+        }
+        let regexp = regexp.to_string();
+        if regexp.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereValue(field));
+        }
+
+        // Change
+        let mut cond = field;
+        cond.push_str(" NOT REGEXP ");
+        cond.push_str(&quote(regexp));
+        self.and_where(&cond)
+    }
+
     /// Add OR condition to the last WHERE condition.
     ///
     /// ```
@@ -3235,6 +3317,91 @@ impl SqlBuilder {
         self.or_where(&cond)
     }
 
+    /// Add OR field REGEXP values to the last WHERE condition.
+    ///
+    /// ```
+    /// # use anyhow::Result;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<()> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("title")
+    ///     .field("price")
+    ///     .or_where_regexp("title", ".* (Philosopher|Sorcerer)'s Stone")
+    ///     .or_where_regexp("title", ".* and the [a-zA-Z]+ of [a-zA-Z]+")
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title, price FROM books WHERE title REGEXP '.* (Philosopher|Sorcerer)''s Stone' OR title REGEXP '.* and the [a-zA-Z]+ of [a-zA-Z]+';", &sql);
+    /// // add                                           ^^^^^         ^^^^^^                                ^^^^^         ^^^^^^
+    /// // here                                          field         regexp                                field         regexp
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn or_where_regexp<S, T>(&mut self, field: S, regexp: T) -> &mut Self
+
+    where
+        S: ToString,
+        T: ToString,
+    {
+        // Checks
+        let field = field.to_string();
+        if field.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereField);
+        }
+        let regexp = regexp.to_string();
+        if regexp.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereValue(field));
+        }
+
+        // Change
+        let mut cond = field;
+        cond.push_str(" REGEXP ");
+        cond.push_str(&quote(regexp));
+        self.or_where(&cond)
+    }
+
+    /// Add OR field NOT REGEXP values to the last WHERE condition.
+    ///
+    /// ```
+    /// # use anyhow::Result;
+    /// use sql_builder::SqlBuilder;
+    ///
+    /// # fn main() -> Result<()> {
+    /// let sql = SqlBuilder::select_from("books")
+    ///     .field("title")
+    ///     .field("price")
+    ///     .or_where_between("price", 8, 20)
+    ///     .or_where_not_regexp("title", ".* and the [a-zA-Z]+ of [a-zA-Z]+")
+    ///     .sql()?;
+    ///
+    /// assert_eq!("SELECT title, price FROM books WHERE price BETWEEN 8 AND 20 OR title NOT REGEXP '.* and the [a-zA-Z]+ of [a-zA-Z]+';", &sql);
+    /// // add                                                                     ^^^^^             ^^^^^^
+    /// // here                                                                    field             regexp
+    /// # Ok(())
+    /// # }
+    /// ```
+    pub fn or_where_not_regexp<S, T>(&mut self, field: S, regexp: T) -> &mut Self
+    where
+        S: ToString,
+        T: ToString,
+    {
+        // Checks
+        let field = field.to_string();
+        if field.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereField);
+        }
+        let regexp = regexp.to_string();
+        if regexp.is_empty() {
+            return self.set_error(&SqlBuilderError::NoWhereValue(field));
+        }
+
+        // Change
+        let mut cond = field;
+        cond.push_str(" NOT REGEXP ");
+        cond.push_str(&quote(regexp));
+        self.or_where(&cond)
+    }
+
     /// Union query with subquery.
     /// ORDER BY must be in the last subquery.
     ///
@@ -3269,7 +3436,6 @@ impl SqlBuilder {
         self.unions.push_str(&append);
         self
     }
-
     /// Union query with all subquery.
     /// ORDER BY must be in the last subquery.
     ///
@@ -4181,6 +4347,38 @@ mod tests {
 
         assert_eq!(
             "SELECT title FROM books WHERE title NOT LIKE '%Alice''s%';",
+            &sql
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_find_books_by_title_regex() -> Result<()> {
+        let sql = SqlBuilder::select_from("books")
+            .field("title")
+            .and_where_regexp("title", r"The .*")
+            .and_where_not_regexp("title", r"[a-zA-Z]+ of [a-zA-Z]+")
+            .sql()?;
+
+        assert_eq!(
+            "SELECT title FROM books WHERE (title REGEXP 'The .*') AND (title NOT REGEXP '[a-zA-Z]+ of [a-zA-Z]+');",
+            &sql
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_find_books_by_title_not_regex() -> Result<()> {
+        let sql = SqlBuilder::select_from("books")
+            .field("title")
+            .or_where_regexp("title", r".* 1\.0 .*")
+            .or_where_not_regexp("title", r"The .*")
+            .sql()?;
+
+        assert_eq!(
+            "SELECT title FROM books WHERE title REGEXP '.* 1\\.0 .*' OR title NOT REGEXP 'The .*';",
             &sql
         );
 
